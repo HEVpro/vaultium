@@ -19,7 +19,7 @@ const config = {
         },
         extend: {
             fontFamily: {
-                varela: ['var(--font-varela-round)'],
+                nunito: ['var(--font-nunito)'],
             },
             colors: {
                 border: 'hsl(var(--border))',
