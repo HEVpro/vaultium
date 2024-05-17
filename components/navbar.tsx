@@ -42,7 +42,7 @@ const Navbar = () => {
                 {navbarLinks.map((link) => (
                     <Link key={link.href} href={link.href}>
                         <Button
-                            className={cn('font-varela text-lg tracking-wider')}
+                            className={cn('font-nunito text-lg tracking-wider')}
                             variant={'link'}
                         >
                             {link.name}
