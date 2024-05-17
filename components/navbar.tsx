@@ -8,6 +8,13 @@ import Link from 'next/link'
 import { usePrivy } from '@privy-io/react-auth'
 import { toast } from './ui/use-toast'
 import { LogOutIcon } from 'lucide-react'
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from "@/components/ui/tooltip"
+
 
 const navbarLinks = [
     {
@@ -50,31 +57,56 @@ const Navbar = () => {
                     </Link>
                 ))}
             </div>
-            <Button
-                disabled={disableLogin}
-                onClick={login}
-                className='bg-gradient rounded-full px-4 py-1.5 text-foreground transition duration-500 hover:scale-105 active:scale-90'
-            >
-                Login
-            </Button>
-            <Button 
-                onClick={async () => {
-                    try {
-                        await logout()
-                        toast({
-                            title: 'Logged out',
-                            description: '👋 We hope see you soon!',
-                            duration: 1500,
-                            className: 'bg-gradient text-foreground text-xl',
-                        })
-                    } catch (e) {
-                        console.info(e)
-                    }
-                }}
-                className='bg-transparent rounded-full px-2 py-1.5 text-foreground transition duration-500 hover:scale-105 active:scale-90'
-            >
-                <LogOutIcon className='w-6 h-6 stroke-white' />
-            </Button>
+            <div className={"flex items-center gap-4"}>
+                {!authenticated ? (
+                    <Button
+                        onClick={login}
+                        className='bg-gradient rounded-full  px-4 py-1.5 text-foreground transition duration-500 hover:scale-105 active:scale-90 disabled:opacity-100 truncate'
+                    >
+                        Login
+                    </Button>
+                ) : (
+                    <TooltipProvider>
+                        <Tooltip>
+                            <TooltipTrigger className='bg-gradient rounded-full  px-4 py-1.5 text-foreground transition duration-500 cursor-default'
+                            >{user?.wallet?.address.slice(0, 10)}...</TooltipTrigger>
+                            <TooltipContent>
+                                <p>{user?.wallet?.address}</p>
+                            </TooltipContent>
+                        </Tooltip>
+                    </TooltipProvider>
+                )}
+
+                {authenticated &&
+                    <TooltipProvider>
+                        <Tooltip>
+                            <TooltipTrigger>
+                                <Button
+                                    onClick={async () => {
+                                        try {
+                                            await logout()
+                                            toast({
+                                                title: 'Logged out',
+                                                description: '👋 We hope see you soon!',
+                                                duration: 1500,
+                                                className: 'bg-gradient text-foreground text-xl',
+                                            })
+                                        } catch (e) {
+                                            console.info(e)
+                                        }
+                                    }}
+                                    className='bg-transparent rounded-full px-2 py-1.5 text-foreground transition duration-500 active:scale-90 hover:bg-transparent'
+                                >
+                                    <LogOutIcon className='w-6 h-6 stroke-white hover:stroke-primary hover:scale-105 ' />
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p>Logout</p>
+                            </TooltipContent>
+                        </Tooltip>
+                    </TooltipProvider>
+                }
+            </div>
         </nav>
     )
 }
