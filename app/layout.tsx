@@ -8,7 +8,7 @@ import Providers from '@/components/providers'
 import { Toaster } from '@/components/ui/toaster'
 
 const varela = Varela_Round({
-    weight: '400',
+    weight: ['400'],
     subsets: ['latin'],
     display: 'swap',
     variable: '--font-varela-round',
