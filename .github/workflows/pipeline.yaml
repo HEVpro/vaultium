@@ -41,7 +41,6 @@ jobs:
         runs-on: ubuntu-20.04
         env:
           NEXT_PUBLIC_PRIVY_ID: ${{ secrets.NEXT_PUBLIC_PRIVY_ID }}
-
         steps:
             - name: Checkout to last commit
               uses: actions/checkout@v4
