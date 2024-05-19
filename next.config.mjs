@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    exportTrailingSlash: true,
+    trailingSlash: true,
 }
 
 export default nextConfig
