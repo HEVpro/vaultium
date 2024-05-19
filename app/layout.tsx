@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { Varela_Round } from 'next/font/google'
+import { Nunito } from 'next/font/google'
 import './globals.css'
 import { cn } from '@/lib/utils'
 import Image from 'next/image'
@@ -7,11 +7,11 @@ import Navbar from '@/components/navbar'
 import Providers from '@/components/providers'
 import { Toaster } from '@/components/ui/toaster'
 
-const varela = Varela_Round({
-    weight: '400',
+const nunito = Nunito({
+    weight: ['200', '400', '700', '900'],
     subsets: ['latin'],
     display: 'swap',
-    variable: '--font-varela-round',
+    variable: '--font-nunito',
 })
 
 export const metadata: Metadata = {
@@ -26,7 +26,7 @@ export default function RootLayout({
 }>) {
     return (
         <html lang='en' className='scroll-smooth'>
-            <body className={cn(varela.variable, 'font-varela bg-foreground')}>
+            <body className={cn(nunito.variable, 'bg-foreground font-nunito')}>
                 <Providers>
                     <main className='mx-auto flex min-h-screen max-w-5xl flex-col items-center justify-between pt-24'>
                         <Navbar />
