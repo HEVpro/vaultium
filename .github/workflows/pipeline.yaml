@@ -22,9 +22,6 @@ jobs:
 
   lint:
     runs-on: ubuntu-20.04
-    defaults:
-      run:
-        working-directory: ./platform
     steps:
       - name: Checkout to last commit
         uses: actions/checkout@v4
