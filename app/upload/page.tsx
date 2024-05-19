@@ -116,7 +116,7 @@ export default function Page() {
                     <h2 className='text-3xl font-semibold text-primary'>
                         Complete the game info
                     </h2>
-                    <div className='w-full mt-4 '>
+                    <div className='mt-4 w-full '>
                         <Form {...form}>
                             <form
                                 onSubmit={form.handleSubmit(onSubmit)}
@@ -264,7 +264,7 @@ export default function Page() {
                                         </FormItem>
                                     )}
                                 />
-                                <div className='col-span-full flex items-center justify-end mt-4'>
+                                <div className='col-span-full mt-4 flex items-center justify-end'>
                                     <Button type='submit'>Submit</Button>
                                 </div>
                             </form>

@@ -81,6 +81,6 @@ input[type='number'] {
         @apply bg-background text-foreground;
     }
     .bg-gradient {
-        @apply from-special bg-gradient-to-r  to-primary;
+        @apply bg-gradient-to-r from-special  to-primary;
     }
 }

@@ -13,8 +13,7 @@ import {
     TooltipContent,
     TooltipProvider,
     TooltipTrigger,
-} from "@/components/ui/tooltip"
-
+} from '@/components/ui/tooltip'
 
 const navbarLinks = [
     {
@@ -57,19 +56,20 @@ const Navbar = () => {
                     </Link>
                 ))}
             </div>
-            <div className={"flex items-center gap-4"}>
+            <div className={'flex items-center gap-4'}>
                 {!authenticated ? (
                     <Button
                         onClick={login}
-                        className='bg-gradient rounded-full  px-4 py-1.5 text-foreground transition duration-500 hover:scale-105 active:scale-90 disabled:opacity-100 truncate'
+                        className='bg-gradient truncate  rounded-full px-4 py-1.5 text-foreground transition duration-500 hover:scale-105 active:scale-90 disabled:opacity-100'
                     >
                         Login
                     </Button>
                 ) : (
                     <TooltipProvider>
                         <Tooltip>
-                            <TooltipTrigger className='bg-gradient rounded-full  px-4 py-1.5 text-foreground transition duration-500 cursor-default'
-                            >{user?.wallet?.address.slice(0, 10)}...</TooltipTrigger>
+                            <TooltipTrigger className='bg-gradient cursor-default  rounded-full px-4 py-1.5 text-foreground transition duration-500'>
+                                {user?.wallet?.address.slice(0, 10)}...
+                            </TooltipTrigger>
                             <TooltipContent>
                                 <p>{user?.wallet?.address}</p>
                             </TooltipContent>
@@ -77,7 +77,7 @@ const Navbar = () => {
                     </TooltipProvider>
                 )}
 
-                {authenticated &&
+                {authenticated && (
                     <TooltipProvider>
                         <Tooltip>
                             <TooltipTrigger>
@@ -87,17 +87,19 @@ const Navbar = () => {
                                             await logout()
                                             toast({
                                                 title: 'Logged out',
-                                                description: '👋 We hope see you soon!',
+                                                description:
+                                                    '👋 We hope see you soon!',
                                                 duration: 1500,
-                                                className: 'bg-gradient text-foreground text-xl',
+                                                className:
+                                                    'bg-gradient text-foreground text-xl',
                                             })
                                         } catch (e) {
                                             console.info(e)
                                         }
                                     }}
-                                    className='bg-transparent rounded-full px-2 py-1.5 text-foreground transition duration-500 active:scale-90 hover:bg-transparent'
+                                    className='rounded-full bg-transparent px-2 py-1.5 text-foreground transition duration-500 hover:bg-transparent active:scale-90'
                                 >
-                                    <LogOutIcon className='w-6 h-6 stroke-white hover:stroke-primary hover:scale-105 ' />
+                                    <LogOutIcon className='h-6 w-6 stroke-white hover:scale-105 hover:stroke-primary ' />
                                 </Button>
                             </TooltipTrigger>
                             <TooltipContent>
@@ -105,7 +107,7 @@ const Navbar = () => {
                             </TooltipContent>
                         </Tooltip>
                     </TooltipProvider>
-                }
+                )}
             </div>
         </nav>
     )

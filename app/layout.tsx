@@ -26,7 +26,7 @@ export default function RootLayout({
 }>) {
     return (
         <html lang='en' className='scroll-smooth'>
-            <body className={cn(nunito.variable, 'font-nunito bg-foreground')}>
+            <body className={cn(nunito.variable, 'bg-foreground font-nunito')}>
                 <Providers>
                     <main className='mx-auto flex min-h-screen max-w-5xl flex-col items-center justify-between pt-24'>
                         <Navbar />
