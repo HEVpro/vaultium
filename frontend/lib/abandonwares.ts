@@ -5,6 +5,7 @@ export const abandonwares = [
         platform: 'Commodore 64',
         releasedIn: 'United States',
         genre: 'Educational',
+        publisher: 'Publisher',
         theme: ['Arcade', 'Pre-school', 'Real-time'],
     },
     {
@@ -13,6 +14,7 @@ export const abandonwares = [
         platform: 'DOS',
         releasedIn: 'United States',
         genre: 'Simulation',
+        publisher: 'Publisher',
         theme: [
             'Flight',
             ' Historical Battle',
@@ -26,6 +28,7 @@ export const abandonwares = [
         platform: 'Commodore 64',
         releasedIn: 'United States',
         genre: 'Puzzle',
+        publisher: 'Publisher',
         theme: ['Mini-Games', 'Real-Time'],
     },
     {
@@ -34,6 +37,7 @@ export const abandonwares = [
         platform: 'Windows 3.x',
         releasedIn: 'United States',
         genre: 'Simulation',
+        publisher: 'Publisher',
         theme: ['Health', 'Science'],
     },
     {
@@ -42,13 +46,13 @@ export const abandonwares = [
         platform: 'Windows',
         releasedIn: 'Germany',
         genre: 'Driving',
+        publisher: 'Publisher',
         theme: [
             'Arcade',
             'Automobile',
             'Combat Vehicules',
-            'Sci-Fi / Futuristic',
+            'Futuristic',
             'Shooter',
-            'Track Racing',
             'Vehicle Simulator',
         ],
     },
