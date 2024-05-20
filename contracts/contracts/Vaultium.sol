@@ -49,8 +49,8 @@ contract Vaultium {
         Challenge[] challenge;
     } 
 
-    mapping(bytes32 => GameInfo) public games;
-    mapping(bytes32 => Challenge) public challenges; // REVIEW IF NAMING OK
+    mapping(bytes32 => GameInfo) public game;
+    mapping(bytes32 => Challenge) public challenge;
 
     function getGameHash(string memory name, uint16 year, string memory publisher) private pure returns (bytes32) {
         return keccak256(abi.encodePacked(name, year, publisher));
@@ -59,11 +59,11 @@ contract Vaultium {
     // TODO: Maybe change function name? It is not only searching but inserting if not found
     function searchAbandonware(string memory name, string memory description, string memory publisher, uint16 year) public returns (GameInfo memory) { 
         bytes32 gameHash = getGameHash(name, year, publisher);
-        GameInfo memory game = games[gameHash];
-        if (game.year == 0) {
-            games[gameHash] = GameInfo(name, year, publisher, description, true); // TODO: Check if it is abandonware
+        GameInfo memory searchedGame = game[gameHash];
+        if (searchedGame.year == 0) {
+            game[gameHash] = GameInfo(name, year, publisher, description, true); // TODO: Check if it is abandonware
         }
-        return games[gameHash];
+        return game[gameHash];
     }
 
 }
