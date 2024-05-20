@@ -34,8 +34,8 @@ const Searcher = () => {
                 />
             </div>
             <div className="grid grid-cols-3 gap-8">
-                {filteredList().map((item) => (
-                    <div className=" group w-full h-full p-6 text-white mx-auto space-y-4 rounded-md transition duration-300 border border-transparent hover:border-primary">
+                {filteredList().map((item, idx) => (
+                    <div key={idx} className=" group w-full h-full p-6 text-white mx-auto space-y-4 rounded-md transition duration-300 border border-transparent hover:border-primary">
                         <div className="w-30 h-30 mx-auto rounded-full border border-primary border-white bg-[#ee96f5]">
                             <img src="./vaultium-logo.png" />
                         </div>
