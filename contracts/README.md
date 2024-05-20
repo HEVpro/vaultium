@@ -63,7 +63,8 @@ npx hardhat ignition deploy ./ignition/modules/Lock.ts
 - GameVersionHistory
     - version                   : GameVersion[]
 
-- GameChallengeHistory          : Challenge[]
+- GameChallengeHistory           
+    - challenge                 : Challenge[]
 
 ## Contract's data
 
