@@ -46,8 +46,8 @@ contract Vaultium {
     }
 
     struct GameChallengeHistory {
-        Challenge[] challenges;
-    }  // REVIEW IF OK
+        Challenge[] challenge;
+    } 
 
     mapping(bytes32 => GameInfo) public games;
     mapping(bytes32 => Challenge) public challenges; // REVIEW IF NAMING OK
