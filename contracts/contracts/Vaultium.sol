@@ -8,6 +8,7 @@ contract Vaultium {
         string publisher;
         string ipfsCid;
         bool isAbandonware;
+        string description;
     }
 
     struct VoteInfo {
@@ -118,7 +119,7 @@ contract Vaultium {
         uint16 _year
     ) public returns (GameInfo[] memory) {
         GameInfo[] memory gameInfo = fillGameInfo(
-            GameInfo(_name, _year, _publisher, _description, true)
+            GameInfo(_name, _year, _publisher, "", true, _description)
         );
         require(gameInfo.length > 0, "No valid games found.");
         for (uint256 i = 0; i < gameInfo.length; i++) {
