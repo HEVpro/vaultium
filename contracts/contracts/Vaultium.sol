@@ -9,6 +9,7 @@ contract Vaultium {
         string ipfsCid;
         bool isAbandonware;
         string description;
+        bytes32 gameHash;
     }
 
     struct VoteInfo {
@@ -50,8 +51,16 @@ contract Vaultium {
         Challenge[] challenge;
     }
 
+    address payable public owner;
+
     mapping(bytes32 => GameInfo) public game;
     mapping(bytes32 => Challenge) public challenge;
+
+    event GameAddedToSystem(bytes32 gameHash, string name, string publisher, uint year);
+
+    constructor() {
+        owner = payable(msg.sender);
+    }
 
     function getGameHash(
         string memory _name,
@@ -71,14 +80,18 @@ contract Vaultium {
         ) {
             return false;
         }
+        if(_gameInfo.gameHash != getGameHash(_gameInfo.name, _gameInfo.year, _gameInfo.publisher)){
+            return false;
+        }
         return true;
     }
 
-    function fillGameInfo(
-        GameInfo memory _gameInfo
+    function getAutofilledGamesForUserInput(
+        GameInfo memory _userInputGameInfo
     ) private pure returns (GameInfo[] memory) {
+        // TODO: call Lilypad to get an array of GameInfo
         GameInfo[] memory gameInfo = new GameInfo[](1);
-        gameInfo[0] = _gameInfo;
+        gameInfo[0] = _userInputGameInfo;
         
         return filterValidGames(gameInfo);
     }
@@ -88,7 +101,6 @@ contract Vaultium {
      * @param gameInfo An array of GameInfo structs
      * @return GameInfo An array of GameInfo structs with only the valid games
      */
-
     function filterValidGames(
         GameInfo[] memory gameInfo
     ) private pure returns (GameInfo[] memory) {
@@ -118,10 +130,10 @@ contract Vaultium {
         string memory _publisher,
         uint16 _year
     ) public returns (GameInfo[] memory) {
-        GameInfo[] memory gameInfo = fillGameInfo(
-            GameInfo(_name, _year, _publisher, "", true, _description)
+        GameInfo[] memory gameInfo = getAutofilledGamesForUserInput(
+            GameInfo(_name, _year, _publisher, "", true, _description, getGameHash(_name, _year, _publisher))
         );
-        require(gameInfo.length > 0, "No valid games found.");
+        require(gameInfo.length > 0, "No valid games found");
         for (uint256 i = 0; i < gameInfo.length; i++) {
             bytes32 gameHash = getGameHash(
                 gameInfo[i].name,
@@ -130,6 +142,7 @@ contract Vaultium {
             );
             if (game[gameHash].year == 0) {
                 game[gameHash] = gameInfo[i];
+                emit GameAddedToSystem(gameInfo[i].gameHash, gameInfo[i].name, gameInfo[i].publisher, gameInfo[i].year);
             } else {
                 gameInfo[i] = game[gameHash];
             }
