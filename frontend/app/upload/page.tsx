@@ -1,4 +1,5 @@
 'use client'
+import ValidateForm from '@/components/pages/upload/validateForm'
 import { Button } from '@/components/ui/button'
 import {
     Form,
@@ -45,8 +46,8 @@ export default function Page() {
     }
 
     return (
-        <div className='flex flex-col items-center justify-start gap-10'>
-            <div className='flex w-full items-end justify-between gap-8  px-6 pb-16 pt-12 text-white'>
+        <div className='flex flex-col items-center justify-start gap-10 pb-24'>
+            <div className='flex w-full items-start justify-between gap-8  px-6 pb-16 pt-12 text-white'>
                 <div className='max-w-lg '>
                     <h1 className='max-w-[15ch] text-4xl text-primary'>
                         HODL Your Retro Games Forever!
@@ -60,53 +61,12 @@ export default function Page() {
                         appreciated by gamers everywhere!
                     </p>
                 </div>
-                <div className='w flex w-full flex-col gap-2'>
-                    <div className='flex w-full items-center gap-2 '>
-                        <div
-                            className={'relative mb-5 h-10 w-60 cursor-pointer'}
-                        >
-                            <Input
-                                type={'file'}
-                                className={
-                                    'absolute left-0 top-1 z-10 h-14 w-full cursor-pointer opacity-0'
-                                }
-                                name={'file'}
-                                onChange={(e) => {
-                                    if (e.target.files) {
-                                        setFile(e.target.files[0])
-                                    }
-                                }}
-                            />
-                            <div className='absolute left-0 top-0.5 flex h-14 w-full cursor-pointer items-center justify-start gap-2 rounded-lg bg-primary pl-2 pt-2 text-sm font-light text-white'>
-                                <FileBoxIcon className=' mb-2.5 h-7 w-7 stroke-foreground  stroke-1' />
-                                <p className='mb-1 w-full'>Click to upload</p>
-                            </div>
-                        </div>
-
-                        <div className='flex h-14 w-full items-center justify-start gap-2 text-wrap rounded-lg border-2 pl-2 pt-2 text-sm'>
-                            {file ? (
-                                <CircleCheck className='ml-2 h-7 w-7 stroke-green-400 stroke-1' />
-                            ) : (
-                                <Upload className='ml-2 h-7 w-7 stroke-primary stroke-1' />
-                            )}
-                            <p className=''>
-                                {file ? file.name : 'Select a file to upload'}
-                            </p>
-                        </div>
-                    </div>
-                    <Button
-                        disabled={!file}
-                        onClick={() => {
-                            // TODO: REPLACE BY GALADRIEL VALIDATION
-                            setIsValid(true)
-                            form.setValue('game', file)
-                        }}
-                        className='text-base text-foreground transition duration-300 hover:text-white active:scale-90'
-                    >
-                        Validate
-                    </Button>
+                {/* VALIDATE */}
+                <div className='w-1/2 flex flex-col gap-2'>
+                    <ValidateForm setIsValid={setIsValid}/>
                 </div>
             </div>
+            {/* UPDATE MORE INFO */}
             {isValid && (
                 <motion.div
                     initial={{ opacity: 0 }}
