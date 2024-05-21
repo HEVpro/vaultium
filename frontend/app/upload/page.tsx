@@ -64,6 +64,40 @@ export default function Page() {
                 {/* VALIDATE */}
                 <div className='w-1/2 flex flex-col gap-2'>
                     <ValidateForm setIsValid={setIsValid}/>
+                    {/* TODO: MOVE THIS FILE UPLOADE TO STEP IF THERE AREN'T ANY IPFSCID  */}
+                    {/* <div className='flex w-full items-center gap-2 '>
+                        <div
+                            className={'relative mb-5 h-10 w-60 cursor-pointer'}
+                        >
+                            <Input
+                                type={'file'}
+                                className={
+                                    'absolute left-0 top-1 z-10 h-14 w-full cursor-pointer opacity-0'
+                                }
+                                name={'file'}
+                                onChange={(e) => {
+                                    if (e.target.files) {
+                                        setFile(e.target.files[0])
+                                    }
+                                }}
+                            />
+                            <div className='absolute left-0 top-0.5 flex h-14 w-full cursor-pointer items-center justify-start gap-2 rounded-lg bg-primary pl-2 pt-2 text-sm font-light text-white'>
+                                <FileBoxIcon className=' mb-2.5 h-7 w-7 stroke-foreground  stroke-1' />
+                                <p className='mb-1 w-full'>Click to upload</p>
+                            </div>
+                        </div>
+
+                        <div className='flex h-14 w-full items-center justify-start gap-2 text-wrap rounded-lg border-2 pl-2 pt-2 text-sm'>
+                            {file ? (
+                                <CircleCheck className='ml-2 h-7 w-7 stroke-green-400 stroke-1' />
+                            ) : (
+                                <Upload className='ml-2 h-7 w-7 stroke-primary stroke-1' />
+                            )}
+                            <p className=''>
+                                {file ? file.name : 'Select a file to upload'}
+                            </p>
+                        </div>
+                    </div> */}
                 </div>
             </div>
             {/* UPDATE MORE INFO */}

@@ -1,6 +1,9 @@
 "use server"
 import lighthouse from '@lighthouse-web3/sdk'
 
+// If exists you can upload the game
+// If exists and have a file, upload the game for a new version —> challenge
+// If array is empty, you are inventing the game
 
 export async function validateGame(data: any): Promise<{data: any, error: any}> {
     // TODO: sync with solidity contract -> Galadriel or lilypad
