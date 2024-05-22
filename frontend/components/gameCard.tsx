@@ -16,6 +16,8 @@ export const GameCard = ({ item }: GameCardProps) => {
         >
             <div className='-z-10 absolute inset-0 bg-black bg-opacity-60 transition duration-300  rounded-t-xl' />
             <Image
+                width={100}
+                height={100}
                 src='./game_bg.jpg'
                 alt='game_image'
                 className='-z-20 absolute w-full h-full object-cover rounded-xl'
