@@ -24,8 +24,6 @@ contract Vaultium {
     struct GameVersion {
         bytes32 gameHash;
         string ipfsCid;
-        VersionVotes upVotes;
-        VersionVotes downVotes;
     }
 
     struct ChallengeVersion {
@@ -54,7 +52,7 @@ contract Vaultium {
     address payable public owner;
 
     mapping(bytes32 => GameInfo) public game;
-    mapping(bytes32 => Challenge) public challenge;
+    mapping(bytes32 => GameChallengeHistory) internal gameChallengeHistory;
 
     event GameAddedToSystem(bytes32 gameHash, string name, string publisher, uint year);
 
@@ -149,4 +147,42 @@ contract Vaultium {
         }
         return gameInfo;
     }
-}
+
+    function challengeAbandonwareVersion(bytes32 _gameHash, string calldata _ipfsCid) public returns (Challenge memory) {
+        require(game[_gameHash].year > 0, "Game not found");
+        // require(_ipfsCid != game[_gameHash].ipfsCid, "IPFS CID is required"); // Fix this
+        
+        if(gameChallengeHistory[_gameHash].challenge.length > 0){
+            Challenge memory lastChallenge = gameChallengeHistory[_gameHash].challenge[gameChallengeHistory[_gameHash].challenge.length - 1]; 
+            require(lastChallenge.closingDate < block.timestamp, "Challenge is already open");
+        }
+
+        Challenge memory newChallenge = Challenge(
+            _gameHash,
+            ChallengeVersion(
+                GameVersion(_gameHash, game[_gameHash].ipfsCid),
+                VersionVotes(new VoteInfo[](0))
+            ),
+            ChallengeVersion(
+                GameVersion(_gameHash, _ipfsCid),
+                VersionVotes(new VoteInfo[](0))
+            ),
+            0,
+            0,
+            block.timestamp,
+            block.timestamp + 30 minutes
+        );
+
+        gameChallengeHistory[_gameHash].challenge.push(newChallenge);
+        return newChallenge;
+    }
+
+    /**
+     * @dev Getter to solve an issue with returning a struct array
+     * @param _gameHash The game hash of the game
+     * @return GameChallengeHistory The history of challenges for a given game
+     */
+    function getChallengeHistory(bytes32 _gameHash) public view returns (GameChallengeHistory memory) {
+        return gameChallengeHistory[_gameHash];
+    }
+ }
