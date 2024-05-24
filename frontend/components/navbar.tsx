@@ -34,7 +34,7 @@ const Navbar = () => {
     const disableLogin = !ready || (ready && authenticated)
 
     return (
-        <nav className='fixed top-4 flex min-h-14 w-full max-w-5xl items-center justify-between rounded-full bg-blue-950 bg-opacity-20 px-6 backdrop-blur-sm'>
+        <nav className='z-50 fixed top-4 flex min-h-14 w-full max-w-5xl items-center justify-between rounded-full bg-blue-950 bg-opacity-20 px-6 backdrop-blur-sm'>
             <div className='flex items-center justify-start gap-2'>
                 <Image
                     width={36}
