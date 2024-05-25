@@ -6,7 +6,7 @@ import hre from "hardhat";
 import { getAddress } from "viem";
 
 
-describe("Lock", function () {
+describe("Valtium", function () {
     // We define a fixture to reuse the same setup in every test.
     // We use loadFixture to run this setup once, snapshot that state,
     // and reset Hardhat Network to that snapshot in every test.
@@ -15,7 +15,7 @@ describe("Lock", function () {
         const [owner, otherAccount] = await hre.viem.getWalletClients();
 
         const vaultium = await hre.viem.deployContract("Vaultium", [], {
-
+            
         });
 
         const publicClient = await hre.viem.getPublicClient();
@@ -73,4 +73,7 @@ describe("Lock", function () {
         });
     });
 
+    describe("Lilypad", function(){
+
+    });
 });

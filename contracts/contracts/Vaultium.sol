@@ -1,7 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.25;
 
-contract Vaultium {
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import "./ILilypadJobManager.sol";
+import "./ILilypadJobClient.sol";
+
+contract Vaultium is Ownable, Initializable, ILilypadJobClient {
     struct GameInfo {
         string name;
         uint16 year;
@@ -51,16 +56,24 @@ contract Vaultium {
         Challenge[] challenge;
     }
 
-    address payable public owner;
-
+    //address payable public owner;
     mapping(bytes32 => GameInfo) public game;
     mapping(bytes32 => Challenge) public challenge;
 
-    event GameAddedToSystem(bytes32 gameHash, string name, string publisher, uint year);
+    event GameAddedToSystem(
+        bytes32 gameHash,
+        string name,
+        string publisher,
+        uint year
+    );
 
-    constructor() {
-        owner = payable(msg.sender);
+    function initialize(address _jobManagerAddress) public initializer {
+        setJobManagerAddress(_jobManagerAddress);
     }
+
+    // constructor() {
+    //     owner = payable(msg.sender);
+    // }
 
     function getGameHash(
         string memory _name,
@@ -80,7 +93,10 @@ contract Vaultium {
         ) {
             return false;
         }
-        if(_gameInfo.gameHash != getGameHash(_gameInfo.name, _gameInfo.year, _gameInfo.publisher)){
+        if (
+            _gameInfo.gameHash !=
+            getGameHash(_gameInfo.name, _gameInfo.year, _gameInfo.publisher)
+        ) {
             return false;
         }
         return true;
@@ -92,7 +108,7 @@ contract Vaultium {
         // TODO: call Lilypad to get an array of GameInfo
         GameInfo[] memory gameInfo = new GameInfo[](1);
         gameInfo[0] = _userInputGameInfo;
-        
+
         return filterValidGames(gameInfo);
     }
 
@@ -131,7 +147,15 @@ contract Vaultium {
         uint16 _year
     ) public returns (GameInfo[] memory) {
         GameInfo[] memory gameInfo = getAutofilledGamesForUserInput(
-            GameInfo(_name, _year, _publisher, "", true, _description, getGameHash(_name, _year, _publisher))
+            GameInfo(
+                _name,
+                _year,
+                _publisher,
+                "",
+                true,
+                _description,
+                getGameHash(_name, _year, _publisher)
+            )
         );
         require(gameInfo.length > 0, "No valid games found");
         for (uint256 i = 0; i < gameInfo.length; i++) {
@@ -142,11 +166,72 @@ contract Vaultium {
             );
             if (game[gameHash].year == 0) {
                 game[gameHash] = gameInfo[i];
-                emit GameAddedToSystem(gameInfo[i].gameHash, gameInfo[i].name, gameInfo[i].publisher, gameInfo[i].year);
+                emit GameAddedToSystem(
+                    gameInfo[i].gameHash,
+                    gameInfo[i].name,
+                    gameInfo[i].publisher,
+                    gameInfo[i].year
+                );
             } else {
                 gameInfo[i] = game[gameHash];
             }
         }
         return gameInfo;
+    }
+
+    // Lilypad
+    address private jobManagerAddress;
+    ILilypadJobManager private jobManagerContract;
+    mapping(uint256 => string) private jobResults;
+
+    event JobCreated(
+        uint256 id,
+        string message
+    );
+
+    event JobCompleted(
+        uint256 id,
+        string dealId,
+        string dataId
+    );
+
+    function setJobManagerAddress(address _jobManagerAddress) public onlyOwner {
+        require(_jobManagerAddress != address(0), "Job manager address");
+        jobManagerAddress = _jobManagerAddress;
+        jobManagerContract = ILilypadJobManager(jobManagerAddress);
+    }
+
+    function getJobResult(uint256 _jobID) public view returns (string memory) {
+        return jobResults[_jobID];
+    }
+
+    function runCowsay(
+        string memory message
+    ) public {
+        string[] memory inputs = new string[](1);
+        inputs[0] = string(abi.encodePacked("Message=", message));
+        uint256 id = jobManagerContract.runJob(
+        "cowsay:v0.0.3",
+        inputs,
+        msg.sender
+        );
+
+        emit JobCreated(
+        id,
+        message
+        );
+    }
+
+    function submitResults(
+        uint256 id,
+        string memory dealId,
+        string memory dataId
+    ) public override {
+        jobResults[id] = dataId;
+        emit JobCompleted(
+            id,
+            dealId,
+            dataId
+        );
     }
 }
