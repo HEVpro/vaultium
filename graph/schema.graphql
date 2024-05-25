@@ -1,0 +1,29 @@
+type GameAddedToSystem @entity(immutable: true) {
+  id: Bytes!
+  gameHash: Bytes! # bytes32
+  name: String! # string
+  genre: Int! # uint8
+  publisher: String! # string
+  year: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type VersionChallengeAccepted @entity(immutable: true) {
+  id: Bytes!
+  gameHash: Bytes! # bytes32
+  ipfsCid: String! # string
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type VersionChallenged @entity(immutable: true) {
+  id: Bytes!
+  gameHash: Bytes! # bytes32
+  ipfsCid: String! # string
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
