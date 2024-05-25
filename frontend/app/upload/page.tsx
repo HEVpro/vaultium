@@ -198,173 +198,90 @@ export default function Page() {
                     </div>
                 )}
             </div>
-
-            {/* {isValid && (
-                <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ duration: 0.5 }}
-                    className='w-full px-6'
-                >
-                    <h2 className='text-3xl font-semibold text-primary'>
-                        Complete the game info
-                    </h2>
-                    <div className='mt-4 w-full '>
-                        <Form {...form}>
-                            <form
-                                onSubmit={form.handleSubmit(onSubmit)}
-                                className='grid w-full grid-cols-1 content-center gap-4 justify-self-center  sm:grid-cols-2	lg:grid-cols-3'
-                            >
-                                <FormField
-                                    control={form.control}
-                                    name='year'
-                                    render={({ field }) => (
-                                        <FormItem className='col-span-1'>
-                                            <FormLabel className='text-primary'>
-                                                Year
-                                            </FormLabel>
-                                            <FormControl>
-                                                <Input
-                                                    placeholder='shadcn'
-                                                    min={1900}
-                                                    max={
-                                                        new Date().getFullYear() +
-                                                        1
-                                                    }
-                                                    step={1}
-                                                    type='number'
-                                                    {...field}
-                                                />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={form.control}
-                                    name='platform'
-                                    render={({ field }) => (
-                                        <FormItem className='col-span-1'>
-                                            <FormLabel className='text-primary'>
-                                                Platform
-                                            </FormLabel>
-                                            <FormControl>
-                                                <Input
-                                                    placeholder='The platform of the game'
-                                                    type='text'
-                                                    {...field}
-                                                />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={form.control}
-                                    name='releasedIn'
-                                    render={({ field }) => (
-                                        <FormItem className='col-span-1'>
-                                            <FormLabel className='text-primary'>
-                                                Released in
-                                            </FormLabel>
-                                            <Select
-                                                onValueChange={field.onChange}
-                                                defaultValue={field.value}
-                                            >
-                                                <FormControl>
-                                                    <SelectTrigger>
-                                                        <SelectValue placeholder='Select a country' />
-                                                    </SelectTrigger>
-                                                </FormControl>
-                                                <SelectContent>
-                                                    {countries.map(
-                                                        (country) => (
-                                                            <SelectItem
-                                                                key={
-                                                                    country.code
-                                                                }
-                                                                value={
-                                                                    country.name
-                                                                }
-                                                            >
-                                                                {country.name}
-                                                            </SelectItem>
-                                                        )
-                                                    )}
-                                                </SelectContent>
-                                            </Select>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={form.control}
-                                    name='genre'
-                                    render={({ field }) => (
-                                        <FormItem className='col-span-1'>
-                                            <FormLabel className='text-primary'>
-                                                Genre
-                                            </FormLabel>
-                                            <FormControl>
-                                                <Input
-                                                    placeholder='e.g. Educational'
-                                                    type='text'
-                                                    className='placeholder:italic'
-                                                    {...field}
-                                                />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={form.control}
-                                    name='theme'
-                                    render={({ field }) => (
-                                        <FormItem className='col-span-1'>
-                                            <FormLabel className='text-primary'>
-                                                Theme
-                                            </FormLabel>
-                                            <FormControl>
-                                                <Input
-                                                    placeholder='e.g. History'
-                                                    type='text'
-                                                    className='placeholder:italic'
-                                                    {...field}
-                                                />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={form.control}
-                                    name='publisher'
-                                    render={({ field }) => (
-                                        <FormItem className='col-span-1'>
-                                            <FormLabel className='text-primary'>
-                                                Publisher
-                                            </FormLabel>
-                                            <FormControl>
-                                                <Input
-                                                    placeholder='e.g. MECC'
-                                                    type='text'
-                                                    className='placeholder:italic'
-                                                    {...field}
-                                                />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <div className='col-span-full mt-4 flex items-center justify-end'>
-                                    <Button type='submit'>Submit</Button>
-                                </div>
-                            </form>
-                        </Form>
-                    </div>
-                </motion.div>
-            )} */}
         </div>
     )
+}
+
+// If exists you can upload the game
+// If exists and have a file, upload the game for a new version —> challenge
+// If array is empty, you are inventing the game
+
+const fakeResponses = [
+    [
+        {
+            name: 'The Legend of Zelda',
+            year: 1986,
+            publisher: 'Nintendo',
+            ipfsCid: 'QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG', // This is a sample IPFS CID, replace with a real one
+            isAbandonware: true,
+            description:
+                'The Legend of Zelda is an action-adventure game developed and published by Nintendo.',
+            gameHash: '0x3f4eabcd5CZsnA625s3Xf2nemtYgPpH', // This is a sample hash, replace with a real one
+        },
+        {
+            name: 'Metroid',
+            year: 1986,
+            publisher: 'Nintendo',
+            ipfsCid: 'QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG', // This is a sample IPFS CID, replace with a real one
+            isAbandonware: true,
+            description:
+                'Metroid is an action-adventure game developed and published by Nintendo.',
+            gameHash: '0x3f4eabcd5CZsnA625s3Xf2nemtYgPpH', // This is a sample hash, replace with a real one
+        },
+        {
+            name: 'Donkey Kong',
+            year: 1981,
+            publisher: 'Nintendo',
+            ipfsCid: 'QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG', // This is a sample IPFS CID, replace with a real one
+            isAbandonware: true,
+            description:
+                'Donkey Kong is an arcade game developed and published by Nintendo.',
+            gameHash: '0x3f4eabcd5CZsnA625s3Xf2nemtYgPpH', // This is a sample hash, replace with a real one
+        },
+    ],
+    [
+        {
+            name: 'Peach Adventure',
+            year: 2000,
+            publisher: 'Nintendo',
+            ipfsCid: null,
+            isAbandonware: true,
+            description:
+                'Peach Adventure is a platform game developed and published by Nintendo.',
+            gameHash: '0x3f4eabcd5CZsnA625s3Xf2nemtYgPpH', // This is a sample hash, replace with a real one
+        },
+        {
+            name: 'Luigi Mansion',
+            year: 2001,
+            publisher: 'Nintendo',
+            ipfsCid: null,
+            isAbandonware: true,
+            description:
+                'Luigi Mansion is an action-adventure game developed and published by Nintendo.',
+            gameHash: '0x3f4eabcd5CZsnA625s3Xf2nemtYgPpH', // This is a sample hash, replace with a real one
+        },
+        {
+            name: 'Yoshi Island',
+            year: 1995,
+            publisher: 'Nintendo',
+            ipfsCid: null,
+            isAbandonware: true,
+            description:
+                'Yoshi Island is a platform game developed and published by Nintendo.',
+            gameHash: '0x3f4eabcd5CZsnA625s3Xf2nemtYgPpH', // This is a sample hash, replace with a real one
+        },
+    ],
+    // [],
+]
+
+export async function validateGame(
+    data: any
+): Promise<{ data: any; error: any }> {
+    // TODO: sync with solidity contract -> Galadriel or lilypad
+
+    // TODO: REPLACE BY THE CORRECT ANSWER FROM THE BLOCKCHAIN
+    const randomIndex = Math.floor(Math.random() * fakeResponses.length)
+    const randomResponse = fakeResponses[randomIndex]
+
+    return { data: randomResponse, error: null }
 }
