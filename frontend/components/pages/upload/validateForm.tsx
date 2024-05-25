@@ -15,11 +15,12 @@ import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { cn } from '@/lib/utils'
 import { validateGame } from '@/lib/actions/uploader'
+import { Game } from '@/lib/types'
 
 export default function ValidateForm({
-    setIsValid,
+    setSearchedGames,
 }: {
-    setIsValid: (value: boolean) => void
+    setSearchedGames: (value: Game[]) => void
 }) {
     const { form } = useValidateForm()
 
@@ -27,12 +28,9 @@ export default function ValidateForm({
         const response = await validateGame(data)
         // TODO: IMPROVE LOGIC IF VALIDATION IS WRONG
         if (response.data) {
-            setIsValid(true)
-            form.reset()
-            toast({
-                title: 'Game validated',
-                duration: 1500,
-            })
+            setSearchedGames(response.data)
+            // TODO: UNCOMMENT WHEN ARE READY THE COMPONENT
+            // form.reset()
         }
     }
     type Field = {
