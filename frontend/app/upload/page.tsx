@@ -67,7 +67,7 @@ export default function Page() {
     }
 
     return (
-        <div className='flex flex-col items-center justify-start pb-24 px-6'>
+        <div className='flex flex-col items-center justify-start px-6 pb-24'>
             <div className='flex w-full items-start justify-between gap-8 py-12 text-white'>
                 <div className='w-full '>
                     <h1 className='max-w-[15ch] text-4xl text-primary'>
@@ -88,28 +88,30 @@ export default function Page() {
                 </div>
             </div>
             <div className='w-full'>
-                {!selectedGame && searchedGames && searchedGames?.length > 0 && (
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ duration: 0.5 }}
-                        className={cn('mt-6 w-full')}
-                    >
-                        <h2 className='text-2xl font-semibold text-primary'>
-                            Maybe your a looking for one of these games?
-                        </h2>
-                        <div className='mt-4 grid w-full grid-cols-3 gap-4'>
-                            {searchedGames?.map((game) => (
-                                <UploadGameCard
-                                    key={game.gameHash}
-                                    game={game}
-                                    setSelectedGame={setSelectedGame}
-                                    canBeUploaded={true}
-                                />
-                            ))}
-                        </div>
-                    </motion.div>
-                )}
+                {!selectedGame &&
+                    searchedGames &&
+                    searchedGames?.length > 0 && (
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ duration: 0.5 }}
+                            className={cn('mt-6 w-full')}
+                        >
+                            <h2 className='text-2xl font-semibold text-primary'>
+                                Maybe your a looking for one of these games?
+                            </h2>
+                            <div className='mt-4 grid w-full grid-cols-3 gap-4'>
+                                {searchedGames?.map((game) => (
+                                    <UploadGameCard
+                                        key={game.gameHash}
+                                        game={game}
+                                        setSelectedGame={setSelectedGame}
+                                        canBeUploaded={true}
+                                    />
+                                ))}
+                            </div>
+                        </motion.div>
+                    )}
                 {selectedGame && (
                     <motion.div
                         initial={{ opacity: 0 }}

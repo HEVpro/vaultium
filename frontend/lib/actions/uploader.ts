@@ -13,7 +13,8 @@ const fakeResponses = [
             publisher: 'Nintendo',
             ipfsCid: 'QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG', // This is a sample IPFS CID, replace with a real one
             isAbandonware: true,
-            description: 'The Legend of Zelda is an action-adventure game developed and published by Nintendo.',
+            description:
+                'The Legend of Zelda is an action-adventure game developed and published by Nintendo.',
             gameHash: '0x3f4eabcd5CZsnA625s3Xf2nemtYgPpH', // This is a sample hash, replace with a real one
         },
         {
@@ -22,7 +23,8 @@ const fakeResponses = [
             publisher: 'Nintendo',
             ipfsCid: 'QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG', // This is a sample IPFS CID, replace with a real one
             isAbandonware: true,
-            description: 'Metroid is an action-adventure game developed and published by Nintendo.',
+            description:
+                'Metroid is an action-adventure game developed and published by Nintendo.',
             gameHash: '0x3f4eabcd5CZsnA625s3Xf2nemtYgPpH', // This is a sample hash, replace with a real one
         },
         {
@@ -31,7 +33,8 @@ const fakeResponses = [
             publisher: 'Nintendo',
             ipfsCid: 'QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG', // This is a sample IPFS CID, replace with a real one
             isAbandonware: true,
-            description: 'Donkey Kong is an arcade game developed and published by Nintendo.',
+            description:
+                'Donkey Kong is an arcade game developed and published by Nintendo.',
             gameHash: '0x3f4eabcd5CZsnA625s3Xf2nemtYgPpH', // This is a sample hash, replace with a real one
         },
     ],
@@ -42,7 +45,8 @@ const fakeResponses = [
             publisher: 'Nintendo',
             ipfsCid: null,
             isAbandonware: true,
-            description: 'Peach Adventure is a platform game developed and published by Nintendo.',
+            description:
+                'Peach Adventure is a platform game developed and published by Nintendo.',
             gameHash: '0x3f4eabcd5CZsnA625s3Xf2nemtYgPpH', // This is a sample hash, replace with a real one
         },
         {
@@ -51,7 +55,8 @@ const fakeResponses = [
             publisher: 'Nintendo',
             ipfsCid: null,
             isAbandonware: true,
-            description: 'Luigi Mansion is an action-adventure game developed and published by Nintendo.',
+            description:
+                'Luigi Mansion is an action-adventure game developed and published by Nintendo.',
             gameHash: '0x3f4eabcd5CZsnA625s3Xf2nemtYgPpH', // This is a sample hash, replace with a real one
         },
         {
@@ -60,7 +65,8 @@ const fakeResponses = [
             publisher: 'Nintendo',
             ipfsCid: null,
             isAbandonware: true,
-            description: 'Yoshi Island is a platform game developed and published by Nintendo.',
+            description:
+                'Yoshi Island is a platform game developed and published by Nintendo.',
             gameHash: '0x3f4eabcd5CZsnA625s3Xf2nemtYgPpH', // This is a sample hash, replace with a real one
         },
     ],
@@ -72,10 +78,9 @@ export async function validateGame(
 ): Promise<{ data: any; error: any }> {
     // TODO: sync with solidity contract -> Galadriel or lilypad
 
-
     // TODO: REPLACE BY THE CORRECT ANSWER FROM THE BLOCKCHAIN
-    const randomIndex = Math.floor(Math.random() * fakeResponses.length);
-    const randomResponse = fakeResponses[randomIndex];
+    const randomIndex = Math.floor(Math.random() * fakeResponses.length)
+    const randomResponse = fakeResponses[randomIndex]
 
     return { data: randomResponse, error: null }
 }
@@ -83,5 +88,3 @@ export async function uploadFile(file: any, apiKey: string, multiple: boolean) {
     const output = await lighthouse.upload(file, apiKey, false, undefined)
     // TODO: add the upload repsonse after validation
 }
-
-

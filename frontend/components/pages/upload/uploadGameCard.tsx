@@ -13,7 +13,11 @@ interface UploadGameCardProps {
     setSelectedGame: (value: Game) => void
     canBeUploaded?: boolean
 }
-export default function UploadGameCard({ game, setSelectedGame, canBeUploaded }: UploadGameCardProps) {
+export default function UploadGameCard({
+    game,
+    setSelectedGame,
+    canBeUploaded,
+}: UploadGameCardProps) {
     return (
         <div
             key={game.gameHash}
@@ -34,7 +38,9 @@ export default function UploadGameCard({ game, setSelectedGame, canBeUploaded }:
                                     </button>
                                 </TooltipTrigger>
                                 <TooltipContent>
-                                    <p className='text-foreground'>Upload a new version</p>
+                                    <p className='text-foreground'>
+                                        Upload a new version
+                                    </p>
                                 </TooltipContent>
                             </Tooltip>
                         </TooltipProvider>

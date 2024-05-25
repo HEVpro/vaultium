@@ -2,14 +2,14 @@ import lighthouse from '@lighthouse-web3/sdk'
 import { Button } from './ui/button'
 import { useState } from 'react'
 
-
-export default function UploadGame() { 
+export default function UploadGame() {
     const [file, setFile] = useState<any>(null)
 
     const progressCallback = (progressData: any) => {
         let percentageDone =
-        100 - Number((progressData?.total / progressData?.uploaded)?.toFixed(2))
-    console.info(percentageDone)
+            100 -
+            Number((progressData?.total / progressData?.uploaded)?.toFixed(2))
+        console.info(percentageDone)
     }
 
     // TODO: move to route handler if Fleek allows route handling
