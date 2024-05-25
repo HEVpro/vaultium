@@ -1,0 +1,32 @@
+specVersion: 1.0.0
+indexerHints:
+  prune: auto
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: MockVaultium
+    network: sepolia
+    source:
+      address: "0xe8b07e948168108c8f0be3bfd448d4a9a9b56596"
+      abi: MockVaultium
+      startBlock: 5975525
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - GameAddedToSystem
+        - VersionChallengeAccepted
+        - VersionChallenged
+      abis:
+        - name: MockVaultium
+          file: ./abis/MockVaultium.json
+      eventHandlers:
+        - event: GameAddedToSystem(bytes32,string,uint8,string,uint256)
+          handler: handleGameAddedToSystem
+        - event: VersionChallengeAccepted(bytes32,string)
+          handler: handleVersionChallengeAccepted
+        - event: VersionChallenged(bytes32,string)
+          handler: handleVersionChallenged
+      file: ./src/mock-vaultium.ts
