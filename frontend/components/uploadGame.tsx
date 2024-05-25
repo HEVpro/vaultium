@@ -1,29 +1,29 @@
 import lighthouse from '@lighthouse-web3/sdk'
-import { useState } from 'react'
 import { Button } from './ui/button'
+import { useState } from 'react'
 
 
-export default function uploadGame() { 
+export default function UploadGame() { 
     const [file, setFile] = useState<any>(null)
 
-    const progressCallback = (progressData) => {
+    const progressCallback = (progressData: any) => {
         let percentageDone =
-            100 - (progressData?.total / progressData?.uploaded)?.toFixed(2)
-        console.log(percentageDone)
+        100 - Number((progressData?.total / progressData?.uploaded)?.toFixed(2))
+    console.info(percentageDone)
     }
 
     // TODO: move to route handler if Fleek allows route handling
-    const uploadFile = async () => {
+    const uploadFile = async (fileInput: any) => {
         // Push file to lighthouse node
         // Both file and folder are supported by upload function
         // Third parameter is for multiple files, if multiple files are to be uploaded at once make it true
         // Fourth parameter is the deal parameters, default null
         const output = await lighthouse.upload(
-            file,
+            fileInput,
             process.env.NNEXT_PUBLIC_LIGHTHOUSE_API_KEY!,
             false
         )
-        console.log('File Status:', output)
+        console.info('File Status:', output)
         /*
           output:
             data: {
@@ -34,13 +34,11 @@ export default function uploadGame() {
           Note: Hash in response is CID.
         */
 
-        console.log(
+        console.info(
             'Visit at https://gateway.lighthouse.storage/ipfs/' +
                 output.data.Hash
         )
     }
-
-    console.log(file)
 
     return (
         <form>
