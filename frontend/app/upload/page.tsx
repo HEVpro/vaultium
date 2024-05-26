@@ -1,6 +1,7 @@
 'use client'
 import { AnimatedCheck } from '@/components/animatedCheck'
-import UploadGameCard from '@/components/pages/upload/uploadGameCard'
+import GameCardResult from '@/components/pages/upload/uploadGameCard'
+import UploadNewVersion from '@/components/pages/upload/uploadNewVersion'
 import ValidateForm from '@/components/pages/upload/validateForm'
 import { Button } from '@/components/ui/button'
 import {
@@ -45,10 +46,6 @@ import { useState } from 'react'
 import { z } from 'zod'
 
 export default function Page() {
-    // Type FILE only suported in node >20, and Fleek deploys on Node 18
-    const [file, setFile] = useState<any | null>(null)
-    // TODO: REPLACE BY GALADRIEL VALIDATION
-    // const [isValid, setIsValid] = useState<boolean>(false)
     const [searchedGames, setSearchedGames] = useState<Game[] | null>(null)
     const [selectedGame, setSelectedGame] = useState<Game | null>(null)
     const { form } = useCustomForm()
@@ -88,6 +85,7 @@ export default function Page() {
                 </div>
             </div>
             <div className='w-full'>
+                {/* THE LIST OF GAME RESULTS */}
                 {!selectedGame &&
                     searchedGames &&
                     searchedGames?.length > 0 && (
@@ -102,16 +100,16 @@ export default function Page() {
                             </h2>
                             <div className='mt-4 grid w-full grid-cols-3 gap-4'>
                                 {searchedGames?.map((game) => (
-                                    <UploadGameCard
+                                    <GameCardResult
                                         key={game.gameHash}
                                         game={game}
                                         setSelectedGame={setSelectedGame}
-                                        canBeUploaded={true}
                                     />
                                 ))}
                             </div>
                         </motion.div>
                     )}
+                {/* YOU HAVE SELECTED A GAME AND YOU WANT TO UPLOAD A NEW VERSION, WITHOUT CHALLENGE */}
                 {selectedGame && (
                     <motion.div
                         initial={{ opacity: 0 }}
@@ -123,71 +121,19 @@ export default function Page() {
                             Do you have a new version? This is the moment!
                         </h2>
                         <div className='relative mt-4 flex w-full items-end  justify-between gap-4'>
-                            <UploadGameCard
+                            <GameCardResult
                                 game={selectedGame}
                                 setSelectedGame={setSelectedGame}
-                                canBeUploaded={false}
                             />
                             <div className='w-full max-w-lg space-y-2'>
-                                <button
-                                    onClick={() => setSelectedGame(null)}
-                                    className='absolute right-0 top-0 transition duration-300 hover:scale-110 active:scale-90'
-                                >
-                                    <XIcon className='h-6 w-6 stroke-white' />
-                                </button>
-                                <div className='flex items-center gap-2'>
-                                    <div
-                                        className={
-                                            'relative h-12  w-60 cursor-pointer'
-                                        }
-                                    >
-                                        <Input
-                                            type={'file'}
-                                            className={
-                                                'absolute left-0 top-0 z-10 h-12 w-full cursor-pointer opacity-0'
-                                            }
-                                            name={'file'}
-                                            onChange={(e) => {
-                                                if (e.target.files) {
-                                                    setFile(e.target.files[0])
-                                                }
-                                            }}
-                                        />
-                                        <div className='absolute left-0 top-0.5 flex h-12 w-full cursor-pointer items-center justify-start gap-2 rounded-lg bg-primary pl-2 pt-2 text-sm font-light text-white'>
-                                            <FileBoxIcon className=' mb-2.5 h-7 w-7 stroke-foreground  stroke-1' />
-                                            <p className='mb-1 w-full'>
-                                                Click to upload
-                                            </p>
-                                        </div>
-                                    </div>
-
-                                    <div className='mt-1 flex h-12 w-full items-center justify-start gap-2 text-wrap rounded-lg border-2 pl-2 text-sm'>
-                                        {file && (
-                                            <AnimatedCheck classname='h-5 w-5 stroke-primary' />
-                                        )}
-                                        <p
-                                            className={cn(
-                                                'font-light tracking-wide text-white',
-                                                file && 'italic text-primary',
-                                                !file && 'pl-6'
-                                            )}
-                                        >
-                                            {file
-                                                ? file.name
-                                                : 'Select a file to upload'}
-                                        </p>
-                                    </div>
-                                </div>
-                                <Button
-                                    disabled={!file}
-                                    className='w-full text-base text-foreground transition duration-300 hover:text-white active:scale-90'
-                                >
-                                    Upload new version
-                                </Button>
+                                <UploadNewVersion
+                                    setSelectedGame={setSelectedGame}
+                                />
                             </div>
                         </div>
                     </motion.div>
                 )}
+                {/* NOT EXISTING GAME */}
                 {searchedGames && searchedGames.length === 0 && (
                     <div className='w-full py-12 text-center'>
                         <h2 className='mx-auto w-[50ch] text-xl text-primary'>
@@ -201,4 +147,3 @@ export default function Page() {
         </div>
     )
 }
-

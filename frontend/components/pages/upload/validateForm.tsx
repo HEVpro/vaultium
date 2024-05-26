@@ -16,6 +16,13 @@ import { Textarea } from '@/components/ui/textarea'
 import { cn } from '@/lib/utils'
 import { Game } from '@/lib/types'
 import { validateGame } from '@/lib/api'
+import { usePrivy } from '@privy-io/react-auth'
+import { useReadContract, useWaitForTransactionReceipt, useWriteContract } from 'wagmi'
+import { type UseReadContractParameters } from 'wagmi'
+import { sepolia } from 'wagmi/chains'
+import { mockVaultiumContract } from '@/lib/wagmi/mockVaultiumContract'
+import { useEffect, useState } from 'react'
+import { useTransaction } from 'wagmi'
 
 export default function ValidateForm({
     setSearchedGames,
@@ -23,16 +30,66 @@ export default function ValidateForm({
     setSearchedGames: (value: Game[]) => void
 }) {
     const { form } = useValidateForm()
+    const { authenticated } = usePrivy()
+
+    const { 
+        data: hash, 
+        isPending, 
+        writeContract 
+      } = useWriteContract() 
+
+
+      const result = useTransaction({
+        hash: '0x0029185312690005acf75f78fa47bdd0c4dc1c0fb1aa04810810999b193d7860',
+      })
+
+
+      useEffect(() => {
+
+      }, [hash])
+
 
     async function onSubmit(data: z.infer<typeof FormSchema>) {
-        const response = await validateGame(data)
-        // TODO: IMPROVE LOGIC IF VALIDATION IS WRONG
-        if (response.data) {
-            setSearchedGames(response.data)
-            // TODO: UNCOMMENT WHEN ARE READY THE COMPONENT
-            // form.reset()
+        if (authenticated) {
+            writeContract({ 
+                abi: mockVaultiumContract.abi,
+                address: '0xE8B07e948168108C8f0BE3bfD448D4a9A9B56596',
+                functionName: 'searchAbandonware',
+                args: [
+                  data.name,
+                    data.description,
+                    data.publisher,
+                    0,
+                    data.year,
+                ],
+                chainId: sepolia.id,
+             })
+             if(hash){
+                // eslint-disable-next-line react-hooks/rules-of-hooks
+                const result = useTransaction({
+                    hash: hash,
+                  })
+                  console.log(result)
+             }
+            // const game = await contract.refetch()
+            // if(game.status === 'success') {
+            //     form.reset()
+            // }
+
+            // console.log(game)
+        } else {
+            toast({
+                title: 'Authentication required',
+                description: 'Please login to validate a game',
+                duration: 2500,
+            })
         }
     }
+    const { isLoading: isConfirming, isSuccess: isConfirmed } =
+    useWaitForTransactionReceipt({
+      hash,
+    })
+
     type Field = {
         name: keyof z.infer<typeof FormSchema>
         label: string
@@ -40,6 +97,7 @@ export default function ValidateForm({
         type: 'text' | 'number' | 'text-area'
         className: string
     }
+    // TODO: ADD SELECT TO GENRE
     const fields: Field[] = [
         {
             name: 'name',
@@ -119,7 +177,7 @@ export default function ValidateForm({
                     }
                     className='col-span-full text-base text-foreground transition duration-300 hover:text-white active:scale-90'
                 >
-                    Validate
+                    {isPending ? 'Validating...' : 'Validate'}
                 </Button>
             </form>
         </Form>
