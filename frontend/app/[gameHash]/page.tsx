@@ -90,10 +90,12 @@ export default async function Page({ params: { gameHash } }: { params: { gameHas
                     />
                 </div>
             </div>
-            <div className="grid grid-cols-3 gap-6">
+            {/* A list of abandonwares */}
+            {/* <div className="grid grid-cols-3 gap-6">
                 {abandonwares.map((abandonware) => (
                     <GameCard item={abandonware} />
-                ))}</div>
+                ))}
+            </div> */}
         </div>
     )
 }
