@@ -28,7 +28,6 @@ import { sepolia } from 'wagmi/chains'
 import { mockVaultiumContract } from '@/lib/wagmi/mockVaultiumContract'
 import { useEffect, useState } from 'react'
 import { useTransaction } from 'wagmi'
-import { getTransaction } from '@wagmi/core'
 import { wagmiConfig } from '@/lib/wagmi/config'
 import { fromHex } from 'viem'
 import { parseTransaction } from 'viem'
@@ -36,6 +35,8 @@ import { decodeFunctionResult } from 'viem'
 import { mock } from 'node:test'
 import Web3 from 'web3'
 import { decodeFunctionData } from 'viem'
+import { decodeAbiParameters, parseAbiParameters } from 'viem'
+
 
 export default function ValidateForm({
     setSearchedGames,
@@ -44,6 +45,7 @@ export default function ValidateForm({
 }) {
     const { form } = useValidateForm()
     const { authenticated } = usePrivy()
+    const web3 = new Web3()
 
     const { data: hash, isPending, writeContract } = useWriteContract()
 
@@ -70,6 +72,7 @@ export default function ValidateForm({
             })
         }
     }
+
     const {
         data,
         isLoading: isConfirming,
@@ -78,9 +81,60 @@ export default function ValidateForm({
         hash,
     })
 
+    const typeArray = [
+        {
+
+            name: 'gameHash',
+            type: 'bytes32',
+        },
+        {
+
+            name: 'name',
+            type: 'string',
+        },
+        {
+
+            name: 'genre',
+            type: 'uint8',
+        },
+        {
+
+            name: 'publisher',
+            type: 'string',
+        },
+        {
+
+            name: 'year',
+            type: 'uint256',
+        },
+    ]
+
+
+
     // 1. isSuccess get the transaction result
     // 2. decodeFunctionData inside the useEffect
     // 3. setSearchedGames
+    useEffect(() => {
+        if (data && isConfirmed) {
+            const hashData = data.logs[0].data
+
+            console.log(data)
+            const decodedParameters = web3.eth.abi.decodeParameters(typeArray, hashData);
+            const gameData = [
+                {
+                    gameHash: String(decodedParameters.gameHash).substring(2).toUpperCase(),
+                    name: decodedParameters.name,
+                    genre: Number(decodedParameters.genre),
+                    publisher: decodedParameters.publisher,
+                    year: Number(decodedParameters.year),
+                }
+
+            ]
+            // objeto creado para almacenar el decode del hash
+            console.log(gameData);
+        }
+    }, [data, hash])
+
 
     type Field = {
         name: keyof z.infer<typeof FormSchema>
@@ -121,25 +175,6 @@ export default function ValidateForm({
         },
     ]
 
-    // const result = useTransaction({
-    //     hash: '0xaedd62ead5dc194edcc03d6b31b9d49b1f2e1cbe56e4ae04a57ca79b64b8e257',
-    //   }) 
-      
-      const result = useTransaction({
-        hash: '0x9776dc0a342ef93fe5cec3ee31c81fe70e9795e25b91d83299ec649a53d059ad',
-      })
-
-      useEffect(() => {
-        if(result){
-            console.log('result', result)
-            const { args } = decodeFunctionData({
-                abi: mockVaultiumContract.abi,
-                data: result?.data?.input
-        })
-        console.log('args', args)
-
-    }
-      }, [result])
 
     return (
         <Form {...form}>
