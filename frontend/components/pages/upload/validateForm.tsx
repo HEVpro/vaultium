@@ -17,12 +17,25 @@ import { cn } from '@/lib/utils'
 import { Game } from '@/lib/types'
 import { validateGame } from '@/lib/api'
 import { usePrivy } from '@privy-io/react-auth'
-import { useReadContract, useWaitForTransactionReceipt, useWriteContract } from 'wagmi'
+import {
+    useReadContract,
+    useTransactionReceipt,
+    useWaitForTransactionReceipt,
+    useWriteContract,
+} from 'wagmi'
 import { type UseReadContractParameters } from 'wagmi'
 import { sepolia } from 'wagmi/chains'
 import { mockVaultiumContract } from '@/lib/wagmi/mockVaultiumContract'
 import { useEffect, useState } from 'react'
 import { useTransaction } from 'wagmi'
+import { getTransaction } from '@wagmi/core'
+import { wagmiConfig } from '@/lib/wagmi/config'
+import { fromHex } from 'viem'
+import { parseTransaction } from 'viem'
+import { decodeFunctionResult } from 'viem'
+import { mock } from 'node:test'
+import Web3 from 'web3'
+import { decodeFunctionData } from 'viem'
 
 export default function ValidateForm({
     setSearchedGames,
@@ -32,51 +45,23 @@ export default function ValidateForm({
     const { form } = useValidateForm()
     const { authenticated } = usePrivy()
 
-    const { 
-        data: hash, 
-        isPending, 
-        writeContract 
-      } = useWriteContract() 
-
-
-      const result = useTransaction({
-        hash: '0x0029185312690005acf75f78fa47bdd0c4dc1c0fb1aa04810810999b193d7860',
-      })
-
-
-      useEffect(() => {
-
-      }, [hash])
-
+    const { data: hash, isPending, writeContract } = useWriteContract()
 
     async function onSubmit(data: z.infer<typeof FormSchema>) {
         if (authenticated) {
-            writeContract({ 
+            writeContract({
                 abi: mockVaultiumContract.abi,
                 address: '0xE8B07e948168108C8f0BE3bfD448D4a9A9B56596',
                 functionName: 'searchAbandonware',
                 args: [
-                  data.name,
+                    data.name,
                     data.description,
                     data.publisher,
                     0,
                     data.year,
                 ],
                 chainId: sepolia.id,
-             })
-             if(hash){
-                // eslint-disable-next-line react-hooks/rules-of-hooks
-                const result = useTransaction({
-                    hash: hash,
-                  })
-                  console.log(result)
-             }
-            // const game = await contract.refetch()
-            // if(game.status === 'success') {
-            //     form.reset()
-            // }
-
-            // console.log(game)
+            })
         } else {
             toast({
                 title: 'Authentication required',
@@ -85,10 +70,17 @@ export default function ValidateForm({
             })
         }
     }
-    const { isLoading: isConfirming, isSuccess: isConfirmed } =
-    useWaitForTransactionReceipt({
-      hash,
+    const {
+        data,
+        isLoading: isConfirming,
+        isSuccess: isConfirmed,
+    } = useWaitForTransactionReceipt({
+        hash,
     })
+
+    // 1. isSuccess get the transaction result
+    // 2. decodeFunctionData inside the useEffect
+    // 3. setSearchedGames
 
     type Field = {
         name: keyof z.infer<typeof FormSchema>
@@ -128,6 +120,26 @@ export default function ValidateForm({
             className: 'col-span-2',
         },
     ]
+
+    // const result = useTransaction({
+    //     hash: '0xaedd62ead5dc194edcc03d6b31b9d49b1f2e1cbe56e4ae04a57ca79b64b8e257',
+    //   }) 
+      
+      const result = useTransaction({
+        hash: '0x9776dc0a342ef93fe5cec3ee31c81fe70e9795e25b91d83299ec649a53d059ad',
+      })
+
+      useEffect(() => {
+        if(result){
+            console.log('result', result)
+            const { args } = decodeFunctionData({
+                abi: mockVaultiumContract.abi,
+                data: result?.data?.input
+        })
+        console.log('args', args)
+
+    }
+      }, [result])
 
     return (
         <Form {...form}>
