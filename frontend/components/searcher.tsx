@@ -4,11 +4,58 @@ import { useEffect, useState } from 'react'
 import { abandonwares } from '@/lib/abandonwares'
 import { GameCard } from './gameCard'
 import { Label } from './ui/label'
+import { ApolloClient, InMemoryCache, gql } from '@apollo/client'
+
+const subgraphName = 'vaultium-testing-sepolia'
+const graphId = '62919'
+const APIURL = `https://api.studio.thegraph.com/query/${graphId}/${subgraphName}/version/latest`
+
+const tokensQuery = gql`
+  query{
+    gameAddedToSystems{
+        name
+        gameHash
+        publisher
+        year
+    }
+  }
+`
 
 const Searcher = () => {
     const [searchTerm, setSearchTerm] = useState('')
-    const [games, setGames] = useState(abandonwares)
+    const [games, setGames] = useState([])
     const [debounceGame, setDebounceGame] = useState('')
+
+    const client = new ApolloClient({
+        uri: APIURL,
+        cache: new InMemoryCache(),
+    })
+
+    const gamesNotToInclude = ['banana', 'game', 'test', 'gaming']
+
+    useEffect(() => {
+        client
+            .query({
+                query: tokensQuery,
+            })
+            .then((data) => {
+                const results = data.data.gameAddedToSystems.map((item: any) => {
+                    return {
+                        name: item.name,
+                        year: item.year,
+                        publisher: item.publisher,
+                        gameHash: item.gameHash,
+                    }
+                }).filter((item: any) => {
+                    const lowerCaseName = item.name.toLowerCase();
+                    return !gamesNotToInclude.some(word => lowerCaseName.includes(word));
+                })
+                setGames(results)
+            })
+            .catch((err) => {
+                console.error('Error fetching data: ', err)
+            })
+    }, [])
 
     useEffect(() => {
         const timerId = setTimeout(() => {
@@ -22,13 +69,11 @@ const Searcher = () => {
 
     useEffect(() => {
         if (debounceGame) {
-            const filteredGames = abandonwares.filter(({ name }) => {
+            const filteredGames = games.filter(({ name }) => {
                 return name.toLowerCase().includes(debounceGame.toLowerCase())
             })
             setGames(filteredGames)
-        } else {
-            setGames(abandonwares)
-        }
+        } 
     }, [debounceGame, abandonwares])
 
     return (
@@ -50,11 +95,12 @@ const Searcher = () => {
 
             {games.length > 0 ? (
                 <div className='grid w-full grid-cols-3 gap-8'>
-                    {games.map((item, idx) => (
+                    {games.length && games.map((item, idx) => (
                         <GameCard key={idx} item={item} />
                     ))}
                 </div>
             ) : (
+                // TODO: ADD AN SKELETON
                 <div className='h-full w-full py-8'>
                     <p className='text-center text-3xl text-gray-400'>
                         {"Oh no! We couldn't find any matching games."}
