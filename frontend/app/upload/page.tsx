@@ -46,7 +46,7 @@ import { useState } from 'react'
 import { z } from 'zod'
 
 export default function Page() {
-    const [searchedGames, setSearchedGames] = useState<Game[] | null>(null)
+    const [gameResult, setGamerResult] = useState<Game | null>(null)
     const [selectedGame, setSelectedGame] = useState<Game | null>(null)
     const { form } = useCustomForm()
 
@@ -81,14 +81,13 @@ export default function Page() {
                 </div>
                 {/* VALIDATE */}
                 <div className='flex w-full flex-col gap-2'>
-                    <ValidateForm setSearchedGames={setSearchedGames} />
+                    <ValidateForm setSearchedGames={setGamerResult} />
                 </div>
             </div>
             <div className='w-full'>
                 {/* THE LIST OF GAME RESULTS */}
                 {!selectedGame &&
-                    searchedGames &&
-                    searchedGames?.length > 0 && (
+                    gameResult && (
                         <motion.div
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
@@ -96,16 +95,14 @@ export default function Page() {
                             className={cn('mt-6 w-full')}
                         >
                             <h2 className='text-2xl font-semibold text-primary'>
-                                Maybe your a looking for one of these games?
+                                Maybe your a looking this game?
                             </h2>
                             <div className='mt-4 grid w-full grid-cols-3 gap-4'>
-                                {searchedGames?.map((game) => (
                                     <GameCardResult
-                                        key={game.gameHash}
-                                        game={game}
+                                        key={gameResult.gameHash}
+                                        game={gameResult}
                                         setSelectedGame={setSelectedGame}
                                     />
-                                ))}
                             </div>
                         </motion.div>
                     )}
@@ -134,7 +131,7 @@ export default function Page() {
                     </motion.div>
                 )}
                 {/* NOT EXISTING GAME */}
-                {searchedGames && searchedGames.length === 0 && (
+                {gameResult && gameResult.length === 0 && (
                     <div className='w-full py-12 text-center'>
                         <h2 className='mx-auto w-[50ch] text-xl text-primary'>
                             {

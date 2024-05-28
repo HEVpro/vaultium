@@ -7,6 +7,7 @@ import {
 import { Game } from '@/lib/types'
 import { CloudUploadIcon, LinkIcon, SwordsIcon } from 'lucide-react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 
 interface UploadGameCardProps {
     game: Game
@@ -50,8 +51,7 @@ export default function GameCardResult({
                         <Tooltip>
                             <TooltipTrigger asChild>
                                 <button
-                                // TODO:  OPEN A CHALLENGE
-                                    onClick={() => console.info("I want a challenge!")}
+                                    onClick={() => console.info('Open challenge')}
                                     className='cursor-pointer transition duration-500 hover:scale-110 active:scale-90 '
                                 >
                                     <SwordsIcon className='h-5 w-5 stroke-1 text-primary transition duration-500 hover:stroke-2' />
@@ -67,7 +67,7 @@ export default function GameCardResult({
                     )}
                     <Link
                         href={`/${game.gameHash}`}
-                        className='pointer-events-none cursor-pointer transition duration-500 hover:scale-110 active:scale-90 '
+                        className=' cursor-pointer transition duration-500 hover:scale-110 active:scale-90 '
                     >
                         <LinkIcon className='h-5 w-5 stroke-1 text-primary transition duration-500 hover:stroke-2' />
                     </Link>

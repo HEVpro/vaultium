@@ -18,12 +18,9 @@ import { Game } from '@/lib/types'
 import { validateGame } from '@/lib/api'
 import { usePrivy } from '@privy-io/react-auth'
 import {
-    useReadContract,
-    useTransactionReceipt,
     useWaitForTransactionReceipt,
     useWriteContract,
 } from 'wagmi'
-import { type UseReadContractParameters } from 'wagmi'
 import { sepolia } from 'wagmi/chains'
 import { mockVaultiumContract } from '@/lib/wagmi/mockVaultiumContract'
 import { useEffect, useState } from 'react'
@@ -36,18 +33,27 @@ import { mock } from 'node:test'
 import Web3 from 'web3'
 import { decodeFunctionData } from 'viem'
 import { decodeAbiParameters, parseAbiParameters } from 'viem'
+import { gameCasterArray } from '@/lib/constants'
 
 
 export default function ValidateForm({
     setSearchedGames,
 }: {
-    setSearchedGames: (value: Game[]) => void
+    setSearchedGames: (value: Game) => void
 }) {
     const { form } = useValidateForm()
     const { authenticated } = usePrivy()
     const web3 = new Web3()
 
     const { data: hash, isPending, writeContract } = useWriteContract()
+
+    const {
+        data,
+        isLoading: isConfirming,
+        isSuccess: isConfirmed,
+    } = useWaitForTransactionReceipt({
+        hash,
+    })
 
     async function onSubmit(data: z.infer<typeof FormSchema>) {
         if (authenticated) {
@@ -73,67 +79,28 @@ export default function ValidateForm({
         }
     }
 
-    const {
-        data,
-        isLoading: isConfirming,
-        isSuccess: isConfirmed,
-    } = useWaitForTransactionReceipt({
-        hash,
-    })
-
-    const typeArray = [
-        {
-
-            name: 'gameHash',
-            type: 'bytes32',
-        },
-        {
-
-            name: 'name',
-            type: 'string',
-        },
-        {
-
-            name: 'genre',
-            type: 'uint8',
-        },
-        {
-
-            name: 'publisher',
-            type: 'string',
-        },
-        {
-
-            name: 'year',
-            type: 'uint256',
-        },
-    ]
-
-
-
-    // 1. isSuccess get the transaction result
-    // 2. decodeFunctionData inside the useEffect
-    // 3. setSearchedGames
     useEffect(() => {
-        if (data && isConfirmed) {
+        if (data && !isConfirming && isConfirmed) {
             const hashData = data.logs[0].data
 
-            console.log(data)
-            const decodedParameters = web3.eth.abi.decodeParameters(typeArray, hashData);
-            const gameData = [
+            console.log('hashData', hashData)
+
+            const decodedParameters = web3.eth.abi.decodeParameters(gameCasterArray, hashData);
+            const gameData: Game = 
                 {
                     gameHash: String(decodedParameters.gameHash).substring(2).toUpperCase(),
-                    name: decodedParameters.name,
+                    name: decodedParameters.name as unknown as string,
                     genre: Number(decodedParameters.genre),
-                    publisher: decodedParameters.publisher,
+                    publisher: decodedParameters.publisher as unknown as string,
                     year: Number(decodedParameters.year),
                 }
+            
+            setSearchedGames(gameData)
+            form.reset()
+            console.log('gameData', gameData)
 
-            ]
-            // objeto creado para almacenar el decode del hash
-            console.log(gameData);
         }
-    }, [data, hash])
+    }, [data])
 
 
     type Field = {
@@ -220,11 +187,11 @@ export default function ValidateForm({
                 ))}
                 <Button
                     disabled={
-                        form.formState.isSubmitting || !form.formState.isDirty
+                        isConfirming
                     }
                     className='col-span-full text-base text-foreground transition duration-300 hover:text-white active:scale-90'
                 >
-                    {isPending ? 'Validating...' : 'Validate'}
+                    {isConfirming ? 'Validating...' : 'Validate'}
                 </Button>
             </form>
         </Form>
