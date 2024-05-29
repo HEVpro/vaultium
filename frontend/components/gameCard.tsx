@@ -1,5 +1,6 @@
 'use client'
 import {
+    HeartIcon,
     MinusCircleIcon,
     PlusCircleIcon,
     TriangleAlertIcon,
@@ -8,13 +9,15 @@ import { Badge } from './ui/badge'
 import { useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
+import { cn } from '@/lib/utils'
 
 interface GameCardProps {
     item: any
 }
 
 export const GameCard = ({ item }: GameCardProps) => {
-    const [vote, setVote] = useState(0)
+    const [like, setLike] = useState(false)
+    const [totalLikes, setTotalLikes] = useState(0)
 
     return (
         <div className='bg-gradient group relative h-[400px] w-full overflow-hidden rounded-xl'>
@@ -49,19 +52,16 @@ export const GameCard = ({ item }: GameCardProps) => {
                                     )
                                 )}
                             </div>
-                            <div className='flex items-end justify-between '>
-                                <button>
-                                    <TriangleAlertIcon className='tranisition duration-300 hover:stroke-yellow-500' />
+                            <div className='z-30 flex items-end gap-4 ml-auto'>
+                                <span>{totalLikes}</span>
+                                <button onClick={(e) => {
+                                    e.preventDefault()
+                                    setLike(!like)
+                                    setTotalLikes(totalLikes + 1)
+                                }}>
+                                    <HeartIcon className={cn('tranisition duration-300 hover:!stroke-red-500',
+                                        like ? "fill-red-500" : "fill-none")} />
                                 </button>
-                                <div className='flex items-center gap-4'>
-                                    <button onClick={() => setVote(vote - 1)}>
-                                        <MinusCircleIcon className='tranisition duration-300 hover:stroke-red-500' />
-                                    </button>
-                                    <span>{vote}</span>
-                                    <button onClick={() => setVote(vote + 1)}>
-                                        <PlusCircleIcon className='tranisition duration-300 hover:!stroke-green-500' />
-                                    </button>
-                                </div>
                             </div>
                         </div>
                     </Link>
