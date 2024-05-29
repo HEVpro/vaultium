@@ -29,6 +29,7 @@ import {
 } from '@/components/ui/tooltip'
 import useCustomForm, { FormSchema } from '@/components/uploadForm'
 import { countries } from '@/lib/countries'
+import { fleekSdk } from '@/lib/fleek'
 import { Game } from '@/lib/types'
 import { cn } from '@/lib/utils'
 import { motion } from 'framer-motion'
@@ -48,6 +49,7 @@ import { z } from 'zod'
 export default function Page() {
     const [gameResult, setGamerResult] = useState<Game | null>(null)
     const [selectedGame, setSelectedGame] = useState<Game | null>(null)
+    const [file, setFile] = useState<any | null>(null)
     const { form } = useCustomForm()
 
     function onSubmit(data: z.infer<typeof FormSchema>) {
@@ -61,6 +63,19 @@ export default function Page() {
         //     </pre>
         //   ),
         // })
+    }
+
+    const uploadToIPFS = async (filename: string, content: Buffer) => {
+        const formData = new FormData()
+        formData.append('file', file)
+
+        fetch('/api/upload-image', {
+            method: 'POST',
+            body: formData,
+        })
+            .then((response) => response.json())
+            .then((data) => console.info("uploaded successfully", data))
+            .catch((error) => console.error(error))
     }
 
     return (
@@ -84,28 +99,36 @@ export default function Page() {
                     <ValidateForm setSearchedGames={setGamerResult} />
                 </div>
             </div>
+            <Input
+                type='file'
+                onChange={(e) => e.target.files && setFile(e.target.files[0])}
+            />
+            <Button onClick={() => uploadToIPFS(file.name, file)}>
+                <CloudUploadIcon size={24} />
+                Upload
+            </Button>
+            
             <div className='w-full'>
                 {/* THE LIST OF GAME RESULTS */}
-                {!selectedGame &&
-                    gameResult && (
-                        <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            transition={{ duration: 0.5 }}
-                            className={cn('mt-6 w-full')}
-                        >
-                            <h2 className='text-2xl font-semibold text-primary'>
-                                Maybe your a looking this game?
-                            </h2>
-                            <div className='mt-4 grid w-full grid-cols-3 gap-4'>
-                                    <GameCardResult
-                                        key={gameResult.gameHash}
-                                        game={gameResult}
-                                        setSelectedGame={setSelectedGame}
-                                    />
-                            </div>
-                        </motion.div>
-                    )}
+                {!selectedGame && gameResult && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 0.5 }}
+                        className={cn('mt-6 w-full')}
+                    >
+                        <h2 className='text-2xl font-semibold text-primary'>
+                            Maybe your a looking this game?
+                        </h2>
+                        <div className='mt-4 grid w-full grid-cols-3 gap-4'>
+                            <GameCardResult
+                                key={gameResult.gameHash}
+                                game={gameResult}
+                                setSelectedGame={setSelectedGame}
+                            />
+                        </div>
+                    </motion.div>
+                )}
                 {/* YOU HAVE SELECTED A GAME AND YOU WANT TO UPLOAD A NEW VERSION, WITHOUT CHALLENGE */}
                 {selectedGame && (
                     <motion.div
@@ -131,7 +154,7 @@ export default function Page() {
                     </motion.div>
                 )}
                 {/* NOT EXISTING GAME */}
-                {gameResult && gameResult.length === 0 && (
+                {!gameResult && (
                     <div className='w-full py-12 text-center'>
                         <h2 className='mx-auto w-[50ch] text-xl text-primary'>
                             {
