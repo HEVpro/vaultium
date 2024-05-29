@@ -82,7 +82,7 @@ contract Vaultium {
         require(_year > 0, "Invalid year");
         bytes32 gameHash = getGameHash(_name, _year, _publisher);
         GameInfo memory gameInfo = GameInfo(_name, _year, _publisher, "", true, _description, gameHash);
-        
+        gameInfo.isAbandonware = true;
         if (game[gameHash].year == 0) {
             game[gameHash] = gameInfo;
             emit GameAddedToSystem(gameHash, gameInfo.name, gameInfo.publisher, gameInfo.year);
