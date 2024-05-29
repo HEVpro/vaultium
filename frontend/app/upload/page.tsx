@@ -74,9 +74,15 @@ export default function Page() {
             body: formData,
         })
             .then((response) => response.json())
-            .then((data) => console.info("uploaded successfully", data))
+            .then((data) => console.info("uploaded successfully", data.pin.cid))
             .catch((error) => console.error(error))
     }
+    // TODO: NEXT STEPS
+    // 0. ADD LOADERS AND CREATE A COMPONENT FOR IT
+    // 1 IF THE GAME HAVE NO CID, UPLOAD THE GAME WITH ICON IN CARD
+    // 2.IF THE GAME DON'T HAVE A CID IMAGE, UPLOAD THE IMAGE WITH ICON IN CARD
+    // 3. IF THE GAME HAVE CID AND IMAGE, SHOW THE GAME CARD WITH ICON
+    // all the steps need to write on the contract
 
     return (
         <div className='flex flex-col items-center justify-start px-6 pb-24'>
