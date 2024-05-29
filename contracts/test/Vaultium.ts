@@ -79,4 +79,41 @@ describe("Lock", function () {
         });
     });
 
+    describe("Create Challenges", function(){
+        describe("Validations", function(){
+            it("Should revert with the right error if there is already an existing challenge", async function(){
+                const { vaultium, publicClient } = await loadFixture(deployVaultium);
+
+                var hash = await vaultium.write.searchAbandonware(["HarryPotter","Meh","HPublish",2004]);
+                await publicClient.waitForTransactionReceipt({ hash });
+                var gameAddedEvents = await vaultium.getEvents.GameAddedToSystem();
+                expect(gameAddedEvents).to.have.lengthOf(1);
+                const gameHash = gameAddedEvents[0].args.gameHash;
+
+                hash = await vaultium.write.challengeAbandonwareVersion([gameHash!,"ipfs cid","image cid"]);
+                await publicClient.waitForTransactionReceipt({hash});
+                var challengeAddedEvents = await vaultium.getEvents.ChallengeAddedToSystem();
+                expect(challengeAddedEvents).to.have.lengthOf(1);
+
+                await expect(vaultium.write.challengeAbandonwareVersion([gameHash!,"ipfs cid","image cid"])).to.be.rejectedWith(
+                    "Challenge already existed"
+                );
+                await expect(vaultium.write.challengeAbandonwareVersion([`0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef`,"ipfs cid","image cid"])).to.be.rejectedWith(
+                    "Game not found"
+                );
+            });
+        });
+
+        describe("Events", function(){
+            it("Should emit an event when a new challenge is added", async function(){
+                const { vaultium, publicClient } = await loadFixture(deployVaultium);
+
+                var hash = await vaultium.write.searchAbandonware(["HarryPotter","Meh","HPublish",2004]);
+                await publicClient.waitForTransactionReceipt({ hash });
+                var gameAddedEvents = await vaultium.getEvents.GameAddedToSystem();
+                expect(gameAddedEvents).to.have.lengthOf(1);
+
+            });
+        });
+    })
 });
