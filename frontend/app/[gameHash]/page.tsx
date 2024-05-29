@@ -1,7 +1,5 @@
-import { GameCard } from "@/components/gameCard"
 import { Badge } from "@/components/ui/badge"
 import { abandonwares } from "@/lib/abandonwares"
-import { MinusCircleIcon, PlusCircleIcon, TriangleAlertIcon } from "lucide-react"
 import Image from "next/image"
 
 export async function generateStaticParams() {
@@ -27,36 +25,36 @@ export default async function Page({ params: { gameHash } }: { params: { gameHas
                         <div className="grid grid-cols-2">
 
                             <div className="">
-                                <p>platform</p>
+                                <p className="font-bold font-nunito">platform</p>
                                 <p>{abandonware?.platform}</p>
                             </div>
                             <div className="">
-                                <p>year</p>
+                                <p className="font-bold font-nunito">year</p>
                                 <p>{abandonware?.year}</p>
                             </div>
                         </div>
                         <div className="grid grid-cols-2">
 
                             <div className="">
-                                <p>genre</p>
+                                <p className="font-bold font-nunito">genre</p>
                                 <p>{abandonware?.genre}</p>
                             </div>
                             <div className="">
-                                <p>publisher</p>
+                                <p className="font-bold font-nunito">publisher</p>
                                 <p>{abandonware?.publisher}</p>
                             </div>
                         </div>
                         <div className="">
-                            <p>released in</p>
+                            <p className="font-bold font-nunito">released in</p>
                             <p>{abandonware?.releasedIn}</p>
                         </div>
                     </div>
                     <div>
-                        <p>description:</p>
+                        <p className="font-bold font-nunito">description:</p>
                         <p className="max-h-32 overflow-scroll no-scrollbar">{abandonware?.description}</p>
                     </div>
                     <div className="space-y-2">
-                        <p>themes:</p>
+                        <p className="font-bold font-nunito">themes:</p>
                         <div className='no-scrollbar flex max-h-20 min-h-16 flex-wrap items-start justify-start gap-1  overflow-scroll'>
                             {abandonware?.theme.map(
                                 (element: string, idx: number) => (
