@@ -40,11 +40,17 @@ describe("Lock", function () {
 
     describe("Searching Games", function(){
         describe("Validations", function(){
-            it("Should evert with the right error if no games exist for a search", async function(){
+            it("Should revert with the right error searching games with incomplete data", async function(){
                 const { vaultium } = await loadFixture(deployVaultium);
 
                 await expect(vaultium.write.searchAbandonware(["","","",0])).to.be.rejectedWith(
-                  "No valid games found"
+                    "Invalid name"
+                );
+                await expect(vaultium.write.searchAbandonware(["game","","",0])).to.be.rejectedWith(
+                    "Invalid publisher"
+                );
+                await expect(vaultium.write.searchAbandonware(["game","","publisher",0])).to.be.rejectedWith(
+                    "Invalid year"
                 );
             });
         });
