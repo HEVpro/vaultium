@@ -5,8 +5,11 @@ import { expect } from "chai";
 import hre from "hardhat";
 import { getAddress } from "viem";
 
+function delay(ms: number) {
+    return new Promise( resolve => setTimeout(resolve, ms) );
+}
 
-describe("Lock", function () {
+describe("Vaultium", function () {
     // We define a fixture to reuse the same setup in every test.
     // We use loadFixture to run this setup once, snapshot that state,
     // and reset Hardhat Network to that snapshot in every test.
@@ -14,7 +17,7 @@ describe("Lock", function () {
         // Contracts are deployed using the first signer/account by default
         const [owner, otherAccount] = await hre.viem.getWalletClients();
 
-        const vaultium = await hre.viem.deployContract("Vaultium", [], {
+        const vaultium = await hre.viem.deployContract("Vaultium", [15], {
 
         });
 
@@ -174,12 +177,25 @@ describe("Lock", function () {
                     "User has already voted in this challenge"
                 );
             });
+            it("Should revert with error if challenge has expired", async function(){
+                var hash = await _vaultium.write.challengeAbandonwareVersion([_gameHash!,"ipfs cid","image cid"]);
+                await _publicClient.waitForTransactionReceipt({hash});
+
+                await expect(_vaultium.write.voteChallenge([_gameHash,true,1])).not.to.be.rejectedWith(
+                    "Challenge not found"
+                );
+                // wait until challenge is closed
+                await delay(15000);
+                await expect(_vaultium.write.voteChallenge([_gameHash,true,1])).to.be.rejectedWith(
+                    "Challenge not found"
+                );
+            });
         });
 
         describe("Get Challenge History Validations", function(){
             it("Should revert if game does not exist", async function(){
                 const {vaultium, publicClient} = await loadFixture(deployVaultium);
-                await expect(vaultium.write.getGameChallengeHistory([`0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef`])).to.be.rejectedWith(
+                await expect(vaultium.read.getGameChallengeHistory([`0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef`])).to.be.rejectedWith(
                     "Game not found"
                 );
             });
@@ -242,4 +258,49 @@ describe("Lock", function () {
         });
     });
 
+    describe("Versions", function(){
+        describe("Validations", function(){
+            it("Revert with error if game does not exist", async function(){
+                const {vaultium, publicClient} = await loadFixture(deployVaultium);
+                await expect(vaultium.write.getGameVersionHistory([`0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef`])).to.be.rejectedWith(
+                    "Game not found"
+                );
+            });
+        });
+        describe("Get Version History Results", function(){
+            it("Should return a the correct list when the game exists", async function(){
+                const {vaultium, publicClient} = await loadFixture(deployVaultium);
+
+                var hash = await vaultium.write.searchAbandonware(["HarryPotter","Meh","HPublish",2004]);
+                await publicClient.waitForTransactionReceipt({ hash });
+                var gameAddedEvents = await vaultium.getEvents.GameAddedToSystem();
+                expect(gameAddedEvents).to.have.lengthOf(1);
+                const gameHash = gameAddedEvents[0].args.gameHash;
+
+                // the history should be empty
+                hash = await vaultium.write.getGameVersionHistory([gameHash!]);
+                await publicClient.waitForTransactionReceipt({hash});
+                var challengeList = await vaultium.read.getGameVersionHistory([gameHash!]);
+                expect(challengeList).to.have.lengthOf(0);
+
+                // create a challenge and make new version win
+                hash = await vaultium.write.challengeAbandonwareVersion([gameHash!,"ipfs cid","image cid"]);
+                await publicClient.waitForTransactionReceipt({hash});
+                hash = await vaultium.write.voteChallenge([gameHash!,true, 9]);
+                await publicClient.waitForTransactionReceipt({hash});
+
+                // wait for challenge to close
+                await delay(15000);
+
+                hash = await vaultium.write.getGameVersionHistory([gameHash!]);
+                await publicClient.waitForTransactionReceipt({hash});
+                challengeList = await vaultium.read.getGameVersionHistory([gameHash!]);
+
+                var closedChallengeEvent = await vaultium.getEvents.ClosedChallenge();
+                expect(closedChallengeEvent).to.have.lengthOf(1);
+
+                expect(challengeList).to.have.lengthOf(1);
+            });
+        })
+    });
 });

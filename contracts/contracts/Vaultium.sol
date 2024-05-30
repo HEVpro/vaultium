@@ -72,13 +72,18 @@ contract Vaultium {
 
     mapping(bytes32 => GameInfo) public game;
     mapping(bytes32 => GameChallengeHistory) public gameChallengeHistory;
+    mapping(bytes32 => GameVersionHistory) public gameVersionHistory;
+
+    uint256 challengeTime; // seconds until challenges close
 
     event GameAddedToSystem(bytes32 gameHash, string name, string publisher, uint year);
     event ChallengeAddedToSystem(bytes32 gameHash, string newIpfsCid, string newImageCid);
     event VotedChallenge(bytes32 gameHash, ChallengeResponse challenge);
+    event ClosedChallenge(bytes32 gameHash, ChallengeResponse challenge);
 
-    constructor() {
+    constructor(uint256 _challengeTime) {
         owner = payable(msg.sender);
+        challengeTime = _challengeTime;
     }
 
     function getGameHash(
@@ -100,6 +105,9 @@ contract Vaultium {
         require(bytes(_publisher).length > 0, "Invalid publisher");
         require(_year > 0, "Invalid year");
         bytes32 gameHash = getGameHash(_name, _year, _publisher);
+
+        closeChallengesIfNeeded(gameHash);
+
         GameInfo memory gameInfo = GameInfo(_name, _year, _publisher, "", "", true, _description, gameHash);
 
         if (game[gameHash].year == 0) {
@@ -130,6 +138,8 @@ contract Vaultium {
         bool hasActiveChallenge = hasActiveChallengeForGame(_gameHash);
         require(!hasActiveChallenge, "Challenge already existed");
 
+        closeChallengesIfNeeded(_gameHash);
+
         ChallengeResponse memory newChallenge = ChallengeResponse(
             _gameHash,
             ChallengeVersionResponse(
@@ -143,7 +153,7 @@ contract Vaultium {
             0,
             0,
             block.timestamp,
-            block.timestamp + 30 minutes
+            block.timestamp + challengeTime
         );
 
         // copy new object to storage
@@ -304,5 +314,74 @@ contract Vaultium {
         }
         
         return response;
+    }
+
+    function getGameVersionHistory(bytes32 _gameHash) public returns (GameVersion[] memory) {
+        require(game[_gameHash].year > 0, "Game not found");
+
+        closeChallengesIfNeeded(_gameHash);
+
+        uint listSize = gameVersionHistory[_gameHash].versionsSize;
+        GameVersion[] memory response = new GameVersion[](listSize);
+
+        for(uint i = 0; i < listSize; i++){
+            response[i] = gameVersionHistory[_gameHash].versions[i];
+        }
+        
+        return response;
+    }
+
+    function stringsEquals(string memory s1, string memory s2) private pure returns (bool) {
+        bytes memory b1 = bytes(s1);
+        bytes memory b2 = bytes(s2);
+        uint256 l1 = b1.length;
+        if (l1 != b2.length) return false;
+        for (uint256 i=0; i<l1; i++) {
+            if (b1[i] != b2[i]) return false;
+        }
+        return true;
+    }
+
+    // closing a challenges may insert a new entry to version history
+    function closeChallengesIfNeeded(bytes32 _gameHash) private {
+        bool hasLastChallenge = gameChallengeHistory[_gameHash].challengesSize > 0;
+        if(!hasLastChallenge)
+            return;
+        bool lastChallengeIsOngoing = 
+            gameChallengeHistory[_gameHash].challenges[gameChallengeHistory[_gameHash].challengesSize - 1].closingDate > block.timestamp;
+        if(lastChallengeIsOngoing)
+            return;
+        bool lastChallengeHadToChangeVersion = 
+            (
+                gameChallengeHistory[_gameHash].challenges[gameChallengeHistory[_gameHash].challengesSize - 1].newVersionPoints > 
+                gameChallengeHistory[_gameHash].challenges[gameChallengeHistory[_gameHash].challengesSize - 1].currentVersionPoints
+            );
+        if(!lastChallengeHadToChangeVersion)
+            return;
+
+        string memory newVersionIpfsCid = (gameChallengeHistory[_gameHash].challenges[gameChallengeHistory[_gameHash].challengesSize - 1].newChallengeVersion.gameVersion.ipfsCid);
+        string memory newVersionImageCid = (gameChallengeHistory[_gameHash].challenges[gameChallengeHistory[_gameHash].challengesSize - 1].newChallengeVersion.gameVersion.imageCid);
+        bool doWeHaveLastVersion = false;
+        if(gameVersionHistory[_gameHash].versionsSize > 0){
+            doWeHaveLastVersion = 
+                stringsEquals(
+                    (gameVersionHistory[_gameHash].versions[gameVersionHistory[_gameHash].versionsSize -1].ipfsCid), 
+                    newVersionIpfsCid)
+                &&
+                stringsEquals(
+                    (gameVersionHistory[_gameHash].versions[gameVersionHistory[_gameHash].versionsSize -1].imageCid), 
+                    newVersionImageCid);
+        }
+        if(doWeHaveLastVersion)
+            return;
+        
+        // If we get here, we have a valid last challenge that doesn't have its last version saved
+        gameVersionHistory[_gameHash].versionsSize++;
+        gameVersionHistory[_gameHash].versions[gameVersionHistory[_gameHash].versionsSize -1] = GameVersion(_gameHash, newVersionIpfsCid, newVersionImageCid);
+        game[_gameHash].ipfsCid = newVersionIpfsCid;
+        game[_gameHash].imageCid = newVersionImageCid;
+
+        ChallengeResponse memory response =  getChallengeResponse(_gameHash, gameChallengeHistory[_gameHash].challengesSize - 1);
+        emit ClosedChallenge(_gameHash, response);
     }
 }
