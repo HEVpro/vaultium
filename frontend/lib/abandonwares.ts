@@ -11,6 +11,7 @@ export const abandonwares = [
         theme: ['Arcade', 'Pre-school', 'Real-time'],
         image: '/game_bg.jpg',
         gameHash: 'abc123',
+        ipfsCid: 'QmXTAXgvisCDzh1cqeJN54kdYkohKMV9VaSzsN3fGQ3Y4Q'
     },
     {
         name: 'B-17 FLYING FORTRESS',
@@ -29,6 +30,7 @@ export const abandonwares = [
         ],
         image: '/game_bg.jpg',
         gameHash: 'def456',
+        ipfsCid: 'QmXTAXgvisCDzh1cqeJN54kdYkohKMV9VaSzsN3fGQ3Y4Q'
     },
     {
         name: 'D-BUG',
@@ -42,6 +44,7 @@ export const abandonwares = [
         theme: ['Mini-Games', 'Real-Time'],
         image: '/game_bg.jpg',
         gameHash: 'ghi789',
+        ipfsCid: 'QmXTAXgvisCDzh1cqeJN54kdYkohKMV9VaSzsN3fGQ3Y4Q'
     },
     {
         name: 'G-NETIX',
@@ -55,6 +58,7 @@ export const abandonwares = [
         theme: ['Health', 'Science'],
         image: '/game_bg.jpg',
         gameHash: 'jkl012',
+        ipfsCid: 'QmXTAXgvisCDzh1cqeJN54kdYkohKMV9VaSzsN3fGQ3Y4Q'
     },
     {
         name: 'S.C.A.R.S.',
@@ -75,5 +79,6 @@ export const abandonwares = [
         ],
         image: '/game_bg.jpg',
         gameHash: 'mno345',
+        ipfsCid: 'QmXTAXgvisCDzh1cqeJN54kdYkohKMV9VaSzsN3fGQ3Y4Q'
     },
 ]
