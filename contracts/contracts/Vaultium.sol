@@ -292,4 +292,17 @@ contract Vaultium {
         emit VotedChallenge(_gameHash, response);
         return response;
     }
+
+    function getGameChallengeHistory(bytes32 _gameHash) public view returns (ChallengeResponse[] memory) {
+        require(game[_gameHash].year > 0, "Game not found");
+
+        uint listSize = gameChallengeHistory[_gameHash].challengesSize;
+        ChallengeResponse[] memory response = new ChallengeResponse[](listSize);
+
+        for(uint i = 0; i < listSize; i++){
+            response[i] = getChallengeResponse(_gameHash, i);
+        }
+        
+        return response;
+    }
 }

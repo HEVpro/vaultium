@@ -176,6 +176,38 @@ describe("Lock", function () {
             });
         });
 
+        describe("Get Challenge History Validations", function(){
+            it("Should revert if game does not exist", async function(){
+                const {vaultium, publicClient} = await loadFixture(deployVaultium);
+                await expect(vaultium.write.getGameChallengeHistory([`0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef`])).to.be.rejectedWith(
+                    "Game not found"
+                );
+            });
+        });
+
+        describe("Get Challenge History Results", function() {
+            it("Should return a the correct list when the game exists", async function(){
+                const {vaultium, publicClient} = await loadFixture(deployVaultium);
+
+                var hash = await vaultium.write.searchAbandonware(["HarryPotter","Meh","HPublish",2004]);
+                await publicClient.waitForTransactionReceipt({ hash });
+                var gameAddedEvents = await vaultium.getEvents.GameAddedToSystem();
+                expect(gameAddedEvents).to.have.lengthOf(1);
+                const gameHash = gameAddedEvents[0].args.gameHash;
+
+                // the history should be empty
+                var challengeList = await vaultium.read.getGameChallengeHistory([gameHash!]);
+                expect(challengeList).to.have.lengthOf(0);
+
+                // the history should have 1 element after adding a challenge
+                hash = await vaultium.write.challengeAbandonwareVersion([gameHash!,"ipfs cid","image cid"]);
+                await publicClient.waitForTransactionReceipt({hash});
+
+                challengeList = await vaultium.read.getGameChallengeHistory([gameHash!]);
+                expect(challengeList).to.have.lengthOf(1);
+            });
+        });
+
         describe("Events", function(){
             it("Should emit an event when a new challenge is added", async function(){
                 const { vaultium, publicClient } = await loadFixture(deployVaultium);
