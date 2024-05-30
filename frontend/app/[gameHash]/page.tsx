@@ -68,11 +68,12 @@ export default async function Page({ params: { gameHash } }: { params: { gameHas
                             )}
                         </div>
                     </div>
-                    <div className="space-y-2">
+                    <div className="space-y-2 flex flex-col">
                         <p className="font-bold font-nunito">download</p>
                         <a href={"https://gateway.lighthouse.storage/ipfs/" + abandonware?.ipfsCid} target="_blank" className="bg-gradient text-black p-2 rounded-lg">Download</a>
+                        <i>Is this version of the file wrong?</i>
+                        <a href={"/challenge/" + gameHash} className="text-blue-500">Challenge it now!</a>
                     </div>
-
                 </div>
 
                 <div className="w-1/2  relative">
