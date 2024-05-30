@@ -1,4 +1,3 @@
-import { Badge } from '@/components/ui/badge'
 import { abandonwares } from '@/lib/abandonwares'
 import Image from 'next/image'
 
@@ -18,10 +17,10 @@ export default async function Page({
     params: { gameHash: string }
 }) {
     const abandonware = await getGame(gameHash)
+    const isGameChallenged = true // TODO: check if the current version is being challenged by contract read
 
     // TODO: print gameversion history --> Either call contract or use thegraph to get the history of the new versions
     // TODO: enable users to challenge a version
-    // TODO: check if the current version is being challenged and, if so, show the challenge status and allow users to vote. Otherwhise, show challenge button
 
     return (
         <div className='min-h-screen w-full space-y-10 px-8 py-12 text-white'>
@@ -83,21 +82,47 @@ export default async function Page({
                             </tbody>
                         </table>
                     </div>
-                    <div className='flex flex-col space-y-2'>
-                        <p className='font-nunito font-bold'>challenge</p>
-                        <span className='bg-gradient rounded-lg p-2 text-black'>
-                            Challenge game version{' '}
-                            {/** TODO: show modal or redirect to page to contract interaction */}
-                        </span>
-                        <i>
-                            If you believe that the current version of the game
-                            is incorrect (malware, does not work properly, etc.)
-                            you can proceed to challenge the current version by
-                            uploading a new one, and all Vaultium users will be
-                            able to vote which is the correct version, current
-                            or new.
-                        </i>
-                    </div>
+                    {!isGameChallenged && (
+                        <div className='flex flex-col space-y-2'>
+                            <p className='font-nunito font-bold'>challenge</p>
+                            <span className='bg-gradient rounded-lg p-2 text-black'>
+                                Challenge game version{' '}
+                                {/** TODO: show modal or redirect to page to contract interaction */}
+                            </span>
+                            <i>
+                                If you believe that the current version of the
+                                game is incorrect (malware, does not work
+                                properly, etc.) you can proceed to challenge the
+                                current version by uploading a new one, and all
+                                Vaultium users will be able to vote which is the
+                                correct version, current or new.
+                            </i>
+                        </div>
+                    )}
+                    {isGameChallenged && (
+                        <div className='flex flex-col space-y-2'>
+                            <p className='font-nunito font-bold'>
+                                challenge status
+                            </p>
+                            <span className='bg-gradient rounded-lg p-2 text-black'>
+                                Challenged
+                            </span>
+                            <i>
+                                The current version of the game is being
+                                challenged. You can vote for the current version
+                                or the new one that is being proposed by the
+                                challenger.
+                            </i>
+                            <div className='flex justify-around'>
+                                <span className='bg-gradient rounded-lg p-2 text-black'>
+                                    Vote for current version
+                                </span>
+                                <span className='bg-gradient rounded-lg p-2 text-black'>
+                                    Vote for new version
+                                </span>
+                            </div>
+                        </div>
+                    )}
                 </div>
 
                 <div className='relative  w-1/2'>
