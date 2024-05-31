@@ -15,25 +15,15 @@ import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { cn } from '@/lib/utils'
 import { Game } from '@/lib/types'
-import { validateGame } from '@/lib/api'
 import { usePrivy } from '@privy-io/react-auth'
 import {
     useWaitForTransactionReceipt,
     useWriteContract,
 } from 'wagmi'
 import { sepolia } from 'wagmi/chains'
-import { mockVaultiumContract } from '@/lib/wagmi/mockVaultiumContract'
-import { useEffect, useState } from 'react'
-import { useTransaction } from 'wagmi'
-import { wagmiConfig } from '@/lib/wagmi/config'
-import { fromHex } from 'viem'
-import { parseTransaction } from 'viem'
-import { decodeFunctionResult } from 'viem'
-import { mock } from 'node:test'
+import { useEffect } from 'react'
 import Web3 from 'web3'
-import { decodeFunctionData } from 'viem'
-import { decodeAbiParameters, parseAbiParameters } from 'viem'
-import { gameCasterArray } from '@/lib/constants'
+import { contractAddress, gameCasterArray } from '@/lib/constants'
 import { vaultiumContract } from '@/lib/wagmi/vaultiumContract'
 
 
@@ -60,7 +50,7 @@ export default function ValidateForm({
         if (authenticated) {
             writeContract({
                 abi: vaultiumContract.abi,
-                address: '0x7abf514378ef5f808d70f5dc6b5b8219f156ad48',
+                address: contractAddress,
                 functionName: 'createAbandonware',
                 args: [
                     data.name,

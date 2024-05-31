@@ -1,4 +1,3 @@
-
 import { createConfig } from '@privy-io/wagmi'
 import { mainnet, sepolia } from 'viem/chains'
 import { http } from 'wagmi'

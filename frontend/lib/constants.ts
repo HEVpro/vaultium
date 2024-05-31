@@ -30,3 +30,5 @@ export const gameCasterArray = [
 const subgraphName = 'vaultium-sepolia'
 const graphId = '62919'
 export const graphUrl = `https://api.studio.thegraph.com/query/${graphId}/${subgraphName}/version/latest`
+
+export const contractAddress = '0x7abf514378ef5f808d70f5dc6b5b8219f156ad48'
