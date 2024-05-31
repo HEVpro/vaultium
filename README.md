@@ -23,5 +23,5 @@ We used the following technologies & tools:
 There are 3 folders within the Vaultium project:
 
   - frontend: a [Next.js](https://nextjs.org/ 14 + [Tailwind](https://tailwindcss.com/) project, deployable on [Fleek](https://fleek.xyz/)
-  - contracts: a [Hardhat](https://hardhat.org/) project, including the [MockVaultium](https://sepolia.etherscan.io/address/0xe8b07e948168108c8f0be3bfd448d4a9a9b56596) contract (used during the development process to enable working on the same time on the frontend and the contracts) and the [Vaultium](https://sepolia.etherscan.io/address/0xB62A6639D89C91b8B04B58c1ecdb4aC6E4399746) contract, the one deployed in "production" (currently only testnet)
+  - contracts: a [Hardhat](https://hardhat.org/) project, including the [MockVaultium](https://sepolia.etherscan.io/address/0xe8b07e948168108c8f0be3bfd448d4a9a9b56596) contract (used during the development process to enable working on the same time on the frontend and the contracts) and the [Vaultium](https://sepolia.etherscan.io/address/0x7abf514378ef5f808d70f5dc6b5b8219f156ad48) contract, the one deployed in "production" (currently only testnet)
   - graph: a [The Graph](https://thegraph.com/) project to index contract events to make it easier to handle them on the frontend
