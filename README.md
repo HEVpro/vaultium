@@ -10,7 +10,7 @@ The website itself is deployed in Fleek, and accessible via .eth.limo here! (lin
 
 We used the following technologies & tools:
 
-  - [Next.js](https://nextjs.org/ 14
+  - [Next.js](https://nextjs.org/) 14
   - [Fleek](https://fleek.xyz/)
   - [Filecoin](https://filecoin.io/)
   - [IPFS](https://ipfs.tech/)
