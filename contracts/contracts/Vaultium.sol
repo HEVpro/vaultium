@@ -2,35 +2,34 @@
 pragma solidity 0.8.25;
 
 contract Vaultium {
+    // objects for contract AND ABI
     struct GameInfo {
         string name;
         uint16 year;
         string publisher;
         string ipfsCid;
+        string imageCid;
         bool isAbandonware;
         string description;
         bytes32 gameHash;
     }
 
     struct VoteInfo {
-        uint32 tokenCount;
+        uint32 pointsCount;
         address voterAddress;
-    }
-
-    struct VersionVotes {
-        VoteInfo[] votes;
     }
 
     struct GameVersion {
         bytes32 gameHash;
         string ipfsCid;
-        VersionVotes upVotes;
-        VersionVotes downVotes;
+        string imageCid;
     }
 
+    // objects for contract
     struct ChallengeVersion {
         GameVersion gameVersion;
-        VersionVotes votes;
+        mapping(uint => VoteInfo) votes;
+        uint votesSize;
     }
 
     struct Challenge {
@@ -44,22 +43,47 @@ contract Vaultium {
     }
 
     struct GameVersionHistory {
-        GameVersion[] version;
+        mapping(uint => GameVersion) versions;
+        uint versionsSize;
     }
 
     struct GameChallengeHistory {
-        Challenge[] challenge;
+        mapping(uint => Challenge) challenges;
+        uint challengesSize;
+    }
+
+    // objects for ABI (returning objects for operations results)
+    struct ChallengeResponse {
+        bytes32 gameHash;
+        ChallengeVersionResponse currentChallengeVersion;
+        ChallengeVersionResponse newChallengeVersion;
+        uint256 currentVersionPoints;
+        uint256 newVersionPoints;
+        uint256 creationDate;
+        uint256 closingDate;
+    }
+
+    struct ChallengeVersionResponse {
+        GameVersion gameVersion;
+        VoteInfo[] votes;
     }
 
     address payable public owner;
 
     mapping(bytes32 => GameInfo) public game;
-    mapping(bytes32 => Challenge) public challenge;
+    mapping(bytes32 => GameChallengeHistory) public gameChallengeHistory;
+    mapping(bytes32 => GameVersionHistory) public gameVersionHistory;
+
+    uint256 challengeTime; // seconds until challenges close
 
     event GameAddedToSystem(bytes32 gameHash, string name, string publisher, uint year);
+    event ChallengeAddedToSystem(bytes32 gameHash, string newIpfsCid, string newImageCid);
+    event VotedChallenge(bytes32 gameHash, ChallengeResponse challenge);
+    event ClosedChallenge(bytes32 gameHash, ChallengeResponse challenge);
 
-    constructor() {
+    constructor(uint256 _challengeTime) {
         owner = payable(msg.sender);
+        challengeTime = _challengeTime;
     }
 
     function getGameHash(
@@ -70,83 +94,294 @@ contract Vaultium {
         return keccak256(abi.encodePacked(_name, _year, _publisher));
     }
 
-    function validateGameInfo(
-        GameInfo memory _gameInfo
-    ) private pure returns (bool) {
-        if (
-            !(_gameInfo.year > 1822) ||
-            bytes(_gameInfo.name).length == 0 ||
-            bytes(_gameInfo.publisher).length == 0
-        ) {
-            return false;
+    // TODO: Maybe change function name? It is not only searching but inserting if not found
+    function searchAbandonware(
+        string calldata _name,
+        string calldata _description,
+        string calldata _publisher,
+        uint16 _year
+    ) public returns (GameInfo memory) {
+        require(bytes(_name).length > 0, "Invalid name");
+        require(bytes(_publisher).length > 0, "Invalid publisher");
+        require(_year > 0, "Invalid year");
+        bytes32 gameHash = getGameHash(_name, _year, _publisher);
+
+        closeChallengesIfNeeded(gameHash);
+
+        GameInfo memory gameInfo = GameInfo(_name, _year, _publisher, "", "", true, _description, gameHash);
+
+        if (game[gameHash].year == 0) {
+            game[gameHash] = gameInfo;
+            emit GameAddedToSystem(gameHash, gameInfo.name, gameInfo.publisher, gameInfo.year);
         }
-        if(_gameInfo.gameHash != getGameHash(_gameInfo.name, _gameInfo.year, _gameInfo.publisher)){
+        
+        return gameInfo;
+    }
+
+    function hasActiveChallengeForGame(
+        bytes32 gameHash
+    ) private view returns (bool) {
+        if(gameChallengeHistory[gameHash].challengesSize == 0)
             return false;
+        uint256 closingDate = gameChallengeHistory[gameHash].challenges[gameChallengeHistory[gameHash].challengesSize - 1].closingDate;
+        if(closingDate < block.timestamp)
+            return false;
+        return true;
+    }
+
+    function challengeAbandonwareVersion(
+        bytes32 _gameHash, 
+        string calldata _ipfsCid,
+        string calldata _imageCid
+    ) public returns (ChallengeResponse memory){
+        require(game[_gameHash].year > 0, "Game not found");
+        bool hasActiveChallenge = hasActiveChallengeForGame(_gameHash);
+        require(!hasActiveChallenge, "Challenge already existed");
+
+        closeChallengesIfNeeded(_gameHash);
+
+        ChallengeResponse memory newChallenge = ChallengeResponse(
+            _gameHash,
+            ChallengeVersionResponse(
+                GameVersion(_gameHash, game[_gameHash].ipfsCid, game[_gameHash].imageCid),
+                new VoteInfo[](0)
+            ),
+            ChallengeVersionResponse(
+                GameVersion(_gameHash, _ipfsCid, _imageCid),
+                new VoteInfo[](0)
+            ),
+            0,
+            0,
+            block.timestamp,
+            block.timestamp + challengeTime
+        );
+
+        // copy new object to storage
+        uint lastChallenge = gameChallengeHistory[_gameHash].challengesSize;
+        gameChallengeHistory[_gameHash].challengesSize++;
+        gameChallengeHistory[_gameHash].challenges[lastChallenge].gameHash = _gameHash;
+
+        gameChallengeHistory[_gameHash].challenges[lastChallenge].currentChallengeVersion.gameVersion = GameVersion(_gameHash, _ipfsCid, _imageCid);
+        gameChallengeHistory[_gameHash].challenges[lastChallenge].currentChallengeVersion.votesSize = 0;
+        gameChallengeHistory[_gameHash].challenges[lastChallenge].newChallengeVersion.gameVersion = GameVersion(_gameHash, _ipfsCid, _imageCid);
+        gameChallengeHistory[_gameHash].challenges[lastChallenge].newChallengeVersion.votesSize = 0;
+        gameChallengeHistory[_gameHash].challenges[lastChallenge].closingDate = newChallenge.closingDate;
+        gameChallengeHistory[_gameHash].challenges[lastChallenge].creationDate = newChallenge.creationDate;
+        gameChallengeHistory[_gameHash].challenges[lastChallenge].currentVersionPoints = newChallenge.currentVersionPoints;
+        gameChallengeHistory[_gameHash].challenges[lastChallenge].newVersionPoints = newChallenge.newVersionPoints;
+
+        emit ChallengeAddedToSystem(_gameHash, _ipfsCid, _imageCid);
+        return newChallenge;
+    }
+
+    function hasUserVotedChallenge(bytes32 gameHash, address userAddr) private view returns (bool){
+        // new version
+        uint newVersionSize = gameChallengeHistory[gameHash]
+                .challenges[gameChallengeHistory[gameHash].challengesSize - 1]
+                .newChallengeVersion.votesSize;
+        
+        for (uint i = 0; i < newVersionSize; i++) {
+            if(gameChallengeHistory[gameHash]
+                .challenges[gameChallengeHistory[gameHash].challengesSize - 1]
+                .newChallengeVersion.votes[i].voterAddress == userAddr)
+                return true;
+        }
+
+        // current version
+        uint currentVersionSize = gameChallengeHistory[gameHash]
+                .challenges[gameChallengeHistory[gameHash].challengesSize - 1]
+                .currentChallengeVersion.votesSize;
+        
+        for (uint i = 0; i < currentVersionSize; i++) {
+            if(gameChallengeHistory[gameHash]
+                .challenges[gameChallengeHistory[gameHash].challengesSize - 1]
+                .currentChallengeVersion.votes[i].voterAddress == userAddr)
+                return true;
+        }
+
+        // not found in any version
+        return false;
+    }
+
+    function getSquareRoot(uint32 n) private pure returns (uint32){
+        for(uint32 i = 1; i*i <= n; i++){
+            if(i*i == n)
+                return i;
+        }
+        return 0;
+    }
+
+    function isSquare(uint32 n) private pure returns (bool){
+        return (getSquareRoot(n) > 0);
+    }
+
+    function getChallengeResponse(bytes32 _gameHash, uint challengeIndex) private view returns (ChallengeResponse memory) {
+        VoteInfo[] memory currentVotes = new VoteInfo[](gameChallengeHistory[_gameHash]
+                .challenges[challengeIndex]
+                .currentChallengeVersion.votesSize);
+        for(uint i = 0; i < currentVotes.length; i++){
+            currentVotes[i] = gameChallengeHistory[_gameHash].challenges[challengeIndex]
+                .currentChallengeVersion.votes[i];
+        }
+
+        VoteInfo[] memory newVotes = new VoteInfo[](gameChallengeHistory[_gameHash]
+                .challenges[challengeIndex]
+                .newChallengeVersion.votesSize);
+        for(uint i = 0; i < newVotes.length; i++){
+            newVotes[i] = gameChallengeHistory[_gameHash].challenges[challengeIndex]
+                .newChallengeVersion.votes[i];
+        }
+
+
+        ChallengeResponse memory newChallenge = ChallengeResponse(
+            _gameHash,
+            ChallengeVersionResponse(
+                GameVersion(_gameHash, game[_gameHash].ipfsCid, game[_gameHash].imageCid),
+                currentVotes
+            ),
+            ChallengeVersionResponse(
+                GameVersion(
+                    _gameHash, 
+                    gameChallengeHistory[_gameHash].challenges[challengeIndex].newChallengeVersion.gameVersion.ipfsCid, 
+                    gameChallengeHistory[_gameHash].challenges[challengeIndex].newChallengeVersion.gameVersion.imageCid),
+                newVotes
+            ),
+            gameChallengeHistory[_gameHash].challenges[challengeIndex].currentVersionPoints,
+            gameChallengeHistory[_gameHash].challenges[challengeIndex].newVersionPoints,
+            gameChallengeHistory[_gameHash].challenges[challengeIndex].creationDate,
+            gameChallengeHistory[_gameHash].challenges[challengeIndex].closingDate
+        );
+        return newChallenge;
+    }
+
+    function voteChallenge(bytes32 _gameHash, bool _voteNewVersion, uint32 _tokenCount) public returns (ChallengeResponse memory){
+        require(game[_gameHash].year > 0, "Game not found");
+        bool hasActiveChallenge = hasActiveChallengeForGame(_gameHash);
+        require(hasActiveChallenge, "Challenge not found");
+        require(_tokenCount > 0 && _tokenCount <= 10000, "You can use between 1 and 10000 tokens");
+        require(isSquare(_tokenCount), "You must vote with a square number of tokens");
+        require(!hasUserVotedChallenge(_gameHash, msg.sender), "User has already voted in this challenge");
+
+        uint32 newPoints = getSquareRoot(_tokenCount);
+
+        // add new vote and recalc quadratic score
+        if(_voteNewVersion){
+            // add vote
+            uint newIndex = gameChallengeHistory[_gameHash]
+                .challenges[gameChallengeHistory[_gameHash].challengesSize - 1]
+                .newChallengeVersion.votesSize;
+            gameChallengeHistory[_gameHash]
+                .challenges[gameChallengeHistory[_gameHash].challengesSize - 1]
+                .newChallengeVersion.votesSize++;
+            gameChallengeHistory[_gameHash]
+                .challenges[gameChallengeHistory[_gameHash].challengesSize - 1]
+                .newChallengeVersion.votes[newIndex] = VoteInfo(newPoints, msg.sender);
+
+            // recalculate voteSum
+            gameChallengeHistory[_gameHash]
+                .challenges[gameChallengeHistory[_gameHash].challengesSize - 1]
+                .newVersionPoints += newPoints;
+        } else {
+            // add vote
+            uint newIndex = gameChallengeHistory[_gameHash]
+                .challenges[gameChallengeHistory[_gameHash].challengesSize - 1]
+                .currentChallengeVersion.votesSize;
+            gameChallengeHistory[_gameHash]
+                .challenges[gameChallengeHistory[_gameHash].challengesSize - 1]
+                .currentChallengeVersion.votesSize++;
+            gameChallengeHistory[_gameHash]
+                .challenges[gameChallengeHistory[_gameHash].challengesSize - 1]
+                .currentChallengeVersion.votes[newIndex] = VoteInfo(newPoints, msg.sender);
+
+            // recalculate voteSum
+            gameChallengeHistory[_gameHash]
+                .challenges[gameChallengeHistory[_gameHash].challengesSize - 1]
+                .currentVersionPoints += newPoints;
+        }
+        ChallengeResponse memory response =  getChallengeResponse(_gameHash, gameChallengeHistory[_gameHash].challengesSize - 1);
+        emit VotedChallenge(_gameHash, response);
+        return response;
+    }
+
+    function getGameChallengeHistory(bytes32 _gameHash) public view returns (ChallengeResponse[] memory) {
+        require(game[_gameHash].year > 0, "Game not found");
+
+        uint listSize = gameChallengeHistory[_gameHash].challengesSize;
+        ChallengeResponse[] memory response = new ChallengeResponse[](listSize);
+
+        for(uint i = 0; i < listSize; i++){
+            response[i] = getChallengeResponse(_gameHash, i);
+        }
+        
+        return response;
+    }
+
+    function getGameVersionHistory(bytes32 _gameHash) public returns (GameVersion[] memory) {
+        require(game[_gameHash].year > 0, "Game not found");
+
+        closeChallengesIfNeeded(_gameHash);
+
+        uint listSize = gameVersionHistory[_gameHash].versionsSize;
+        GameVersion[] memory response = new GameVersion[](listSize);
+
+        for(uint i = 0; i < listSize; i++){
+            response[i] = gameVersionHistory[_gameHash].versions[i];
+        }
+        
+        return response;
+    }
+
+    function stringsEquals(string memory s1, string memory s2) private pure returns (bool) {
+        bytes memory b1 = bytes(s1);
+        bytes memory b2 = bytes(s2);
+        uint256 l1 = b1.length;
+        if (l1 != b2.length) return false;
+        for (uint256 i=0; i<l1; i++) {
+            if (b1[i] != b2[i]) return false;
         }
         return true;
     }
 
-    function getAutofilledGamesForUserInput(
-        GameInfo memory _userInputGameInfo
-    ) private pure returns (GameInfo[] memory) {
-        // TODO: call Lilypad to get an array of GameInfo
-        GameInfo[] memory gameInfo = new GameInfo[](1);
-        gameInfo[0] = _userInputGameInfo;
-        
-        return filterValidGames(gameInfo);
-    }
-
-    /**
-     * @dev Given an array of games, it returns a new array with only the valid games
-     * @param gameInfo An array of GameInfo structs
-     * @return GameInfo An array of GameInfo structs with only the valid games
-     */
-    function filterValidGames(
-        GameInfo[] memory gameInfo
-    ) private pure returns (GameInfo[] memory) {
-        bool[] memory validGames = new bool[](gameInfo.length);
-        uint256 validGamesCount = 0;
-        for (uint256 i = 0; i < gameInfo.length; i++) {
-            validGames[i] = validateGameInfo(gameInfo[i]);
-            if (validGames[i]) {
-                validGamesCount++;
-            }
-        }
-        GameInfo[] memory validGamesResult = new GameInfo[](validGamesCount);
-        uint256 validGamesIndex = 0;
-        for (uint256 i = 0; i < gameInfo.length; i++) {
-            if (validGames[i]) {
-                validGamesResult[validGamesIndex] = gameInfo[i];
-                validGamesIndex++;
-            }
-        }
-        return validGamesResult;
-    }
-
-    // TODO: Maybe change function name? It is not only searching but inserting if not found
-    function searchAbandonware(
-        string memory _name,
-        string memory _description,
-        string memory _publisher,
-        uint16 _year
-    ) public returns (GameInfo[] memory) {
-        GameInfo[] memory gameInfo = getAutofilledGamesForUserInput(
-            GameInfo(_name, _year, _publisher, "", true, _description, getGameHash(_name, _year, _publisher))
-        );
-        require(gameInfo.length > 0, "No valid games found");
-        for (uint256 i = 0; i < gameInfo.length; i++) {
-            bytes32 gameHash = getGameHash(
-                gameInfo[i].name,
-                gameInfo[i].year,
-                gameInfo[i].publisher
+    // closing a challenges may insert a new entry to version history
+    function closeChallengesIfNeeded(bytes32 _gameHash) private {
+        bool hasLastChallenge = gameChallengeHistory[_gameHash].challengesSize > 0;
+        if(!hasLastChallenge)
+            return;
+        bool lastChallengeIsOngoing = 
+            gameChallengeHistory[_gameHash].challenges[gameChallengeHistory[_gameHash].challengesSize - 1].closingDate > block.timestamp;
+        if(lastChallengeIsOngoing)
+            return;
+        bool lastChallengeHadToChangeVersion = 
+            (
+                gameChallengeHistory[_gameHash].challenges[gameChallengeHistory[_gameHash].challengesSize - 1].newVersionPoints > 
+                gameChallengeHistory[_gameHash].challenges[gameChallengeHistory[_gameHash].challengesSize - 1].currentVersionPoints
             );
-            if (game[gameHash].year == 0) {
-                game[gameHash] = gameInfo[i];
-                emit GameAddedToSystem(gameInfo[i].gameHash, gameInfo[i].name, gameInfo[i].publisher, gameInfo[i].year);
-            } else {
-                gameInfo[i] = game[gameHash];
-            }
+        if(!lastChallengeHadToChangeVersion)
+            return;
+
+        string memory newVersionIpfsCid = (gameChallengeHistory[_gameHash].challenges[gameChallengeHistory[_gameHash].challengesSize - 1].newChallengeVersion.gameVersion.ipfsCid);
+        string memory newVersionImageCid = (gameChallengeHistory[_gameHash].challenges[gameChallengeHistory[_gameHash].challengesSize - 1].newChallengeVersion.gameVersion.imageCid);
+        bool doWeHaveLastVersion = false;
+        if(gameVersionHistory[_gameHash].versionsSize > 0){
+            doWeHaveLastVersion = 
+                stringsEquals(
+                    (gameVersionHistory[_gameHash].versions[gameVersionHistory[_gameHash].versionsSize -1].ipfsCid), 
+                    newVersionIpfsCid)
+                &&
+                stringsEquals(
+                    (gameVersionHistory[_gameHash].versions[gameVersionHistory[_gameHash].versionsSize -1].imageCid), 
+                    newVersionImageCid);
         }
-        return gameInfo;
+        if(doWeHaveLastVersion)
+            return;
+        
+        // If we get here, we have a valid last challenge that doesn't have its last version saved
+        gameVersionHistory[_gameHash].versionsSize++;
+        gameVersionHistory[_gameHash].versions[gameVersionHistory[_gameHash].versionsSize -1] = GameVersion(_gameHash, newVersionIpfsCid, newVersionImageCid);
+        game[_gameHash].ipfsCid = newVersionIpfsCid;
+        game[_gameHash].imageCid = newVersionImageCid;
+
+        ChallengeResponse memory response =  getChallengeResponse(_gameHash, gameChallengeHistory[_gameHash].challengesSize - 1);
+        emit ClosedChallenge(_gameHash, response);
     }
 }

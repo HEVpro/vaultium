@@ -5,8 +5,11 @@ import { expect } from "chai";
 import hre from "hardhat";
 import { getAddress } from "viem";
 
+function delay(ms: number) {
+    return new Promise( resolve => setTimeout(resolve, ms) );
+}
 
-describe("Lock", function () {
+describe("Vaultium", function () {
     // We define a fixture to reuse the same setup in every test.
     // We use loadFixture to run this setup once, snapshot that state,
     // and reset Hardhat Network to that snapshot in every test.
@@ -14,7 +17,7 @@ describe("Lock", function () {
         // Contracts are deployed using the first signer/account by default
         const [owner, otherAccount] = await hre.viem.getWalletClients();
 
-        const vaultium = await hre.viem.deployContract("Vaultium", [], {
+        const vaultium = await hre.viem.deployContract("Vaultium", [15], {
 
         });
 
@@ -40,11 +43,17 @@ describe("Lock", function () {
 
     describe("Searching Games", function(){
         describe("Validations", function(){
-            it("Should evert with the right error if no games exist for a search", async function(){
+            it("Should revert with the right error searching games with incomplete data", async function(){
                 const { vaultium } = await loadFixture(deployVaultium);
 
                 await expect(vaultium.write.searchAbandonware(["","","",0])).to.be.rejectedWith(
-                  "No valid games found"
+                    "Invalid name"
+                );
+                await expect(vaultium.write.searchAbandonware(["game","","",0])).to.be.rejectedWith(
+                    "Invalid publisher"
+                );
+                await expect(vaultium.write.searchAbandonware(["game","","publisher",0])).to.be.rejectedWith(
+                    "Invalid year"
                 );
             });
         });
@@ -73,4 +82,225 @@ describe("Lock", function () {
         });
     });
 
+    describe("Challenges", function(){
+        describe("Create challenges Validations", function(){
+            it("Should revert with the right error if there is already an existing challenge", async function(){
+                const { vaultium, publicClient } = await loadFixture(deployVaultium);
+
+                var hash = await vaultium.write.searchAbandonware(["HarryPotter","Meh","HPublish",2004]);
+                await publicClient.waitForTransactionReceipt({ hash });
+                var gameAddedEvents = await vaultium.getEvents.GameAddedToSystem();
+                expect(gameAddedEvents).to.have.lengthOf(1);
+                const gameHash = gameAddedEvents[0].args.gameHash;
+
+                hash = await vaultium.write.challengeAbandonwareVersion([gameHash!,"ipfs cid","image cid"]);
+                await publicClient.waitForTransactionReceipt({hash});
+                var challengeAddedEvents = await vaultium.getEvents.ChallengeAddedToSystem();
+                expect(challengeAddedEvents).to.have.lengthOf(1);
+
+                await expect(vaultium.write.challengeAbandonwareVersion([gameHash!,"ipfs cid","image cid"])).to.be.rejectedWith(
+                    "Challenge already existed"
+                );
+                await expect(vaultium.write.challengeAbandonwareVersion([`0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef`,"ipfs cid","image cid"])).to.be.rejectedWith(
+                    "Game not found"
+                );
+            });
+        });
+
+        describe("Vote challenges Validations", function(){
+            var _vaultium: any;
+            var _publicClient : any;
+            var _gameHash : any;
+
+            // before each test, prepare a contract with an game (_gameHash) and a challenge
+            this.beforeEach(async function() {
+                const {vaultium, publicClient} = await loadFixture(deployVaultium);
+                _vaultium = vaultium;
+                _publicClient = publicClient;
+
+                var hash = await _vaultium.write.searchAbandonware(["HarryPotter","Meh","HPublish",2004]);
+                await _publicClient.waitForTransactionReceipt({ hash });
+
+                var gameAddedEvents = await _vaultium.getEvents.GameAddedToSystem();
+                expect(gameAddedEvents).to.have.lengthOf(1);
+                _gameHash = gameAddedEvents[0].args.gameHash;
+            });
+            it("Should revert with error if game not found ", async function(){
+                await expect(_vaultium.write.voteChallenge([`0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef`,true,1])).to.be.rejectedWith(
+                    "Game not found"
+                );
+            });
+            it("Should revert with error if challenge not found ", async function(){
+                await expect(_vaultium.write.voteChallenge([_gameHash,true,1])).to.be.rejectedWith(
+                    "Challenge not found"
+                );
+            });
+            it("Should revert with error if invalid token count", async function(){
+                var hash = await _vaultium.write.challengeAbandonwareVersion([_gameHash!,"ipfs cid","image cid"]);
+                await _publicClient.waitForTransactionReceipt({hash});
+                await expect(_vaultium.write.voteChallenge([_gameHash,true,0])).to.be.rejectedWith(
+                    "You can use between 1 and 10000 tokens"
+                );
+                await expect(_vaultium.write.voteChallenge([_gameHash,true,10001])).to.be.rejectedWith(
+                    "You can use between 1 and 10000 tokens"
+                );
+                await expect(_vaultium.write.voteChallenge([_gameHash,true,4])).not.to.be.rejectedWith(
+                    "You can use between 1 and 10000 tokens"
+                );
+                await expect(_vaultium.write.voteChallenge([_gameHash,true,10000])).not.to.be.rejectedWith(
+                    "You can use between 1 and 10000 tokens"
+                );
+                await expect(_vaultium.write.voteChallenge([_gameHash,true,3])).to.be.rejectedWith(
+                    "You must vote with a square number of tokens"
+                );
+                await expect(_vaultium.write.voteChallenge([_gameHash,true,18])).to.be.rejectedWith(
+                    "You must vote with a square number of tokens"
+                );
+                await expect(_vaultium.write.voteChallenge([_gameHash,true,4])).not.to.be.rejectedWith(
+                    "You must vote with a square number of tokens"
+                );
+                await expect(_vaultium.write.voteChallenge([_gameHash,true,10000])).not.to.be.rejectedWith(
+                    "You must vote with a square number of tokens"
+                );
+            });
+            it("Should revert with error if user has already voted", async function(){
+                var hash = await _vaultium.write.challengeAbandonwareVersion([_gameHash!,"ipfs cid","image cid"]);
+                await _publicClient.waitForTransactionReceipt({hash});
+
+                await expect(_vaultium.write.voteChallenge([_gameHash,true,4])).not.to.be.rejectedWith(
+                    "User has already voted in this challenge"
+                );
+                await expect(_vaultium.write.voteChallenge([_gameHash,true,4])).to.be.rejectedWith(
+                    "User has already voted in this challenge"
+                );
+                await expect(_vaultium.write.voteChallenge([_gameHash,false,4])).to.be.rejectedWith(
+                    "User has already voted in this challenge"
+                );
+            });
+            it("Should revert with error if challenge has expired", async function(){
+                var hash = await _vaultium.write.challengeAbandonwareVersion([_gameHash!,"ipfs cid","image cid"]);
+                await _publicClient.waitForTransactionReceipt({hash});
+
+                await expect(_vaultium.write.voteChallenge([_gameHash,true,1])).not.to.be.rejectedWith(
+                    "Challenge not found"
+                );
+                // wait until challenge is closed
+                await delay(15000);
+                await expect(_vaultium.write.voteChallenge([_gameHash,true,1])).to.be.rejectedWith(
+                    "Challenge not found"
+                );
+            });
+        });
+
+        describe("Get Challenge History Validations", function(){
+            it("Should revert if game does not exist", async function(){
+                const {vaultium, publicClient} = await loadFixture(deployVaultium);
+                await expect(vaultium.read.getGameChallengeHistory([`0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef`])).to.be.rejectedWith(
+                    "Game not found"
+                );
+            });
+        });
+
+        describe("Get Challenge History Results", function() {
+            it("Should return a the correct list when the game exists", async function(){
+                const {vaultium, publicClient} = await loadFixture(deployVaultium);
+
+                var hash = await vaultium.write.searchAbandonware(["HarryPotter","Meh","HPublish",2004]);
+                await publicClient.waitForTransactionReceipt({ hash });
+                var gameAddedEvents = await vaultium.getEvents.GameAddedToSystem();
+                expect(gameAddedEvents).to.have.lengthOf(1);
+                const gameHash = gameAddedEvents[0].args.gameHash;
+
+                // the history should be empty
+                var challengeList = await vaultium.read.getGameChallengeHistory([gameHash!]);
+                expect(challengeList).to.have.lengthOf(0);
+
+                // the history should have 1 element after adding a challenge
+                hash = await vaultium.write.challengeAbandonwareVersion([gameHash!,"ipfs cid","image cid"]);
+                await publicClient.waitForTransactionReceipt({hash});
+
+                challengeList = await vaultium.read.getGameChallengeHistory([gameHash!]);
+                expect(challengeList).to.have.lengthOf(1);
+            });
+        });
+
+        describe("Events", function(){
+            it("Should emit an event when a new challenge is added", async function(){
+                const { vaultium, publicClient } = await loadFixture(deployVaultium);
+
+                var hash = await vaultium.write.searchAbandonware(["HarryPotter","Meh","HPublish",2004]);
+                await publicClient.waitForTransactionReceipt({ hash });
+                var gameAddedEvents = await vaultium.getEvents.GameAddedToSystem();
+                expect(gameAddedEvents).to.have.lengthOf(1);
+
+            });
+
+            it("Should emit an event when a new vote is added to a challenge", async function() {
+                const {vaultium, publicClient} = await loadFixture(deployVaultium);
+
+                var hash = await vaultium.write.searchAbandonware(["HarryPotter","Meh","HPublish",2004]);
+                await publicClient.waitForTransactionReceipt({ hash });
+                var gameAddedEvents = await vaultium.getEvents.GameAddedToSystem();
+                expect(gameAddedEvents).to.have.lengthOf(1);
+                const gameHash = gameAddedEvents[0].args.gameHash;
+
+                hash = await vaultium.write.challengeAbandonwareVersion([gameHash!,"ipfs cid","image cid"]);
+                await publicClient.waitForTransactionReceipt({hash});
+                
+                // ok vote
+                hash = await vaultium.write.voteChallenge([gameHash!,true, 9]);
+                var gameVotedEvents = await vaultium.getEvents.VotedChallenge();
+                expect(gameVotedEvents).to.have.lengthOf(1);
+                const challenge : any = gameVotedEvents[0].args.challenge;
+                expect(challenge.gameHash).to.equal(gameHash);
+                expect(challenge.newVersionPoints).to.equal(3n);
+            });
+        });
+    });
+
+    describe("Versions", function(){
+        describe("Validations", function(){
+            it("Revert with error if game does not exist", async function(){
+                const {vaultium, publicClient} = await loadFixture(deployVaultium);
+                await expect(vaultium.write.getGameVersionHistory([`0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef`])).to.be.rejectedWith(
+                    "Game not found"
+                );
+            });
+        });
+        describe("Get Version History Results", function(){
+            it("Should return a the correct list when the game exists", async function(){
+                const {vaultium, publicClient} = await loadFixture(deployVaultium);
+
+                var hash = await vaultium.write.searchAbandonware(["HarryPotter","Meh","HPublish",2004]);
+                await publicClient.waitForTransactionReceipt({ hash });
+                var gameAddedEvents = await vaultium.getEvents.GameAddedToSystem();
+                expect(gameAddedEvents).to.have.lengthOf(1);
+                const gameHash = gameAddedEvents[0].args.gameHash;
+
+                // the history should be empty
+                hash = await vaultium.write.getGameVersionHistory([gameHash!]);
+                await publicClient.waitForTransactionReceipt({hash});
+                var challengeList = await vaultium.read.getGameVersionHistory([gameHash!]);
+                expect(challengeList).to.have.lengthOf(0);
+
+                // create a challenge and make new version win
+                hash = await vaultium.write.challengeAbandonwareVersion([gameHash!,"ipfs cid","image cid"]);
+                await publicClient.waitForTransactionReceipt({hash});
+                hash = await vaultium.write.voteChallenge([gameHash!,true, 9]);
+                await publicClient.waitForTransactionReceipt({hash});
+
+                // wait for challenge to close
+                await delay(15000);
+
+                hash = await vaultium.write.getGameVersionHistory([gameHash!]);
+                await publicClient.waitForTransactionReceipt({hash});
+                challengeList = await vaultium.read.getGameVersionHistory([gameHash!]);
+
+                var closedChallengeEvent = await vaultium.getEvents.ClosedChallenge();
+                expect(closedChallengeEvent).to.have.lengthOf(1);
+
+                expect(challengeList).to.have.lengthOf(1);
+            });
+        })
+    });
 });
