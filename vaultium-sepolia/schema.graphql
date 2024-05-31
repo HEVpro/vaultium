@@ -1,0 +1,12 @@
+type GameAddedToSystem @entity(immutable: true) {
+  id: Bytes!
+  gameHash: Bytes! # bytes32
+  name: String! # string
+  publisher: String! # string
+  year: BigInt! # uint256
+  country: String! # string
+  genres: [Int!]! # uint8[]
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}

@@ -1,0 +1,555 @@
+[
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "_challengeTime", "type": "uint256" }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "bytes32",
+        "name": "gameHash",
+        "type": "bytes32"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "name",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "publisher",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "year",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "country",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "enum Vaultium.Genre[]",
+        "name": "genres",
+        "type": "uint8[]"
+      }
+    ],
+    "name": "GameAddedToSystem",
+    "type": "event"
+  },
+  {
+    "inputs": [
+      { "internalType": "bytes32", "name": "_gameHash", "type": "bytes32" },
+      { "internalType": "string", "name": "_ipfsCid", "type": "string" },
+      { "internalType": "string", "name": "_imageCid", "type": "string" }
+    ],
+    "name": "challengeAbandonwareVersion",
+    "outputs": [
+      {
+        "components": [
+          { "internalType": "bytes32", "name": "gameHash", "type": "bytes32" },
+          {
+            "components": [
+              {
+                "components": [
+                  {
+                    "internalType": "bytes32",
+                    "name": "gameHash",
+                    "type": "bytes32"
+                  },
+                  {
+                    "internalType": "string",
+                    "name": "ipfsCid",
+                    "type": "string"
+                  },
+                  {
+                    "internalType": "string",
+                    "name": "imageCid",
+                    "type": "string"
+                  }
+                ],
+                "internalType": "struct Vaultium.GameVersion",
+                "name": "gameVersion",
+                "type": "tuple"
+              },
+              {
+                "components": [
+                  {
+                    "internalType": "uint32",
+                    "name": "pointsCount",
+                    "type": "uint32"
+                  },
+                  {
+                    "internalType": "address",
+                    "name": "voterAddress",
+                    "type": "address"
+                  }
+                ],
+                "internalType": "struct Vaultium.VoteInfo[]",
+                "name": "votes",
+                "type": "tuple[]"
+              }
+            ],
+            "internalType": "struct Vaultium.ChallengeVersionResponse",
+            "name": "currentChallengeVersion",
+            "type": "tuple"
+          },
+          {
+            "components": [
+              {
+                "components": [
+                  {
+                    "internalType": "bytes32",
+                    "name": "gameHash",
+                    "type": "bytes32"
+                  },
+                  {
+                    "internalType": "string",
+                    "name": "ipfsCid",
+                    "type": "string"
+                  },
+                  {
+                    "internalType": "string",
+                    "name": "imageCid",
+                    "type": "string"
+                  }
+                ],
+                "internalType": "struct Vaultium.GameVersion",
+                "name": "gameVersion",
+                "type": "tuple"
+              },
+              {
+                "components": [
+                  {
+                    "internalType": "uint32",
+                    "name": "pointsCount",
+                    "type": "uint32"
+                  },
+                  {
+                    "internalType": "address",
+                    "name": "voterAddress",
+                    "type": "address"
+                  }
+                ],
+                "internalType": "struct Vaultium.VoteInfo[]",
+                "name": "votes",
+                "type": "tuple[]"
+              }
+            ],
+            "internalType": "struct Vaultium.ChallengeVersionResponse",
+            "name": "newChallengeVersion",
+            "type": "tuple"
+          },
+          {
+            "internalType": "uint256",
+            "name": "currentVersionPoints",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "newVersionPoints",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "creationDate",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "closingDate",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct Vaultium.ChallengeResponse",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "bytes32", "name": "_gameHash", "type": "bytes32" }
+    ],
+    "name": "closeChallengesIfNeeded",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "string", "name": "_name", "type": "string" },
+      { "internalType": "string", "name": "_description", "type": "string" },
+      { "internalType": "string", "name": "_publisher", "type": "string" },
+      { "internalType": "uint16", "name": "_year", "type": "uint16" },
+      { "internalType": "string", "name": "_country", "type": "string" },
+      {
+        "internalType": "enum Vaultium.Genre[]",
+        "name": "_genres",
+        "type": "uint8[]"
+      }
+    ],
+    "name": "createAbandonware",
+    "outputs": [
+      {
+        "components": [
+          { "internalType": "string", "name": "name", "type": "string" },
+          { "internalType": "uint16", "name": "year", "type": "uint16" },
+          { "internalType": "string", "name": "publisher", "type": "string" },
+          { "internalType": "string", "name": "ipfsCid", "type": "string" },
+          { "internalType": "string", "name": "imageCid", "type": "string" },
+          { "internalType": "bool", "name": "isAbandonware", "type": "bool" },
+          { "internalType": "string", "name": "description", "type": "string" },
+          { "internalType": "bytes32", "name": "gameHash", "type": "bytes32" },
+          { "internalType": "string", "name": "country", "type": "string" },
+          {
+            "internalType": "enum Vaultium.Genre[]",
+            "name": "genres",
+            "type": "uint8[]"
+          }
+        ],
+        "internalType": "struct Vaultium.GameInfo",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "bytes32", "name": "_gameHash", "type": "bytes32" }
+    ],
+    "name": "getAbandonware",
+    "outputs": [
+      {
+        "components": [
+          { "internalType": "string", "name": "name", "type": "string" },
+          { "internalType": "uint16", "name": "year", "type": "uint16" },
+          { "internalType": "string", "name": "publisher", "type": "string" },
+          { "internalType": "string", "name": "ipfsCid", "type": "string" },
+          { "internalType": "string", "name": "imageCid", "type": "string" },
+          { "internalType": "bool", "name": "isAbandonware", "type": "bool" },
+          { "internalType": "string", "name": "description", "type": "string" },
+          { "internalType": "bytes32", "name": "gameHash", "type": "bytes32" },
+          { "internalType": "string", "name": "country", "type": "string" },
+          {
+            "internalType": "enum Vaultium.Genre[]",
+            "name": "genres",
+            "type": "uint8[]"
+          }
+        ],
+        "internalType": "struct Vaultium.GameInfo",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "bytes32", "name": "_gameHash", "type": "bytes32" }
+    ],
+    "name": "getGameChallengeHistory",
+    "outputs": [
+      {
+        "components": [
+          { "internalType": "bytes32", "name": "gameHash", "type": "bytes32" },
+          {
+            "components": [
+              {
+                "components": [
+                  {
+                    "internalType": "bytes32",
+                    "name": "gameHash",
+                    "type": "bytes32"
+                  },
+                  {
+                    "internalType": "string",
+                    "name": "ipfsCid",
+                    "type": "string"
+                  },
+                  {
+                    "internalType": "string",
+                    "name": "imageCid",
+                    "type": "string"
+                  }
+                ],
+                "internalType": "struct Vaultium.GameVersion",
+                "name": "gameVersion",
+                "type": "tuple"
+              },
+              {
+                "components": [
+                  {
+                    "internalType": "uint32",
+                    "name": "pointsCount",
+                    "type": "uint32"
+                  },
+                  {
+                    "internalType": "address",
+                    "name": "voterAddress",
+                    "type": "address"
+                  }
+                ],
+                "internalType": "struct Vaultium.VoteInfo[]",
+                "name": "votes",
+                "type": "tuple[]"
+              }
+            ],
+            "internalType": "struct Vaultium.ChallengeVersionResponse",
+            "name": "currentChallengeVersion",
+            "type": "tuple"
+          },
+          {
+            "components": [
+              {
+                "components": [
+                  {
+                    "internalType": "bytes32",
+                    "name": "gameHash",
+                    "type": "bytes32"
+                  },
+                  {
+                    "internalType": "string",
+                    "name": "ipfsCid",
+                    "type": "string"
+                  },
+                  {
+                    "internalType": "string",
+                    "name": "imageCid",
+                    "type": "string"
+                  }
+                ],
+                "internalType": "struct Vaultium.GameVersion",
+                "name": "gameVersion",
+                "type": "tuple"
+              },
+              {
+                "components": [
+                  {
+                    "internalType": "uint32",
+                    "name": "pointsCount",
+                    "type": "uint32"
+                  },
+                  {
+                    "internalType": "address",
+                    "name": "voterAddress",
+                    "type": "address"
+                  }
+                ],
+                "internalType": "struct Vaultium.VoteInfo[]",
+                "name": "votes",
+                "type": "tuple[]"
+              }
+            ],
+            "internalType": "struct Vaultium.ChallengeVersionResponse",
+            "name": "newChallengeVersion",
+            "type": "tuple"
+          },
+          {
+            "internalType": "uint256",
+            "name": "currentVersionPoints",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "newVersionPoints",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "creationDate",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "closingDate",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct Vaultium.ChallengeResponse[]",
+        "name": "",
+        "type": "tuple[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "bytes32", "name": "_gameHash", "type": "bytes32" }
+    ],
+    "name": "getGameVersionHistory",
+    "outputs": [
+      {
+        "components": [
+          { "internalType": "bytes32", "name": "gameHash", "type": "bytes32" },
+          { "internalType": "string", "name": "ipfsCid", "type": "string" },
+          { "internalType": "string", "name": "imageCid", "type": "string" }
+        ],
+        "internalType": "struct Vaultium.GameVersion[]",
+        "name": "",
+        "type": "tuple[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "owner",
+    "outputs": [
+      { "internalType": "address payable", "name": "", "type": "address" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "bytes32", "name": "_gameHash", "type": "bytes32" },
+      { "internalType": "bool", "name": "_voteNewVersion", "type": "bool" },
+      { "internalType": "uint32", "name": "_tokenCount", "type": "uint32" }
+    ],
+    "name": "voteChallenge",
+    "outputs": [
+      {
+        "components": [
+          { "internalType": "bytes32", "name": "gameHash", "type": "bytes32" },
+          {
+            "components": [
+              {
+                "components": [
+                  {
+                    "internalType": "bytes32",
+                    "name": "gameHash",
+                    "type": "bytes32"
+                  },
+                  {
+                    "internalType": "string",
+                    "name": "ipfsCid",
+                    "type": "string"
+                  },
+                  {
+                    "internalType": "string",
+                    "name": "imageCid",
+                    "type": "string"
+                  }
+                ],
+                "internalType": "struct Vaultium.GameVersion",
+                "name": "gameVersion",
+                "type": "tuple"
+              },
+              {
+                "components": [
+                  {
+                    "internalType": "uint32",
+                    "name": "pointsCount",
+                    "type": "uint32"
+                  },
+                  {
+                    "internalType": "address",
+                    "name": "voterAddress",
+                    "type": "address"
+                  }
+                ],
+                "internalType": "struct Vaultium.VoteInfo[]",
+                "name": "votes",
+                "type": "tuple[]"
+              }
+            ],
+            "internalType": "struct Vaultium.ChallengeVersionResponse",
+            "name": "currentChallengeVersion",
+            "type": "tuple"
+          },
+          {
+            "components": [
+              {
+                "components": [
+                  {
+                    "internalType": "bytes32",
+                    "name": "gameHash",
+                    "type": "bytes32"
+                  },
+                  {
+                    "internalType": "string",
+                    "name": "ipfsCid",
+                    "type": "string"
+                  },
+                  {
+                    "internalType": "string",
+                    "name": "imageCid",
+                    "type": "string"
+                  }
+                ],
+                "internalType": "struct Vaultium.GameVersion",
+                "name": "gameVersion",
+                "type": "tuple"
+              },
+              {
+                "components": [
+                  {
+                    "internalType": "uint32",
+                    "name": "pointsCount",
+                    "type": "uint32"
+                  },
+                  {
+                    "internalType": "address",
+                    "name": "voterAddress",
+                    "type": "address"
+                  }
+                ],
+                "internalType": "struct Vaultium.VoteInfo[]",
+                "name": "votes",
+                "type": "tuple[]"
+              }
+            ],
+            "internalType": "struct Vaultium.ChallengeVersionResponse",
+            "name": "newChallengeVersion",
+            "type": "tuple"
+          },
+          {
+            "internalType": "uint256",
+            "name": "currentVersionPoints",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "newVersionPoints",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "creationDate",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "closingDate",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct Vaultium.ChallengeResponse",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
+]

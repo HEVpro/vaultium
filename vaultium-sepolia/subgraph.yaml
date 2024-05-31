@@ -1,0 +1,26 @@
+specVersion: 1.0.0
+indexerHints:
+  prune: auto
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: Vaultium
+    network: sepolia
+    source:
+      address: "0x7abf514378ef5f808d70f5dc6b5b8219f156ad48"
+      abi: Vaultium
+      startBlock: 6013676
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - GameAddedToSystem
+      abis:
+        - name: Vaultium
+          file: ./abis/Vaultium.json
+      eventHandlers:
+        - event: GameAddedToSystem(bytes32,string,string,uint256,string,uint8[])
+          handler: handleGameAddedToSystem
+      file: ./src/vaultium.ts
