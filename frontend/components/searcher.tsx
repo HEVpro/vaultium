@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react'
 import { abandonwares } from '@/lib/abandonwares'
 import { GameCard } from './gameCard'
 import { Label } from './ui/label'
+import { usePrivy } from '@privy-io/react-auth'
+import { Skeleton } from './ui/skeleton'
 import { ApolloClient, InMemoryCache, gql } from '@apollo/client'
 import { graphUrl } from '@/lib/constants'
 import { graphClient } from '@/lib/graph'
@@ -23,7 +25,7 @@ const Searcher = () => {
     const [searchTerm, setSearchTerm] = useState('')
     const [games, setGames] = useState([])
     const [debounceGame, setDebounceGame] = useState('')
-
+    const { ready, authenticated, login, logout, user } = usePrivy()
 
     const gamesNotToInclude = ['banana', 'game', 'test', 'gaming']
 
@@ -63,11 +65,11 @@ const Searcher = () => {
 
     useEffect(() => {
         if (debounceGame) {
-            const filteredGames = games.filter(({ name }) => {
+            const filteredGames = games.filter(({ name }: { name: string }) => {
                 return name.toLowerCase().includes(debounceGame.toLowerCase())
             })
             setGames(filteredGames)
-        } 
+        }
     }, [debounceGame, abandonwares])
 
     return (
@@ -86,24 +88,33 @@ const Searcher = () => {
                     />
                 </div>
             </div>
-
-            {games.length > 0 ? (
+            {!ready ? (
                 <div className='grid w-full grid-cols-3 gap-8'>
-                    {games.length && games.map((item, idx) => (
-                        <GameCard key={idx} item={item} />
-                    ))}
+                    {new Array(6).fill(0).map((_, index) => <Skeleton className="h-[400px] w-full rounded-xl bg-gradient" />
+                    )}
+
                 </div>
             ) : (
-                // TODO: ADD AN SKELETON
-                <div className='h-full w-full py-8'>
-                    <p className='text-center text-3xl text-gray-400'>
-                        {"Oh no! We couldn't find any matching games."}
-                    </p>
-                    <p className='mx-auto w-[38ch] text-center text-3xl text-gray-400'>
-                        Looks like this game hid better than a final boss. Why
-                        not try another search?
-                    </p>
-                </div>
+                <>
+                    {games.length > 0 ? (
+                        <div className='grid w-full grid-cols-3 gap-8'>
+                            {games.length && games.map((item, idx) => (
+                                <GameCard key={idx} item={item} />
+                            ))}
+                        </div>
+                    ) : (
+                        // TODO: ADD AN SKELETON
+                        <div className='h-full w-full py-8'>
+                            <p className='text-center text-3xl text-gray-400'>
+                                {"Oh no! We couldn't find any matching games."}
+                            </p>
+                            <p className='mx-auto w-[38ch] text-center text-3xl text-gray-400'>
+                                Looks like this game hid better than a final boss. Why
+                                not try another search?
+                            </p>
+                        </div>
+                    )}
+                </>
             )}
         </div>
     )
