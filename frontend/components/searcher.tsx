@@ -65,11 +65,11 @@ const Searcher = () => {
 
     useEffect(() => {
         if (debounceGame) {
-            const filteredGames = games.filter(({ name }) => {
+            const filteredGames = games.filter(({ name }: { name: string }) => {
                 return name.toLowerCase().includes(debounceGame.toLowerCase())
             })
             setGames(filteredGames)
-        } 
+        }
     }, [debounceGame, abandonwares])
 
     return (
@@ -104,7 +104,7 @@ const Searcher = () => {
                         </div>
                     ) : (
                         // TODO: ADD AN SKELETON
-                <div className='h-full w-full py-8'>
+                        <div className='h-full w-full py-8'>
                             <p className='text-center text-3xl text-gray-400'>
                                 {"Oh no! We couldn't find any matching games."}
                             </p>

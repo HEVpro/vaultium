@@ -28,7 +28,7 @@ export const GameCard = ({ item }: GameCardProps) => {
                     <Image
                         width={350}
                         height={400}
-                        src={item.image}
+                        src={item.image ? item.image : "/game_bg.jpg"}
                         alt='game_image'
                         className='absolute -z-20 h-full w-full rounded-xl object-cover'
                     />
