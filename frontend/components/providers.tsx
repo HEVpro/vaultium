@@ -1,25 +1,22 @@
 'use client'
 
+import { privyConfig } from '@/lib/privyConfig'
+import { wagmiConfig } from '@/lib/wagmi/config'
 import { PrivyProvider } from '@privy-io/react-auth'
+import { WagmiProvider, createConfig } from '@privy-io/wagmi'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+
+const queryClient = new QueryClient()
 
 export default function Providers({ children }: { children: React.ReactNode }) {
     return (
         <PrivyProvider
             appId={process.env.NEXT_PUBLIC_PRIVY_ID!}
-            config={{
-                // Customize Privy's appearance in your app|
-                appearance: {
-                    theme: 'dark',
-                    accentColor: '#F384E4',
-                    logo: 'https://unktrccybuqsazntkwmm.supabase.co/storage/v1/object/public/images/vaultium-logo.png',
-                },
-                // Create embedded wallets for users who don't have a wallet
-                embeddedWallets: {
-                    createOnLogin: 'users-without-wallets',
-                },
-            }}
+            config={privyConfig}
         >
-            {children}
+            <QueryClientProvider client={queryClient}>
+                <WagmiProvider config={wagmiConfig}>{children}</WagmiProvider>
+            </QueryClientProvider>
         </PrivyProvider>
     )
 }

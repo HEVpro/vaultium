@@ -16,23 +16,93 @@ import { Textarea } from '@/components/ui/textarea'
 import { cn } from '@/lib/utils'
 import { Game } from '@/lib/types'
 import { validateGame } from '@/lib/api'
+import { usePrivy } from '@privy-io/react-auth'
+import {
+    useWaitForTransactionReceipt,
+    useWriteContract,
+} from 'wagmi'
+import { sepolia } from 'wagmi/chains'
+import { mockVaultiumContract } from '@/lib/wagmi/mockVaultiumContract'
+import { useEffect, useState } from 'react'
+import { useTransaction } from 'wagmi'
+import { wagmiConfig } from '@/lib/wagmi/config'
+import { fromHex } from 'viem'
+import { parseTransaction } from 'viem'
+import { decodeFunctionResult } from 'viem'
+import { mock } from 'node:test'
+import Web3 from 'web3'
+import { decodeFunctionData } from 'viem'
+import { decodeAbiParameters, parseAbiParameters } from 'viem'
+import { gameCasterArray } from '@/lib/constants'
+
 
 export default function ValidateForm({
     setSearchedGames,
 }: {
-    setSearchedGames: (value: Game[]) => void
+    setSearchedGames: (value: Game) => void
 }) {
     const { form } = useValidateForm()
+    const { authenticated } = usePrivy()
+    const web3 = new Web3()
+
+    const { data: hash, isPending, writeContract } = useWriteContract()
+
+    const {
+        data,
+        isLoading: isConfirming,
+        isSuccess: isConfirmed,
+    } = useWaitForTransactionReceipt({
+        hash,
+    })
 
     async function onSubmit(data: z.infer<typeof FormSchema>) {
-        const response = await validateGame(data)
-        // TODO: IMPROVE LOGIC IF VALIDATION IS WRONG
-        if (response.data) {
-            setSearchedGames(response.data)
-            // TODO: UNCOMMENT WHEN ARE READY THE COMPONENT
-            // form.reset()
+        if (authenticated) {
+            writeContract({
+                abi: mockVaultiumContract.abi,
+                address: '0xE8B07e948168108C8f0BE3bfD448D4a9A9B56596',
+                functionName: 'searchAbandonware',
+                args: [
+                    data.name,
+                    data.description,
+                    data.publisher,
+                    0,
+                    data.year,
+                ],
+                chainId: sepolia.id,
+            })
+        } else {
+            toast({
+                title: 'Authentication required',
+                description: 'Please login to validate a game',
+                duration: 2500,
+            })
         }
     }
+
+    useEffect(() => {
+        if (data && !isConfirming && isConfirmed) {
+            const hashData = data.logs[0].data
+
+            console.log('hashData', hashData)
+
+            const decodedParameters = web3.eth.abi.decodeParameters(gameCasterArray, hashData);
+            const gameData: Game = 
+                {
+                    gameHash: String(decodedParameters.gameHash).substring(2).toUpperCase(),
+                    name: decodedParameters.name as unknown as string,
+                    genre: Number(decodedParameters.genre),
+                    publisher: decodedParameters.publisher as unknown as string,
+                    year: Number(decodedParameters.year),
+                }
+            
+            setSearchedGames(gameData)
+            form.reset()
+            console.log('gameData', gameData)
+
+        }
+    }, [data])
+
+
     type Field = {
         name: keyof z.infer<typeof FormSchema>
         label: string
@@ -40,6 +110,7 @@ export default function ValidateForm({
         type: 'text' | 'number' | 'text-area'
         className: string
     }
+    // TODO: ADD SELECT TO GENRE
     const fields: Field[] = [
         {
             name: 'name',
@@ -70,6 +141,7 @@ export default function ValidateForm({
             className: 'col-span-2',
         },
     ]
+
 
     return (
         <Form {...form}>
@@ -115,11 +187,11 @@ export default function ValidateForm({
                 ))}
                 <Button
                     disabled={
-                        form.formState.isSubmitting || !form.formState.isDirty
+                        isConfirming
                     }
                     className='col-span-full text-base text-foreground transition duration-300 hover:text-white active:scale-90'
                 >
-                    Validate
+                    {isConfirming ? 'Validating...' : 'Validate'}
                 </Button>
             </form>
         </Form>

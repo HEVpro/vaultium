@@ -5,18 +5,17 @@ import {
     TooltipTrigger,
 } from '@/components/ui/tooltip'
 import { Game } from '@/lib/types'
-import { CloudUploadIcon, LinkIcon } from 'lucide-react'
+import { CloudUploadIcon, LinkIcon, SwordsIcon } from 'lucide-react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 
 interface UploadGameCardProps {
     game: Game
     setSelectedGame: (value: Game) => void
-    canBeUploaded?: boolean
 }
-export default function UploadGameCard({
+export default function GameCardResult({
     game,
     setSelectedGame,
-    canBeUploaded,
 }: UploadGameCardProps) {
     return (
         <div
@@ -26,7 +25,8 @@ export default function UploadGameCard({
             <div className='flex h-6 w-full  items-center justify-between'>
                 <p className='text-lg text-primary'>{game.name}</p>
                 <div className='flex items-center justify-center gap-2'>
-                    {!game?.ipfsCid && canBeUploaded && (
+                    {!game?.ipfsCid ? (
+                        // TODO: THERE ARE NOT IPFS CID, SO WE CAN UPLOAD A NEW VERSION
                         <TooltipProvider>
                             <Tooltip>
                                 <TooltipTrigger asChild>
@@ -44,10 +44,30 @@ export default function UploadGameCard({
                                 </TooltipContent>
                             </Tooltip>
                         </TooltipProvider>
+                    ): 
+                    // TODO: THERE ARE IPFS CID, SO WE CAN OPEN A CHALLENGE
+                    (
+                        <TooltipProvider>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <button
+                                    onClick={() => console.info('Open challenge')}
+                                    className='cursor-pointer transition duration-500 hover:scale-110 active:scale-90 '
+                                >
+                                    <SwordsIcon className='h-5 w-5 stroke-1 text-primary transition duration-500 hover:stroke-2' />
+                                </button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p className='text-foreground'>
+                                    Do you think that there are a better version? Create a challenge!
+                                </p>
+                            </TooltipContent>
+                        </Tooltip>
+                    </TooltipProvider>
                     )}
                     <Link
                         href={`/${game.gameHash}`}
-                        className='pointer-events-none cursor-pointer transition duration-500 hover:scale-110 active:scale-90 '
+                        className=' cursor-pointer transition duration-500 hover:scale-110 active:scale-90 '
                     >
                         <LinkIcon className='h-5 w-5 stroke-1 text-primary transition duration-500 hover:stroke-2' />
                     </Link>
