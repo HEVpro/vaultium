@@ -1,5 +1,6 @@
 import { type ClassValue, clsx } from 'clsx'
 import { twMerge } from 'tailwind-merge'
+import { z } from 'zod';
 
 export function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs))
@@ -23,3 +24,8 @@ export const transformGenres = (genres: number[]): string[] => {
 
     return genres.map(genre => genreMap[genre] || 'Other');
 }
+
+export const optionSchemaNumber = z.object({
+    label: z.string(),
+    value: z.number(),
+})

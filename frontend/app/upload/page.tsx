@@ -2,7 +2,7 @@
 import { AnimatedCheck } from '@/components/animatedCheck'
 import GameCardResult from '@/components/pages/upload/uploadGameCard'
 import UploadNewVersion from '@/components/pages/upload/uploadNewVersion'
-import ValidateForm from '@/components/pages/upload/validateForm'
+import CreateAbandomware from '@/components/pages/upload/validateForm'
 import { Button } from '@/components/ui/button'
 import {
     Form,
@@ -47,20 +47,8 @@ import { useState } from 'react'
 import { z } from 'zod'
 
 export default function Page() {
-    const randomAbandonware: Game = {
-        name: 'Random Game',
-        year: 1990,
-        publisher: 'Random Publisher',
-        ipfsCid: 'QmRandomIPFSCid',
-        isAbandonware: true,
-        description: 'This is a random abandonware game.',
-        gameHash: 'randomGameHash',
-        genre: 1,
-    }
-    const [gameResult, setGamerResult] = useState<Game | null>(null)
-    const [selectedGame, setSelectedGame] = useState<Game | null>(
-        randomAbandonware
-    )
+    const [gameResult, setGameResult] = useState<Game | null>(null)
+    const [selectedGame, setSelectedGame] = useState<Game | null>(null)
     const [file, setFile] = useState<any | null>(null)
     const { form } = useCustomForm()
 
@@ -77,7 +65,7 @@ export default function Page() {
         // })
     }
 
-    // REPLACE BY GAME, 
+    // REPLACE BY GAME,
     const uploadToIPFS = async (filename: string, content: Buffer) => {
         const formData = new FormData()
         formData.append('file', file)
@@ -113,9 +101,9 @@ export default function Page() {
                         appreciated by gamers everywhere!
                     </p>
                 </div>
-                {/* VALIDATE */}
+                {/* CREATE */}
                 <div className='flex w-full flex-col gap-2'>
-                    <ValidateForm setSearchedGames={setGamerResult} />
+                    <CreateAbandomware setResultGame={setGameResult} />
                 </div>
             </div>
             {/* TODO: upload image */}
@@ -129,12 +117,8 @@ export default function Page() {
             </Button> */}
 
             <div className='w-full'>
-                <GameCardResult
-                    game={selectedGame as Game}
-                    setSelectedGame={setSelectedGame}
-                />
                 {/* THE LIST OF GAME RESULTS */}
-                {!selectedGame && gameResult && (
+                {gameResult && (
                     <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}

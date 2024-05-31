@@ -1,3 +1,4 @@
+import GameChallenge from '@/components/pages/challenge/challenge'
 import { abandonwares } from '@/lib/abandonwares'
 import { graphClient } from '@/lib/graph'
 import { gql } from '@apollo/client/core'
@@ -40,18 +41,18 @@ export default async function Page({
     const abandonware = await getGame(gameHash)
     const isGameChallenged = true // TODO: check if the current version is being challenged using hasActiveChallengeForGame
 
-    // TODO: print gameversion history --> getGameVersionHistory
-    // TODO: enable users to challenge a version
-
-    // challengeAbandonwareVersion --> call contract to challenge a version of the abandonware, imageCid pass an empty string (or anything, it is not being used)
-    // voting: _voteNewVersion true -> new version, false -> current version // token count put 1 
+    return (
+        <div className='min-h-screen w-full space-y-10 px-8 py-12 text-white'>
+            <GameChallenge gameHash={gameHash} />
+        </div>
+    )
 
     return (
         <div className='min-h-screen w-full space-y-10 px-8 py-12 text-white'>
             <div className='flex w-full '>
                 <div className='w-1/2 space-y-6 px-10'>
                     <h1 className='text-3xl'>{abandonware?.name}</h1>
-                    <div className='space-y-2'>
+                    {/* <div className='space-y-2'>
                         <div className='grid grid-cols-2'>
                             <div className=''>
                                 <p className='font-nunito font-bold'>
@@ -80,7 +81,7 @@ export default async function Page({
                             <p className='font-nunito font-bold'>released in</p>
                             <p>{abandonware?.releasedIn}</p>
                         </div>
-                    </div>
+                    </div> */}
                     <div className=''>
                         <p className='font-nunito font-bold'>version history</p>
                         <table className='table-auto'>
@@ -123,7 +124,7 @@ export default async function Page({
                             </i>
                         </div>
                     )}
-                    {isGameChallenged && (
+                    {/* {isGameChallenged && (
                         <div className='flex flex-col space-y-2'>
                             <p className='font-nunito font-bold'>
                                 challenge status
@@ -146,24 +147,7 @@ export default async function Page({
                                 </span>
                             </div>
                         </div>
-                    )}
-                </div>
-
-                <div className='relative  w-1/2'>
-                    <Image
-                        width={600}
-                        height={600}
-                        src={abandonware?.image as string}
-                        alt='bg-image'
-                        className='mx-auto h-96 w-full rounded-3xl object-cover shadow-xl shadow-blue-950'
-                    />
-                    <Image
-                        width={400}
-                        height={400}
-                        src={abandonware?.image as string}
-                        alt='bg-image'
-                        className='absolute inset-x-20 inset-y-20 -z-20 mx-auto h-96 w-full object-cover opacity-10 shadow-inner'
-                    />
+                    )} */}
                 </div>
             </div>
         </div>

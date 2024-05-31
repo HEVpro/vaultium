@@ -7,10 +7,18 @@ import { wagmiConfig } from '@/lib/wagmi/config'
 import { vaultiumContract } from '@/lib/wagmi/vaultiumContract'
 import { readContract } from '@wagmi/core'
 import Link from 'next/link'
+import { redirect, useSearchParams } from 'next/navigation'
 import { useState } from 'react'
 import { useReadContract } from 'wagmi'
 
-export default function GameInfo({ gameHash }: { gameHash: string }) {
+export default function GameInfo() {
+    const searchParams = useSearchParams()
+    const gameHash = searchParams.get('gameHash')
+
+    if(!gameHash || !gameHash?.startsWith('0x')) {
+        redirect('/')
+    }
+
     const { data, isPending } = useReadContract({
         abi: vaultiumContract.abi,
         address: contractAddress,
@@ -60,30 +68,50 @@ export default function GameInfo({ gameHash }: { gameHash: string }) {
                                     ))}
                                 </div>
                             </div>
-
                             <div className='flex flex-col space-y-2'>
-                                {/* TODO: DOWNLOAD FROM IPFS */}
-                                <a
-                                    href={
-                                        'https://gateway.lighthouse.storage/ipfs/' +
-                                        abandonware?.ipfsCid
-                                    }
-                                    target='_blank'
-                                    className='max-w-sm rounded-lg bg-primary p-2 text-center text-foreground'
-                                >
-                                    Download
-                                </a>
-                                <div className='flex items-center gap-2'>
-                                    <p className='text-primary'>
-                                        Is this version of the file wrong?
-                                    </p>
+                                {abandonware.ipfsCid ? (
+                                    <>
+                                        {/* TODO: DOWNLOAD */}
+                                        <a
+                                            href={
+                                                'https://gateway.lighthouse.storage/ipfs/' +
+                                                abandonware?.ipfsCid
+                                            }
+                                            target='_blank'
+                                            className='max-w-sm rounded-lg bg-primary p-2 text-center text-foreground'
+                                        >
+                                            Download
+                                        </a>
+                                        <div className='flex items-center gap-2'>
+                                            <p className='text-primary'>
+                                                Is this version of the file
+                                                wrong?
+                                            </p>
+                                            <Link
+                                                href={
+                                                    '/' +
+                                                    gameHash +
+                                                    '/challenge'
+                                                }
+                                                className='hover:cursor-pointer hover:text-special-magenta-200'
+                                            >
+                                                Challenge it now!
+                                            </Link>
+                                        </div>
+                                    </>
+                                ) : (
+                                    // TODO: WHEN CREATE THE UPLOAD MODAL ADD HERE THE COMPONENT
                                     <Link
-                                        href={'/' + gameHash + '/challenge'}
-                                        className='hover:cursor-pointer hover:text-special-magenta-200'
+                                        href={
+                                            'https://gateway.lighthouse.storage/ipfs/' +
+                                            abandonware?.ipfsCid
+                                        }
+                                        target='_blank'
+                                        className='max-w-sm rounded-lg bg-primary p-2 text-center text-foreground hover:bg-special-magenta-300 transition duration-500'
                                     >
-                                        Challenge it now!
+                                        Upload
                                     </Link>
-                                </div>
+                                )}
                             </div>
                         </div>
                         <div className='w-1/2'>

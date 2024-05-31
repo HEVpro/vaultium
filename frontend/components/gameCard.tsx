@@ -32,7 +32,7 @@ export const GameCard = ({ item }: GameCardProps) => {
                         alt='game_image'
                         className='absolute -z-20 h-full w-full rounded-xl object-cover'
                     />
-                    <Link href={"/" + item.gameHash} className='cursor-pointer flex h-full w-full flex-col justify-between overflow-hidden rounded-xl px-4 py-6 *:transition *:duration-500'>
+                    <Link href={"/game?gameHash=" + item.gameHash} className='cursor-pointer flex h-full w-full flex-col justify-between overflow-hidden rounded-xl px-4 py-6 *:transition *:duration-500'>
                         <p className='text-3xl font-bold text-primary '>
                             {item.name}
                         </p>

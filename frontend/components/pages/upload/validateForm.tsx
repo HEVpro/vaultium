@@ -4,7 +4,6 @@ import useValidateForm, { FormSchema } from './useValidateForm'
 import {
     Form,
     FormControl,
-    FormDescription,
     FormField,
     FormItem,
     FormLabel,
@@ -14,23 +13,20 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { cn } from '@/lib/utils'
-import { Game } from '@/lib/types'
+import { Game, OptionType } from '@/lib/types'
 import { usePrivy } from '@privy-io/react-auth'
-import {
-    useWaitForTransactionReceipt,
-    useWriteContract,
-} from 'wagmi'
+import { useWaitForTransactionReceipt, useWriteContract } from 'wagmi'
 import { sepolia } from 'wagmi/chains'
 import { useEffect } from 'react'
 import Web3 from 'web3'
-import { contractAddress, gameCasterArray } from '@/lib/constants'
+import { contractAddress, gameCasterArray, genres } from '@/lib/constants'
 import { vaultiumContract } from '@/lib/wagmi/vaultiumContract'
+import { MultiSelect } from '@/components/multiselect'
 
-
-export default function ValidateForm({
-    setSearchedGames,
+export default function CreateAbandomware({
+    setResultGame,
 }: {
-    setSearchedGames: (value: Game) => void
+    setResultGame: (value: Game) => void
 }) {
     const { form } = useValidateForm()
     const { authenticated } = usePrivy()
@@ -45,7 +41,6 @@ export default function ValidateForm({
     } = useWaitForTransactionReceipt({
         hash,
     })
-
     async function onSubmit(data: z.infer<typeof FormSchema>) {
         if (authenticated) {
             writeContract({
@@ -58,7 +53,7 @@ export default function ValidateForm({
                     data.publisher,
                     data.year,
                     data.country,
-                    data.genres
+                    data. genres.map((a) => a.value),
                 ],
                 chainId: sepolia.id,
             })
@@ -75,34 +70,33 @@ export default function ValidateForm({
         if (data && !isConfirming && isConfirmed) {
             const hashData = data.logs[0].data
 
-            console.log('hashData', hashData)
+            // ALERT: if cannot be decoded, check gameCasterArray
+            const decodedParameters = web3.eth.abi.decodeParameters(
+                gameCasterArray,
+                hashData
+            )
+            const gameData: Game = {
+                gameHash: String(decodedParameters.gameHash),
+                name: decodedParameters.name as unknown as string,
+                genres: decodedParameters.genres as number[],
+                publisher: decodedParameters.publisher as unknown as string,
+                year: Number(decodedParameters.year),
+                country: decodedParameters.country as unknown as string,
+            }
 
-            const decodedParameters = web3.eth.abi.decodeParameters(gameCasterArray, hashData);
-            const gameData: Game = 
-                {
-                    gameHash: String(decodedParameters.gameHash).substring(2).toUpperCase(),
-                    name: decodedParameters.name as unknown as string,
-                    genre: Number(decodedParameters.genre),
-                    publisher: decodedParameters.publisher as unknown as string,
-                    year: Number(decodedParameters.year),
-                }
-            
-            setSearchedGames(gameData)
+            setResultGame(gameData)
             form.reset()
-            console.log('gameData', gameData)
-
         }
     }, [data])
-
 
     type Field = {
         name: keyof z.infer<typeof FormSchema>
         label: string
         placeholder: string
-        type: 'text' | 'number' | 'text-area'
+        type: 'text' | 'number' | 'textarea' | 'select'
         className: string
+        options?: { label: string; value: number }[]
     }
-    // TODO: ADD SELECT TO GENRE
     const fields: Field[] = [
         {
             name: 'name',
@@ -112,11 +106,18 @@ export default function ValidateForm({
             className: 'col-span-2',
         },
         {
+            name: 'description',
+            label: 'Description',
+            placeholder: 'Enter description',
+            type: 'textarea',
+            className: 'col-span-2',
+        },
+        {
             name: 'publisher',
             label: 'Publisher',
             placeholder: 'Enter publisher',
             type: 'text',
-            className: 'col-span-1',
+            className: 'col-span-2',
         },
         {
             name: 'year',
@@ -126,14 +127,86 @@ export default function ValidateForm({
             className: 'col-span-1',
         },
         {
-            name: 'description',
-            label: 'Description',
-            placeholder: 'Enter description',
-            type: 'text-area',
+            name: 'country',
+            label: 'Country',
+            placeholder: 'Enter a country',
+            type: 'text',
+            className: 'col-span-1',
+        },
+        {
+            name: 'genres',
+            label: 'Genres',
+            placeholder: 'Select a genre',
+            type: 'select',
             className: 'col-span-2',
+            options: genres?.map((genre, index) => ({
+                label: genre,
+                value: index,
+            })),
         },
     ]
 
+    const inputSelector = (
+        type: string,
+        placeholder: string,
+        field: any,
+        options: OptionType[]
+    ) => {
+        switch (type) {
+            case 'number':
+                return (
+                    <Input
+                        placeholder={field.placeholder}
+                        value={field.value}
+                        type={type}
+                        className='bg-transparent text-primary'
+                        onChange={(e) => {
+                            field.onChange(e.target.valueAsNumber)
+                        }}
+                        step={1}
+                    />
+                )
+            case 'text':
+                return (
+                    <Input
+                        placeholder={field.placeholder}
+                        value={field.value}
+                        type={type}
+                        className='bg-transparent text-primary'
+                        onChange={(e) => {
+                            field.onChange(e.target.value)
+                        }}
+                    />
+                )
+            case 'select':
+                if (!options) return null
+                return (
+                    <MultiSelect
+                        selected={
+                            field.value
+                                ? // @ts-ignore
+                                  field.value.map((item) => ({
+                                      label: item.label,
+                                      value: item.value,
+                                  }))
+                                : []
+                        }
+                        options={options as OptionType[]}
+                        className='w-full bg-transparent text-primary'
+                        {...field}
+                    />
+                )
+            case 'textarea':
+                return (
+                    <Textarea
+                        placeholder={placeholder}
+                        className='bg-transparent text-primary'
+                        rows={6}
+                        {...field}
+                    />
+                )
+        }
+    }
 
     return (
         <Form {...form}>
@@ -150,26 +223,11 @@ export default function ValidateForm({
                             <FormItem className={cn(inputField.className)}>
                                 <FormLabel>{inputField.label}</FormLabel>
                                 <FormControl>
-                                    {inputField.type === 'text-area' ? (
-                                        <>
-                                            <Textarea
-                                                {...field}
-                                                placeholder='Type your message here.'
-                                                className='bg-transparent text-primary'
-                                            />
-                                            <FormDescription>
-                                                {
-                                                    "If you don't remember the name, you can write a description!"
-                                                }
-                                            </FormDescription>
-                                        </>
-                                    ) : (
-                                        <Input
-                                            placeholder={inputField.placeholder}
-                                            type={inputField.type}
-                                            className='bg-transparent text-primary'
-                                            {...field}
-                                        />
+                                    {inputSelector(
+                                        inputField.type,
+                                        inputField.placeholder,
+                                        field,
+                                        inputField.options as OptionType[]
                                     )}
                                 </FormControl>
                                 <FormMessage />
@@ -178,12 +236,10 @@ export default function ValidateForm({
                     />
                 ))}
                 <Button
-                    disabled={
-                        isConfirming
-                    }
-                    className='col-span-full text-base text-foreground transition duration-300 hover:text-white active:scale-90'
+                    disabled={isConfirming}
+                    className='col-span-full mt-8 text-base text-foreground transition duration-300 hover:text-white active:scale-90'
                 >
-                    {isConfirming ? 'Validating...' : 'Validate'}
+                    {isPending || isConfirming ? 'Validating...' : 'Create'}
                 </Button>
             </form>
         </Form>

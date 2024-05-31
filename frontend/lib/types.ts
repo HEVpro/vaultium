@@ -5,6 +5,7 @@ export interface Game {
     year: number;
     gameHash: string;
     country: string;
+    description: string;
 }
 
 
@@ -16,4 +17,9 @@ export interface Abandonware {
     description: string
     ipfsCid: string
     // Add other properties as needed
+}
+
+export type OptionType = {
+    label: string
+    value: any
 }
