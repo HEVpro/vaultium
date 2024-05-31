@@ -1,10 +1,31 @@
 import { abandonwares } from '@/lib/abandonwares'
+import { graphClient } from '@/lib/graph'
+import { gql } from '@apollo/client/core'
 import Image from 'next/image'
+import { redirect } from 'next/navigation'
 
 export async function generateStaticParams() {
-    return abandonwares.map((abandonware: any) => ({
-        gameHash: abandonware.gameHash,
-    }))
+    // let results: {gameHash: string}[] = []
+    const tokensQuery = gql`
+        query {
+            gameAddedToSystems {
+                gameHash
+            }
+        }
+    `
+    const gameHashes = await graphClient
+        .query({
+            query: tokensQuery,
+        })
+        .then((data) => {
+            return data.data.gameAddedToSystems.map((item: any) => ({
+                gameHash: item.gameHash,
+            }))
+        })
+        .catch((err) => {
+            console.error('Error fetching data: ', err)
+        })
+    return gameHashes
 }
 
 async function getGame(gameHash: string) {
