@@ -16,6 +16,7 @@ export interface Abandonware {
     publisher: string
     description: string
     ipfsCid: string
+    gameHash: string
     // Add other properties as needed
 }
 

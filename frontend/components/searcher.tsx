@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { abandonwares } from '@/lib/abandonwares'
 import { GameCard } from './gameCard'
 import { Label } from './ui/label'
 import { usePrivy } from '@privy-io/react-auth'
@@ -13,10 +12,12 @@ import { graphClient } from '@/lib/graph'
 const tokensQuery = gql`
   query{
     gameAddedToSystems{
-        name
-        gameHash
-        publisher
-        year
+        genres
+    name
+    publisher
+    year
+    gameHash
+    country
     }
   }
 `
@@ -25,7 +26,8 @@ const Searcher = () => {
     const [searchTerm, setSearchTerm] = useState('')
     const [games, setGames] = useState([])
     const [debounceGame, setDebounceGame] = useState('')
-    const { ready, authenticated, login, logout, user } = usePrivy()
+    const { ready } = usePrivy()
+
 
     const gamesNotToInclude = ['banana', 'game', 'test', 'gaming']
 
@@ -41,17 +43,23 @@ const Searcher = () => {
                         year: item.year,
                         publisher: item.publisher,
                         gameHash: item.gameHash,
+                        genres: item.genres
                     }
                 }).filter((item: any) => {
                     const lowerCaseName = item.name.toLowerCase();
-                    return !gamesNotToInclude.some(word => lowerCaseName.includes(word));
+                    if (debounceGame) {
+                        return lowerCaseName.includes(debounceGame.toLowerCase())
+                    } else {
+                        return !gamesNotToInclude.some(word => lowerCaseName.includes(word));
+                    }
                 })
                 setGames(results)
             })
             .catch((err) => {
                 console.error('Error fetching data: ', err)
             })
-    }, [])
+
+    }, [debounceGame])
 
     useEffect(() => {
         const timerId = setTimeout(() => {
@@ -62,15 +70,6 @@ const Searcher = () => {
             clearTimeout(timerId)
         }
     }, [searchTerm])
-
-    useEffect(() => {
-        if (debounceGame) {
-            const filteredGames = games.filter(({ name }: { name: string }) => {
-                return name.toLowerCase().includes(debounceGame.toLowerCase())
-            })
-            setGames(filteredGames)
-        }
-    }, [debounceGame, abandonwares])
 
     return (
         <div className='mt-10 flex min-h-screen w-full flex-col items-end gap-8 pb-12'>
@@ -96,14 +95,14 @@ const Searcher = () => {
                 </div>
             ) : (
                 <>
-                    {games.length > 0 ? (
+                    {games && games.length > 0 && (
                         <div className='grid w-full grid-cols-3 gap-8'>
                             {games.length && games.map((item, idx) => (
                                 <GameCard key={idx} item={item} />
                             ))}
                         </div>
-                    ) : (
-                        // TODO: ADD AN SKELETON
+                    )}
+                    {games && games.length === 0 && debounceGame.length > 0 && (
                         <div className='h-full w-full py-8'>
                             <p className='text-center text-3xl text-gray-400'>
                                 {"Oh no! We couldn't find any matching games."}

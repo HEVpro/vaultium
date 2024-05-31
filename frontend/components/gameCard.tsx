@@ -1,26 +1,23 @@
 'use client'
-import {
-    HeartIcon,
-    MinusCircleIcon,
-    PlusCircleIcon,
-    TriangleAlertIcon,
-} from 'lucide-react'
+import { HeartIcon } from 'lucide-react'
 import { Badge } from './ui/badge'
 import { useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { cn } from '@/lib/utils'
+import { cn, transformGenres } from '@/lib/utils'
+import { Abandonware } from '@/lib/types'
 
 interface GameCardProps {
-    item: any
+    item: Abandonware
 }
 
 export const GameCard = ({ item }: GameCardProps) => {
     const [like, setLike] = useState(false)
     const [totalLikes, setTotalLikes] = useState(0)
 
+    const parsedGenres = transformGenres(item?.genres ?? [])
+
     return (
-        // TODO: REPLACE GAME IMAGE BY DEFAULT IMAGE
         <div className='bg-gradient group relative h-[400px] w-full overflow-hidden rounded-xl'>
             <div className='absolute inset-0.5 place-content-center'>
                 <div className='relative z-20  h-full w-full min-w-44 rounded-xl text-white shadow-[inset_0px_110px_60px_-44px_rgba(0,0,0,0.75)] shadow-black transition duration-300 *:transition *:duration-300'>
@@ -28,7 +25,7 @@ export const GameCard = ({ item }: GameCardProps) => {
                     <Image
                         width={350}
                         height={400}
-                        src={item.image ? item.image : "/game_bg.jpg"}
+                        src={"/game_bg.jpg"}
                         alt='game_image'
                         className='absolute -z-20 h-full w-full rounded-xl object-cover'
                     />
@@ -41,14 +38,14 @@ export const GameCard = ({ item }: GameCardProps) => {
                                 <p>{item.publisher}</p>
                                 <p>{item.year}</p>
                             </div>
-                            <div className='no-scrollbar flex max-h-20 min-h-16 flex-wrap items-end justify-start gap-1  overflow-scroll'>
-                                {item.theme && item.theme.map(
-                                    (element: string, idx: number) => (
+                            <div className='no-scrollbar flex max-h-14 min-h-12 flex-wrap items-start justify-start gap-1  overflow-scroll'>
+                                {parsedGenres.map(
+                                    (item) => (
                                         <Badge
-                                            className='bg-gradient h-6 text-black'
-                                            key={idx}
+                                            key={item}
+                                            className='bg-gradient mr-2 text-foreground capitalize mb-1'
                                         >
-                                            {element}
+                                            {item}
                                         </Badge>
                                     )
                                 )}
