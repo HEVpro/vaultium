@@ -100,10 +100,11 @@ describe("Vaultium", function () {
                 expect(gameAddedEvents).to.have.lengthOf(1);
                 const gameHash = gameAddedEvents[0].args.gameHash;
 
+                const functionResult = await vaultium.read.challengeAbandonwareVersion([gameHash!,"ipfs cid","image cid"]);
                 hash = await vaultium.write.challengeAbandonwareVersion([gameHash!,"ipfs cid","image cid"]);
                 await publicClient.waitForTransactionReceipt({hash});
-                var challengeAddedEvents = await vaultium.getEvents.ChallengeAddedToSystem();
-                expect(challengeAddedEvents).to.have.lengthOf(1);
+                expect(functionResult.gameHash).to.equal(gameHash);
+                expect(functionResult.newChallengeVersion.gameVersion.ipfsCid).to.equal("ipfs cid");
 
                 await expect(vaultium.write.challengeAbandonwareVersion([gameHash!,"ipfs cid","image cid"])).to.be.rejectedWith(
                     "Challenge already existed"
@@ -255,12 +256,11 @@ describe("Vaultium", function () {
                 await publicClient.waitForTransactionReceipt({hash});
                 
                 // ok vote
+                const voteChallengeResult = await vaultium.read.voteChallenge([gameHash!,true, 9]);
                 hash = await vaultium.write.voteChallenge([gameHash!,true, 9]);
-                var gameVotedEvents = await vaultium.getEvents.VotedChallenge();
-                expect(gameVotedEvents).to.have.lengthOf(1);
-                const challenge : any = gameVotedEvents[0].args.challenge;
-                expect(challenge.gameHash).to.equal(gameHash);
-                expect(challenge.newVersionPoints).to.equal(3n);
+                await publicClient.waitForTransactionReceipt({hash});''
+                expect(voteChallengeResult.gameHash).to.equal(gameHash);
+                expect(voteChallengeResult.newVersionPoints).to.equal(3n);
             });
         });
     });

@@ -93,9 +93,6 @@ contract Vaultium {
     uint256 challengeTime; // seconds until challenges close
 
     event GameAddedToSystem(bytes32 gameHash, string name, string publisher, uint year, string country, Genre[] genres);
-    event ChallengeAddedToSystem(bytes32 gameHash, string newIpfsCid, string newImageCid);
-    event VotedChallenge(bytes32 gameHash, ChallengeResponse challenge);
-    event ClosedChallenge(bytes32 gameHash, ChallengeResponse challenge);
 
     constructor(uint256 _challengeTime) {
         owner = payable(msg.sender);
@@ -109,7 +106,7 @@ contract Vaultium {
     ) private pure returns (bytes32) {
         return keccak256(abi.encodePacked(_name, _year, _publisher));
     }
-    
+
     function createAbandonware(
         string calldata _name,
         string calldata _description,
@@ -224,7 +221,6 @@ contract Vaultium {
         gameChallengeHistory[_gameHash].challenges[lastChallenge].currentVersionPoints = newChallenge.currentVersionPoints;
         gameChallengeHistory[_gameHash].challenges[lastChallenge].newVersionPoints = newChallenge.newVersionPoints;
 
-        emit ChallengeAddedToSystem(_gameHash, _ipfsCid, _imageCid);
         return newChallenge;
     }
 
@@ -352,9 +348,7 @@ contract Vaultium {
                 .challenges[gameChallengeHistory[_gameHash].challengesSize - 1]
                 .currentVersionPoints += newPoints;
         }
-        ChallengeResponse memory response =  getChallengeResponse(_gameHash, gameChallengeHistory[_gameHash].challengesSize - 1);
-        emit VotedChallenge(_gameHash, response);
-        return response;
+        return getChallengeResponse(_gameHash, gameChallengeHistory[_gameHash].challengesSize - 1);
     }
 
     function getGameChallengeHistory(bytes32 _gameHash) public view returns (ChallengeResponse[] memory) {
@@ -484,8 +478,5 @@ contract Vaultium {
         gameVersionHistory[_gameHash].versions[gameVersionHistory[_gameHash].versionsSize -1] = GameVersion(_gameHash, newVersionIpfsCid, newVersionImageCid);
         game[_gameHash].ipfsCid = newVersionIpfsCid;
         game[_gameHash].imageCid = newVersionImageCid;
-
-        ChallengeResponse memory response =  getChallengeResponse(_gameHash, gameChallengeHistory[_gameHash].challengesSize - 1);
-        emit ClosedChallenge(_gameHash, response);
     }
 }
