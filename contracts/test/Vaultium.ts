@@ -41,43 +41,50 @@ describe("Vaultium", function () {
         });
     });
 
-    describe("Searching Games", function(){
+    describe("Create and Get Games", function(){
         describe("Validations", function(){
             it("Should revert with the right error searching games with incomplete data", async function(){
-                const { vaultium } = await loadFixture(deployVaultium);
+                const { publicClient, vaultium } = await loadFixture(deployVaultium);
 
-                await expect(vaultium.write.searchAbandonware(["","","",0])).to.be.rejectedWith(
+                await expect(vaultium.write.createAbandonware(["","","",0, "ES", []])).to.be.rejectedWith(
                     "Invalid name"
                 );
-                await expect(vaultium.write.searchAbandonware(["game","","",0])).to.be.rejectedWith(
+                await expect(vaultium.write.createAbandonware(["game","","",0, "ES", []])).to.be.rejectedWith(
                     "Invalid publisher"
                 );
-                await expect(vaultium.write.searchAbandonware(["game","","publisher",0])).to.be.rejectedWith(
+                await expect(vaultium.write.createAbandonware(["game","","publisher",0, "ES", []])).to.be.rejectedWith(
                     "Invalid year"
+                );
+                var hash = await vaultium.write.createAbandonware(["Dune", "","Virgin Games",1992, "ES", []]);
+                await publicClient.waitForTransactionReceipt({ hash });
+                await expect(vaultium.write.createAbandonware(["Dune","","Virgin Games",1992, "ES", []])).to.be.rejectedWith(
+                    "Game already exists"
+                );
+
+                // first time we search for a game, it does not exist
+                await expect(vaultium.read.getAbandonware([`0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef`])).to.be.rejectedWith(
+                    "Game does not exist"
                 );
             });
         });
 
-        describe("Events", function(){
-            it("Should emit an event when (and only when) finding a new game", async function(){
+        describe("Events and getter", function(){
+            it("Should emit an event when when creating a new game", async function(){
                 const { vaultium, publicClient } = await loadFixture(deployVaultium);
 
-                // first time we search for a game, it is hashed and stored on the contract
-                var hash = await vaultium.write.searchAbandonware(["Dune", "","Virgin Games",1992]);
+                // create new abandonware should emit related event
+                var hash = await vaultium.write.createAbandonware(["Dune", "","Virgin Games",1992, "ES", []]);
                 await publicClient.waitForTransactionReceipt({ hash });
-                
                 // get the GameAddedToSystem events in the latest block
                 var gameAddedEvents = await vaultium.getEvents.GameAddedToSystem();
                 expect(gameAddedEvents).to.have.lengthOf(1);
                 expect(gameAddedEvents[0].args.name).to.equal("Dune");
+                const gameHash = gameAddedEvents[0].args.gameHash;
 
-                // second time we search for a game, it already exists on the system
-                hash = await vaultium.write.searchAbandonware(["Dune", "","Virgin Games",1992]);
+                // get recently added game
+                const abandonware = await vaultium.read.getAbandonware([gameHash]);
                 await publicClient.waitForTransactionReceipt({ hash });
-
-                // get the GameAddedToSystem events in the latest block
-                gameAddedEvents = await vaultium.getEvents.GameAddedToSystem();
-                expect(gameAddedEvents).to.have.lengthOf(0);
+                expect(abandonware.name).to.equal("Dune");
             });
         });
     });
@@ -87,7 +94,7 @@ describe("Vaultium", function () {
             it("Should revert with the right error if there is already an existing challenge", async function(){
                 const { vaultium, publicClient } = await loadFixture(deployVaultium);
 
-                var hash = await vaultium.write.searchAbandonware(["HarryPotter","Meh","HPublish",2004]);
+                var hash = await vaultium.write.createAbandonware(["HarryPotter","Meh","HPublish",2004, "ES", []]);
                 await publicClient.waitForTransactionReceipt({ hash });
                 var gameAddedEvents = await vaultium.getEvents.GameAddedToSystem();
                 expect(gameAddedEvents).to.have.lengthOf(1);
@@ -118,7 +125,7 @@ describe("Vaultium", function () {
                 _vaultium = vaultium;
                 _publicClient = publicClient;
 
-                var hash = await _vaultium.write.searchAbandonware(["HarryPotter","Meh","HPublish",2004]);
+                var hash = await _vaultium.write.createAbandonware(["HarryPotter","Meh","HPublish",2004, "ES", []]);
                 await _publicClient.waitForTransactionReceipt({ hash });
 
                 var gameAddedEvents = await _vaultium.getEvents.GameAddedToSystem();
@@ -205,7 +212,7 @@ describe("Vaultium", function () {
             it("Should return a the correct list when the game exists", async function(){
                 const {vaultium, publicClient} = await loadFixture(deployVaultium);
 
-                var hash = await vaultium.write.searchAbandonware(["HarryPotter","Meh","HPublish",2004]);
+                var hash = await vaultium.write.createAbandonware(["HarryPotter","Meh","HPublish",2004, "ES", []]);
                 await publicClient.waitForTransactionReceipt({ hash });
                 var gameAddedEvents = await vaultium.getEvents.GameAddedToSystem();
                 expect(gameAddedEvents).to.have.lengthOf(1);
@@ -228,7 +235,7 @@ describe("Vaultium", function () {
             it("Should emit an event when a new challenge is added", async function(){
                 const { vaultium, publicClient } = await loadFixture(deployVaultium);
 
-                var hash = await vaultium.write.searchAbandonware(["HarryPotter","Meh","HPublish",2004]);
+                var hash = await vaultium.write.createAbandonware(["HarryPotter","Meh","HPublish",2004, "ES", []]);
                 await publicClient.waitForTransactionReceipt({ hash });
                 var gameAddedEvents = await vaultium.getEvents.GameAddedToSystem();
                 expect(gameAddedEvents).to.have.lengthOf(1);
@@ -238,7 +245,7 @@ describe("Vaultium", function () {
             it("Should emit an event when a new vote is added to a challenge", async function() {
                 const {vaultium, publicClient} = await loadFixture(deployVaultium);
 
-                var hash = await vaultium.write.searchAbandonware(["HarryPotter","Meh","HPublish",2004]);
+                var hash = await vaultium.write.createAbandonware(["HarryPotter","Meh","HPublish",2004, "ES", []]);
                 await publicClient.waitForTransactionReceipt({ hash });
                 var gameAddedEvents = await vaultium.getEvents.GameAddedToSystem();
                 expect(gameAddedEvents).to.have.lengthOf(1);
@@ -271,7 +278,7 @@ describe("Vaultium", function () {
             it("Should return a the correct list when the game exists", async function(){
                 const {vaultium, publicClient} = await loadFixture(deployVaultium);
 
-                var hash = await vaultium.write.searchAbandonware(["HarryPotter","Meh","HPublish",2004]);
+                var hash = await vaultium.write.createAbandonware(["HarryPotter","Meh","HPublish",2004,"ES",[]]);
                 await publicClient.waitForTransactionReceipt({ hash });
                 var gameAddedEvents = await vaultium.getEvents.GameAddedToSystem();
                 expect(gameAddedEvents).to.have.lengthOf(1);
@@ -295,9 +302,6 @@ describe("Vaultium", function () {
                 hash = await vaultium.write.getGameVersionHistory([gameHash!]);
                 await publicClient.waitForTransactionReceipt({hash});
                 challengeList = await vaultium.read.getGameVersionHistory([gameHash!]);
-
-                var closedChallengeEvent = await vaultium.getEvents.ClosedChallenge();
-                expect(closedChallengeEvent).to.have.lengthOf(1);
 
                 expect(challengeList).to.have.lengthOf(1);
             });

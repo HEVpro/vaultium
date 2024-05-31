@@ -2,6 +2,20 @@
 pragma solidity 0.8.25;
 
 contract Vaultium {
+    enum Genre {
+        Action,
+        Adventure,
+        Fighting,
+        Platform,
+        Puzzle,
+        Racing,
+        RolePlaying,
+        Shooter,
+        Simulation,
+        Sports,
+        Strategy,
+        Other
+    }
     // objects for contract AND ABI
     struct GameInfo {
         string name;
@@ -12,6 +26,8 @@ contract Vaultium {
         bool isAbandonware;
         string description;
         bytes32 gameHash;
+        string country;
+        Genre[] genres;
     }
 
     struct VoteInfo {
@@ -70,13 +86,13 @@ contract Vaultium {
 
     address payable public owner;
 
-    mapping(bytes32 => GameInfo) public game;
-    mapping(bytes32 => GameChallengeHistory) public gameChallengeHistory;
-    mapping(bytes32 => GameVersionHistory) public gameVersionHistory;
+    mapping(bytes32 => GameInfo) private game;
+    mapping(bytes32 => GameChallengeHistory) private gameChallengeHistory;
+    mapping(bytes32 => GameVersionHistory) private gameVersionHistory;
 
     uint256 challengeTime; // seconds until challenges close
 
-    event GameAddedToSystem(bytes32 gameHash, string name, string publisher, uint year);
+    event GameAddedToSystem(bytes32 gameHash, string name, string publisher, uint year, string country, Genre[] genres);
     event ChallengeAddedToSystem(bytes32 gameHash, string newIpfsCid, string newImageCid);
     event VotedChallenge(bytes32 gameHash, ChallengeResponse challenge);
     event ClosedChallenge(bytes32 gameHash, ChallengeResponse challenge);
@@ -93,28 +109,66 @@ contract Vaultium {
     ) private pure returns (bytes32) {
         return keccak256(abi.encodePacked(_name, _year, _publisher));
     }
-
-    // TODO: Maybe change function name? It is not only searching but inserting if not found
-    function searchAbandonware(
+    
+    function createAbandonware(
         string calldata _name,
         string calldata _description,
         string calldata _publisher,
-        uint16 _year
+        uint16 _year,
+        string calldata _country,
+        Genre[] calldata _genres
     ) public returns (GameInfo memory) {
         require(bytes(_name).length > 0, "Invalid name");
         require(bytes(_publisher).length > 0, "Invalid publisher");
         require(_year > 0, "Invalid year");
         bytes32 gameHash = getGameHash(_name, _year, _publisher);
+        require(game[gameHash].year == 0, "Game already exists");
 
-        closeChallengesIfNeeded(gameHash);
+        GameInfo memory gameInfo = GameInfo(_name, _year, _publisher, "", "", true, _description, gameHash, _country, _genres);
 
-        GameInfo memory gameInfo = GameInfo(_name, _year, _publisher, "", "", true, _description, gameHash);
-
-        if (game[gameHash].year == 0) {
-            game[gameHash] = gameInfo;
-            emit GameAddedToSystem(gameHash, gameInfo.name, gameInfo.publisher, gameInfo.year);
-        }
+        game[gameHash] = gameInfo;
+        emit GameAddedToSystem(gameHash, gameInfo.name, gameInfo.publisher, gameInfo.year, gameInfo.country, gameInfo.genres);
         
+        return gameInfo;
+    }
+
+    function getAbandonware(bytes32 _gameHash) public view returns (GameInfo memory){
+        require(game[_gameHash].year != 0, "Game does not exist");
+        GameInfo memory gameInfo = GameInfo(
+            game[_gameHash].name, 
+            game[_gameHash].year, 
+            game[_gameHash].publisher, 
+            game[_gameHash].ipfsCid, 
+            game[_gameHash].imageCid, 
+            game[_gameHash].isAbandonware, 
+            game[_gameHash].description, 
+            game[_gameHash].gameHash,
+            game[_gameHash].country,
+            game[_gameHash].genres
+        );
+
+        bool hasLastChallenge = gameChallengeHistory[_gameHash].challengesSize > 0;
+        if(!hasLastChallenge)
+            return gameInfo;
+        bool lastChallengeIsOngoing = 
+            gameChallengeHistory[_gameHash].challenges[gameChallengeHistory[_gameHash].challengesSize - 1].closingDate > block.timestamp;
+        if(lastChallengeIsOngoing)
+            return gameInfo;
+            
+        // last challenge is closed, we should (just in case, update our gameInfo)
+        if(gameChallengeHistory[_gameHash].challenges[gameChallengeHistory[_gameHash].challengesSize - 1].currentVersionPoints <
+            gameChallengeHistory[_gameHash].challenges[gameChallengeHistory[_gameHash].challengesSize - 1].newVersionPoints){
+            // new version is the right one
+            gameInfo.ipfsCid = gameChallengeHistory[_gameHash].challenges[gameChallengeHistory[_gameHash].challengesSize - 1].newChallengeVersion.gameVersion.ipfsCid;
+            gameInfo.imageCid = gameChallengeHistory[_gameHash].challenges[gameChallengeHistory[_gameHash].challengesSize - 1].newChallengeVersion.gameVersion.imageCid;
+
+        } else {
+            // current version is the right one
+            gameInfo.ipfsCid = gameChallengeHistory[_gameHash].challenges[gameChallengeHistory[_gameHash].challengesSize - 1].currentChallengeVersion.gameVersion.ipfsCid;
+            gameInfo.imageCid = gameChallengeHistory[_gameHash].challenges[gameChallengeHistory[_gameHash].challengesSize - 1].currentChallengeVersion.gameVersion.imageCid;
+        }
+
+
         return gameInfo;
     }
 
@@ -316,17 +370,67 @@ contract Vaultium {
         return response;
     }
 
-    function getGameVersionHistory(bytes32 _gameHash) public returns (GameVersion[] memory) {
+    function getGameVersionHistory(bytes32 _gameHash) public view returns (GameVersion[] memory) {
         require(game[_gameHash].year > 0, "Game not found");
 
-        closeChallengesIfNeeded(_gameHash);
-
         uint listSize = gameVersionHistory[_gameHash].versionsSize;
+
+        bool hasLastChallenge = gameChallengeHistory[_gameHash].challengesSize > 0;
+        bool lastChallengeIsOngoing = false;
+        if(hasLastChallenge) lastChallengeIsOngoing = 
+            gameChallengeHistory[_gameHash].challenges[gameChallengeHistory[_gameHash].challengesSize - 1].closingDate > block.timestamp;
+
+        bool versionHistoryMissesLastChallenge = false;
+        if(hasLastChallenge && !lastChallengeIsOngoing){
+            // check if last version in version history is the same as last challenge winner
+            if(gameChallengeHistory[_gameHash].challenges[gameChallengeHistory[_gameHash].challengesSize - 1].currentVersionPoints <
+                gameChallengeHistory[_gameHash].challenges[gameChallengeHistory[_gameHash].challengesSize - 1].newVersionPoints){
+                // new version is the right one
+                bool hasLastVersionInHistory = gameVersionHistory[_gameHash].versionsSize > 0;
+
+                bool sameIpfs = hasLastVersionInHistory && stringsEquals(gameVersionHistory[_gameHash].versions[gameVersionHistory[_gameHash].versionsSize - 1].ipfsCid,
+                    gameChallengeHistory[_gameHash].challenges[gameChallengeHistory[_gameHash].challengesSize - 1].newChallengeVersion.gameVersion.ipfsCid);
+                bool sameImage= hasLastVersionInHistory && stringsEquals(gameVersionHistory[_gameHash].versions[gameVersionHistory[_gameHash].versionsSize - 1].imageCid,
+                    gameChallengeHistory[_gameHash].challenges[gameChallengeHistory[_gameHash].challengesSize - 1].newChallengeVersion.gameVersion.imageCid);
+                // misses if objects are differents
+                versionHistoryMissesLastChallenge = !(sameIpfs && sameImage);
+            } else {
+                // current version is the right one
+                bool hasLastVersionInHistory = gameVersionHistory[_gameHash].versionsSize > 0;
+
+                bool sameIpfs = hasLastVersionInHistory && stringsEquals(gameVersionHistory[_gameHash].versions[gameVersionHistory[_gameHash].versionsSize - 1].ipfsCid,
+                    gameChallengeHistory[_gameHash].challenges[gameChallengeHistory[_gameHash].challengesSize - 1].currentChallengeVersion.gameVersion.ipfsCid);
+                bool sameImage= hasLastVersionInHistory && stringsEquals(gameVersionHistory[_gameHash].versions[gameVersionHistory[_gameHash].versionsSize - 1].imageCid,
+                    gameChallengeHistory[_gameHash].challenges[gameChallengeHistory[_gameHash].challengesSize - 1].currentChallengeVersion.gameVersion.imageCid);
+
+                versionHistoryMissesLastChallenge = !(sameIpfs && sameImage);
+            }
+        }
+
+        if(versionHistoryMissesLastChallenge)
+            listSize++;
         GameVersion[] memory response = new GameVersion[](listSize);
 
-        for(uint i = 0; i < listSize; i++){
+        for(uint i = 0; i < gameVersionHistory[_gameHash].versionsSize; i++){
             response[i] = gameVersionHistory[_gameHash].versions[i];
         }
+
+        if(versionHistoryMissesLastChallenge){
+            // add version to last response position
+            if(gameChallengeHistory[_gameHash].challenges[gameChallengeHistory[_gameHash].challengesSize - 1].currentVersionPoints <
+                gameChallengeHistory[_gameHash].challenges[gameChallengeHistory[_gameHash].challengesSize - 1].newVersionPoints){
+                // new version is the right one
+                response[listSize-1] = GameVersion(_gameHash, 
+                    gameChallengeHistory[_gameHash].challenges[gameChallengeHistory[_gameHash].challengesSize - 1].newChallengeVersion.gameVersion.ipfsCid,
+                    gameChallengeHistory[_gameHash].challenges[gameChallengeHistory[_gameHash].challengesSize - 1].newChallengeVersion.gameVersion.imageCid);
+            } else {
+                // current version is the right one
+                response[listSize-1] = GameVersion(_gameHash, 
+                    gameChallengeHistory[_gameHash].challenges[gameChallengeHistory[_gameHash].challengesSize - 1].currentChallengeVersion.gameVersion.ipfsCid,
+                    gameChallengeHistory[_gameHash].challenges[gameChallengeHistory[_gameHash].challengesSize - 1].currentChallengeVersion.gameVersion.imageCid);
+            }
+        }
+
         
         return response;
     }
@@ -343,7 +447,7 @@ contract Vaultium {
     }
 
     // closing a challenges may insert a new entry to version history
-    function closeChallengesIfNeeded(bytes32 _gameHash) private {
+    function closeChallengesIfNeeded(bytes32 _gameHash) public {
         bool hasLastChallenge = gameChallengeHistory[_gameHash].challengesSize > 0;
         if(!hasLastChallenge)
             return;
