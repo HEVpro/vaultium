@@ -29,17 +29,14 @@ export async function generateStaticParams() {
     return gameHashes
 }
 
-async function getGame(gameHash: string) {
-    return abandonwares.find((abandonware) => abandonware.gameHash === gameHash)
-}
-
 export default async function Page({
     params: { gameHash },
 }: {
     params: { gameHash: string }
 }) {
-    if(!gameHash) redirect('/')
-    const abandonware = await getGame(gameHash)
+    // TODO: read contract with getAbandonware function by using gameHash (must be in HEX)
+    return null
+
     return (
         <div className='min-h-screen w-full space-y-10 px-8 py-12 text-white'>
             <div className='flex w-full '>

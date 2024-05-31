@@ -38,10 +38,13 @@ export default async function Page({
     params: { gameHash: string }
 }) {
     const abandonware = await getGame(gameHash)
-    const isGameChallenged = true // TODO: check if the current version is being challenged by contract read
+    const isGameChallenged = true // TODO: check if the current version is being challenged using hasActiveChallengeForGame
 
-    // TODO: print gameversion history --> Either call contract or use thegraph to get the history of the new versions
+    // TODO: print gameversion history --> getGameVersionHistory
     // TODO: enable users to challenge a version
+
+    // challengeAbandonwareVersion --> call contract to challenge a version of the abandonware, imageCid pass an empty string (or anything, it is not being used)
+    // voting: _voteNewVersion true -> new version, false -> current version // token count put 1 
 
     return (
         <div className='min-h-screen w-full space-y-10 px-8 py-12 text-white'>
