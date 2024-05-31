@@ -34,6 +34,7 @@ import Web3 from 'web3'
 import { decodeFunctionData } from 'viem'
 import { decodeAbiParameters, parseAbiParameters } from 'viem'
 import { gameCasterArray } from '@/lib/constants'
+import { vaultiumContract } from '@/lib/wagmi/vaultiumContract'
 
 
 export default function ValidateForm({
@@ -58,15 +59,16 @@ export default function ValidateForm({
     async function onSubmit(data: z.infer<typeof FormSchema>) {
         if (authenticated) {
             writeContract({
-                abi: mockVaultiumContract.abi,
-                address: '0xE8B07e948168108C8f0BE3bfD448D4a9A9B56596',
-                functionName: 'searchAbandonware',
+                abi: vaultiumContract.abi,
+                address: '0x7abf514378ef5f808d70f5dc6b5b8219f156ad48',
+                functionName: 'createAbandonware',
                 args: [
                     data.name,
                     data.description,
                     data.publisher,
-                    0,
                     data.year,
+                    data.country,
+                    data.genres
                 ],
                 chainId: sepolia.id,
             })
