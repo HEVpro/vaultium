@@ -3,8 +3,9 @@ export interface Game {
     name: string
     year: number
     publisher: string
-    ipfsCid: string | null
-    isAbandonware: boolean
-    description: string
-    gameHash: string
+    ipfsCid?: string | null
+    isAbandonware?: boolean
+    description?: string
+    gameHash: string;
+    genre: number;
 }

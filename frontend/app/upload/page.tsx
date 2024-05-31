@@ -1,6 +1,7 @@
 'use client'
 import { AnimatedCheck } from '@/components/animatedCheck'
-import UploadGameCard from '@/components/pages/upload/uploadGameCard'
+import GameCardResult from '@/components/pages/upload/uploadGameCard'
+import UploadNewVersion from '@/components/pages/upload/uploadNewVersion'
 import ValidateForm from '@/components/pages/upload/validateForm'
 import { Button } from '@/components/ui/button'
 import {
@@ -28,6 +29,7 @@ import {
 } from '@/components/ui/tooltip'
 import useCustomForm, { FormSchema } from '@/components/uploadForm'
 import { countries } from '@/lib/countries'
+import { fleekSdk } from '@/lib/fleek'
 import { Game } from '@/lib/types'
 import { cn } from '@/lib/utils'
 import { motion } from 'framer-motion'
@@ -45,12 +47,9 @@ import { useState } from 'react'
 import { z } from 'zod'
 
 export default function Page() {
-    // Type FILE only suported in node >20, and Fleek deploys on Node 18
-    const [file, setFile] = useState<any | null>(null)
-    // TODO: REPLACE BY GALADRIEL VALIDATION
-    // const [isValid, setIsValid] = useState<boolean>(false)
-    const [searchedGames, setSearchedGames] = useState<Game[] | null>(null)
+    const [gameResult, setGamerResult] = useState<Game | null>(null)
     const [selectedGame, setSelectedGame] = useState<Game | null>(null)
+    const [file, setFile] = useState<any | null>(null)
     const { form } = useCustomForm()
 
     function onSubmit(data: z.infer<typeof FormSchema>) {
@@ -65,6 +64,25 @@ export default function Page() {
         //   ),
         // })
     }
+
+    const uploadToIPFS = async (filename: string, content: Buffer) => {
+        const formData = new FormData()
+        formData.append('file', file)
+
+        fetch('/api/upload-image', {
+            method: 'POST',
+            body: formData,
+        })
+            .then((response) => response.json())
+            .then((data) => console.info("uploaded successfully", data.pin.cid))
+            .catch((error) => console.error(error))
+    }
+    // TODO: NEXT STEPS
+    // 0. ADD LOADERS AND CREATE A COMPONENT FOR IT
+    // 1 IF THE GAME HAVE NO CID, UPLOAD THE GAME WITH ICON IN CARD
+    // 2.IF THE GAME DON'T HAVE A CID IMAGE, UPLOAD THE IMAGE WITH ICON IN CARD
+    // 3. IF THE GAME HAVE CID AND IMAGE, SHOW THE GAME CARD WITH ICON
+    // all the steps need to write on the contract
 
     return (
         <div className='flex flex-col items-center justify-start px-6 pb-24'>
@@ -84,34 +102,40 @@ export default function Page() {
                 </div>
                 {/* VALIDATE */}
                 <div className='flex w-full flex-col gap-2'>
-                    <ValidateForm setSearchedGames={setSearchedGames} />
+                    <ValidateForm setSearchedGames={setGamerResult} />
                 </div>
             </div>
+            <Input
+                type='file'
+                onChange={(e) => e.target.files && setFile(e.target.files[0])}
+            />
+            <Button onClick={() => uploadToIPFS(file.name, file)}>
+                <CloudUploadIcon size={24} />
+                Upload
+            </Button>
+            
             <div className='w-full'>
-                {!selectedGame &&
-                    searchedGames &&
-                    searchedGames?.length > 0 && (
-                        <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            transition={{ duration: 0.5 }}
-                            className={cn('mt-6 w-full')}
-                        >
-                            <h2 className='text-2xl font-semibold text-primary'>
-                                Maybe your a looking for one of these games?
-                            </h2>
-                            <div className='mt-4 grid w-full grid-cols-3 gap-4'>
-                                {searchedGames?.map((game) => (
-                                    <UploadGameCard
-                                        key={game.gameHash}
-                                        game={game}
-                                        setSelectedGame={setSelectedGame}
-                                        canBeUploaded={true}
-                                    />
-                                ))}
-                            </div>
-                        </motion.div>
-                    )}
+                {/* THE LIST OF GAME RESULTS */}
+                {!selectedGame && gameResult && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 0.5 }}
+                        className={cn('mt-6 w-full')}
+                    >
+                        <h2 className='text-2xl font-semibold text-primary'>
+                            Maybe your a looking this game?
+                        </h2>
+                        <div className='mt-4 grid w-full grid-cols-3 gap-4'>
+                            <GameCardResult
+                                key={gameResult.gameHash}
+                                game={gameResult}
+                                setSelectedGame={setSelectedGame}
+                            />
+                        </div>
+                    </motion.div>
+                )}
+                {/* YOU HAVE SELECTED A GAME AND YOU WANT TO UPLOAD A NEW VERSION, WITHOUT CHALLENGE */}
                 {selectedGame && (
                     <motion.div
                         initial={{ opacity: 0 }}
@@ -123,72 +147,20 @@ export default function Page() {
                             Do you have a new version? This is the moment!
                         </h2>
                         <div className='relative mt-4 flex w-full items-end  justify-between gap-4'>
-                            <UploadGameCard
+                            <GameCardResult
                                 game={selectedGame}
                                 setSelectedGame={setSelectedGame}
-                                canBeUploaded={false}
                             />
                             <div className='w-full max-w-lg space-y-2'>
-                                <button
-                                    onClick={() => setSelectedGame(null)}
-                                    className='absolute right-0 top-0 transition duration-300 hover:scale-110 active:scale-90'
-                                >
-                                    <XIcon className='h-6 w-6 stroke-white' />
-                                </button>
-                                <div className='flex items-center gap-2'>
-                                    <div
-                                        className={
-                                            'relative h-12  w-60 cursor-pointer'
-                                        }
-                                    >
-                                        <Input
-                                            type={'file'}
-                                            className={
-                                                'absolute left-0 top-0 z-10 h-12 w-full cursor-pointer opacity-0'
-                                            }
-                                            name={'file'}
-                                            onChange={(e) => {
-                                                if (e.target.files) {
-                                                    setFile(e.target.files[0])
-                                                }
-                                            }}
-                                        />
-                                        <div className='absolute left-0 top-0.5 flex h-12 w-full cursor-pointer items-center justify-start gap-2 rounded-lg bg-primary pl-2 pt-2 text-sm font-light text-white'>
-                                            <FileBoxIcon className=' mb-2.5 h-7 w-7 stroke-foreground  stroke-1' />
-                                            <p className='mb-1 w-full'>
-                                                Click to upload
-                                            </p>
-                                        </div>
-                                    </div>
-
-                                    <div className='mt-1 flex h-12 w-full items-center justify-start gap-2 text-wrap rounded-lg border-2 pl-2 text-sm'>
-                                        {file && (
-                                            <AnimatedCheck classname='h-5 w-5 stroke-primary' />
-                                        )}
-                                        <p
-                                            className={cn(
-                                                'font-light tracking-wide text-white',
-                                                file && 'italic text-primary',
-                                                !file && 'pl-6'
-                                            )}
-                                        >
-                                            {file
-                                                ? file.name
-                                                : 'Select a file to upload'}
-                                        </p>
-                                    </div>
-                                </div>
-                                <Button
-                                    disabled={!file}
-                                    className='w-full text-base text-foreground transition duration-300 hover:text-white active:scale-90'
-                                >
-                                    Upload new version
-                                </Button>
+                                <UploadNewVersion
+                                    setSelectedGame={setSelectedGame}
+                                />
                             </div>
                         </div>
                     </motion.div>
                 )}
-                {searchedGames && searchedGames.length === 0 && (
+                {/* NOT EXISTING GAME */}
+                {!gameResult && (
                     <div className='w-full py-12 text-center'>
                         <h2 className='mx-auto w-[50ch] text-xl text-primary'>
                             {
@@ -201,4 +173,3 @@ export default function Page() {
         </div>
     )
 }
-

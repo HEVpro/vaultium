@@ -34,11 +34,11 @@ export const GameCard = ({ item }: GameCardProps) => {
                         </p>
                         <div className=' flex translate-y-12 flex-col justify-between gap-4  opacity-100  group-hover:translate-y-0 '>
                             <div className='flex justify-between'>
-                                <p>{item.platform}</p>
+                                <p>{item.publisher}</p>
                                 <p>{item.year}</p>
                             </div>
                             <div className='no-scrollbar flex max-h-20 min-h-16 flex-wrap items-end justify-start gap-1  overflow-scroll'>
-                                {item.theme.map(
+                                {item.theme && item.theme.map(
                                     (element: string, idx: number) => (
                                         <Badge
                                             className='bg-gradient h-6 text-black'
