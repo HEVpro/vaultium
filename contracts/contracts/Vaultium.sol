@@ -171,7 +171,7 @@ contract Vaultium {
 
     function hasActiveChallengeForGame(
         bytes32 gameHash
-    ) private view returns (bool) {
+    ) public view returns (bool) {
         if(gameChallengeHistory[gameHash].challengesSize == 0)
             return false;
         uint256 closingDate = gameChallengeHistory[gameHash].challenges[gameChallengeHistory[gameHash].challengesSize - 1].closingDate;
