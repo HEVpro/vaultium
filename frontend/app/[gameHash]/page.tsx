@@ -3,6 +3,7 @@ import { abandonwares } from '@/lib/abandonwares'
 import { graphClient } from '@/lib/graph'
 import { gql } from '@apollo/client'
 import Image from 'next/image'
+import { redirect } from 'next/navigation'
 
 export async function generateStaticParams() {
     // let results: {gameHash: string}[] = []
@@ -37,6 +38,7 @@ export default async function Page({
 }: {
     params: { gameHash: string }
 }) {
+    if(!gameHash) redirect('/')
     const abandonware = await getGame(gameHash)
     return (
         <div className='min-h-screen w-full space-y-10 px-8 py-12 text-white'>
