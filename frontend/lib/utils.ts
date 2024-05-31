@@ -6,34 +6,20 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 
-export const transformGenres = (genres: number[]) => {
-    return genres.map((genre) => {
-        switch (genre) {
-            case 0:
-                return 'Action'
-            case 1:
-                return 'Adventure'
-            case 2:
-                return 'Fighting'
-            case 3:
-                return 'Platform'
-            case 4:
-                return 'Puzzle'
-            case 5:
-                return 'Racing'
-            case 6:
-                return 'RolePlaying'
-            case 7:
-                return 'Shooter'
-            case 8:
-                return 'Simulation'
-            case 9:
-                return 'Sports'
-            case 10:
-                return 'Strategy'
-            default:
-                return 'Other'
- 
-        }
-    })
+export const transformGenres = (genres: number[]): string[] => {
+    const genreMap: Record<number, string> = {
+        0: 'Action',
+        1: 'Adventure',
+        2: 'Fighting',
+        3: 'Platform',
+        4: 'Puzzle',
+        5: 'Racing',
+        6: 'RolePlaying',
+        7: 'Shooter',
+        8: 'Simulation',
+        9: 'Sports',
+        10: 'Strategy'
+    };
+
+    return genres.map(genre => genreMap[genre] || 'Other');
 }
