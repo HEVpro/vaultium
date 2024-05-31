@@ -3,9 +3,9 @@ import { buildModule } from "@nomicfoundation/hardhat-ignition/modules";
 
 const MockVaultium = buildModule("MockVaultium", (m) => {
 
-  const lock = m.contract("MockVaultium", [], {} );
+  const mockVaultium = m.contract("MockVaultium", [], {} );
 
-  return { lock };
+  return { mockVaultium };
 });
 
 export default MockVaultium;
