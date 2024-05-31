@@ -17,6 +17,7 @@ export const GameCard = ({ item }: GameCardProps) => {
     const [vote, setVote] = useState(0)
 
     return (
+        // TODO: REPLACE GAME IMAGE BY DEFAULT IMAGE
         <div className='bg-gradient group relative h-[400px] w-full overflow-hidden rounded-xl'>
             <div className='absolute inset-0.5 place-content-center'>
                 <div className='relative z-20  h-full w-full min-w-44 rounded-xl text-white shadow-[inset_0px_110px_60px_-44px_rgba(0,0,0,0.75)] shadow-black transition duration-300 *:transition *:duration-300'>

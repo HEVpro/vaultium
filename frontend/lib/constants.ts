@@ -26,3 +26,7 @@ export const gameCasterArray = [
         type: 'uint256',
     },
 ]
+
+const subgraphName = 'vaultium-testing-sepolia'
+const graphId = '62919'
+export const graphUrl = `https://api.studio.thegraph.com/query/${graphId}/${subgraphName}/version/latest`
