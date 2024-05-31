@@ -5,10 +5,8 @@ import { abandonwares } from '@/lib/abandonwares'
 import { GameCard } from './gameCard'
 import { Label } from './ui/label'
 import { ApolloClient, InMemoryCache, gql } from '@apollo/client'
-
-const subgraphName = 'vaultium-testing-sepolia'
-const graphId = '62919'
-const APIURL = `https://api.studio.thegraph.com/query/${graphId}/${subgraphName}/version/latest`
+import { graphUrl } from '@/lib/constants'
+import { graphClient } from '@/lib/graph'
 
 const tokensQuery = gql`
   query{
@@ -20,21 +18,17 @@ const tokensQuery = gql`
     }
   }
 `
-
+// TODO: RENAME
 const Searcher = () => {
     const [searchTerm, setSearchTerm] = useState('')
     const [games, setGames] = useState([])
     const [debounceGame, setDebounceGame] = useState('')
 
-    const client = new ApolloClient({
-        uri: APIURL,
-        cache: new InMemoryCache(),
-    })
 
     const gamesNotToInclude = ['banana', 'game', 'test', 'gaming']
 
     useEffect(() => {
-        client
+        graphClient
             .query({
                 query: tokensQuery,
             })

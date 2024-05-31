@@ -47,8 +47,20 @@ import { useState } from 'react'
 import { z } from 'zod'
 
 export default function Page() {
+    const randomAbandonware: Game = {
+        name: 'Random Game',
+        year: 1990,
+        publisher: 'Random Publisher',
+        ipfsCid: 'QmRandomIPFSCid',
+        isAbandonware: true,
+        description: 'This is a random abandonware game.',
+        gameHash: 'randomGameHash',
+        genre: 1,
+    }
     const [gameResult, setGamerResult] = useState<Game | null>(null)
-    const [selectedGame, setSelectedGame] = useState<Game | null>(null)
+    const [selectedGame, setSelectedGame] = useState<Game | null>(
+        randomAbandonware
+    )
     const [file, setFile] = useState<any | null>(null)
     const { form } = useCustomForm()
 
@@ -65,6 +77,7 @@ export default function Page() {
         // })
     }
 
+    // REPLACE BY GAME, 
     const uploadToIPFS = async (filename: string, content: Buffer) => {
         const formData = new FormData()
         formData.append('file', file)
@@ -74,7 +87,7 @@ export default function Page() {
             body: formData,
         })
             .then((response) => response.json())
-            .then((data) => console.info("uploaded successfully", data.pin.cid))
+            .then((data) => console.info('uploaded successfully', data.pin.cid))
             .catch((error) => console.error(error))
     }
     // TODO: NEXT STEPS
@@ -105,16 +118,21 @@ export default function Page() {
                     <ValidateForm setSearchedGames={setGamerResult} />
                 </div>
             </div>
-            <Input
+            {/* TODO: upload image */}
+            {/* <Input
                 type='file'
                 onChange={(e) => e.target.files && setFile(e.target.files[0])}
             />
             <Button onClick={() => uploadToIPFS(file.name, file)}>
                 <CloudUploadIcon size={24} />
                 Upload
-            </Button>
-            
+            </Button> */}
+
             <div className='w-full'>
+                <GameCardResult
+                    game={selectedGame as Game}
+                    setSelectedGame={setSelectedGame}
+                />
                 {/* THE LIST OF GAME RESULTS */}
                 {!selectedGame && gameResult && (
                     <motion.div
@@ -160,7 +178,8 @@ export default function Page() {
                     </motion.div>
                 )}
                 {/* NOT EXISTING GAME */}
-                {!gameResult && (
+                {/* TODO: FIX LOGIC WHEN LANDING ON PAGE */}
+                {/* {!gameResult && (
                     <div className='w-full py-12 text-center'>
                         <h2 className='mx-auto w-[50ch] text-xl text-primary'>
                             {
@@ -168,7 +187,7 @@ export default function Page() {
                             }
                         </h2>
                     </div>
-                )}
+                )} */}
             </div>
         </div>
     )
