@@ -89,7 +89,7 @@ const Searcher = () => {
             </div>
             {!ready ? (
                 <div className='grid w-full grid-cols-3 gap-8'>
-                    {new Array(6).fill(0).map((_, index) => <Skeleton className="h-[400px] w-full rounded-xl bg-gradient" />
+                    {new Array(6).fill(0).map((_, index) => <Skeleton key={index} className="h-[400px] w-full rounded-xl bg-gradient" />
                     )}
 
                 </div>

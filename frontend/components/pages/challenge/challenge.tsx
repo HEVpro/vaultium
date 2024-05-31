@@ -20,7 +20,7 @@ export default function GameChallenge({ gameHash }: { gameHash: string }) {
 
     const challenge = data as Abandonware
 
-    // const parsedGenres = transformGenres(abandonware?.genres ?? [])
+    const parsedGenres = transformGenres(challenge?.genres ?? [])
 
     const isGameChallenged = true // TODO: check if the current version is being challenged using hasActiveChallengeForGame
 
@@ -36,10 +36,10 @@ export default function GameChallenge({ gameHash }: { gameHash: string }) {
     return (
         <>
             {/* TODO: ADD SKELETON */}
-            {abandonware && (
+            {challenge && (
                 <div className=''>
                     <h1 className='text-4xl font-semibold text-primary'>
-                        {abandonware?.name}
+                        {challenge?.name}
                     </h1>
                     <div className='mt-4 flex items-start justify-between gap-8'>
                         <div className='w-1/2 space-y-6'>
@@ -48,14 +48,14 @@ export default function GameChallenge({ gameHash }: { gameHash: string }) {
                                     <p className='font-nunito text-primary'>
                                         Year
                                     </p>
-                                    <p>{abandonware?.year}</p>
+                                    <p>{challenge?.year}</p>
                                 </div>
 
                                 <div className=''>
                                     <p className='font-nunito text-primary'>
                                         Publisher
                                     </p>
-                                    <p>{abandonware?.publisher}</p>
+                                    <p>{challenge?.publisher}</p>
                                 </div>
                                 <div className='col-span-full'>
                                     <p className='font-nunito text-primary'>

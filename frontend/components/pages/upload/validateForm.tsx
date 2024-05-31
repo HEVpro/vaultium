@@ -82,6 +82,7 @@ export default function CreateAbandomware({
                 publisher: decodedParameters.publisher as unknown as string,
                 year: Number(decodedParameters.year),
                 country: decodedParameters.country as unknown as string,
+                description: ''
             }
 
             setResultGame(gameData)
