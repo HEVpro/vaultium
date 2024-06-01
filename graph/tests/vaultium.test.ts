@@ -5,7 +5,7 @@ import {
   clearStore,
   beforeAll,
   afterAll
-} from "matchstick-as"
+} from "matchstick-as/assembly/index"
 import { Bytes, BigInt } from "@graphprotocol/graph-ts"
 import { GameAddedToSystem } from "../generated/schema"
 import { GameAddedToSystem as GameAddedToSystemEvent } from "../generated/Vaultium/Vaultium"

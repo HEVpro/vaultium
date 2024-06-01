@@ -16,7 +16,7 @@ npx hardhat ignition deploy ./ignition/modules/Lock.ts
 
 A mock contract has been deployed on this address: [0xE8B07e948168108C8f0BE3bfD448D4a9A9B56596](https://sepolia.etherscan.io/address/0xe8b07e948168108c8f0be3bfd448d4a9a9b56596) - Only for front-end development purposes
 
-The current last version of the contract is deployed on this address: [0x7abf514378ef5f808d70f5dc6b5b8219f156ad48](https://sepolia.etherscan.io/address/0x7abf514378ef5f808d70f5dc6b5b8219f156ad48)
+The current last version of the contract is deployed on this address: [0x68d95dbe806ce53e011cc7044bbf7385d9519bc3](https://sepolia.etherscan.io/address/0x68d95dbe806ce53e011cc7044bbf7385d9519bc3)
 
 
 

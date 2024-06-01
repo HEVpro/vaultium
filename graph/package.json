@@ -1,13 +1,13 @@
 {
-  "name": "vaultium-sepolia",
+  "name": "vaultium-sepolia-2",
   "license": "UNLICENSED",
   "scripts": {
     "codegen": "graph codegen",
     "build": "graph build",
-    "deploy": "graph deploy --node https://api.studio.thegraph.com/deploy/ vaultium-sepolia",
-    "create-local": "graph create --node http://localhost:8020/ vaultium-sepolia",
-    "remove-local": "graph remove --node http://localhost:8020/ vaultium-sepolia",
-    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 vaultium-sepolia",
+    "deploy": "graph deploy --node https://api.studio.thegraph.com/deploy/ vaultium-sepolia-2",
+    "create-local": "graph create --node http://localhost:8020/ vaultium-sepolia-2",
+    "remove-local": "graph remove --node http://localhost:8020/ vaultium-sepolia-2",
+    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 vaultium-sepolia-2",
     "test": "graph test"
   },
   "dependencies": {
