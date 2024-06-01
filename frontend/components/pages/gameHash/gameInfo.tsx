@@ -7,11 +7,17 @@ import { transformGenres } from '@/lib/utils'
 import { vaultiumContract } from '@/lib/wagmi/vaultiumContract'
 import Link from 'next/link'
 import { redirect, useSearchParams } from 'next/navigation'
+import { useState } from 'react'
 import { useReadContract } from 'wagmi'
+import Uploader from '../upload/uploader'
 
 export default function GameInfo() {
     const searchParams = useSearchParams()
     const gameHash = searchParams.get('gameHash')
+    const [uploadedSuccessfully, setUploadedSuccessfully] =
+        useState<boolean>(false)
+
+    const [uploadGame, setUploadGame] = useState<boolean>(false)
 
     if (!gameHash || !gameHash?.startsWith('0x')) {
         redirect('/')
@@ -106,9 +112,10 @@ export default function GameInfo() {
                                                 {/* TODO: DOWNLOAD */}
                                                 <a
                                                     href={
-                                                        'https://gateway.lighthouse.storage/ipfs/' +
+                                                        'https://ipfs.io/ipfs/' +
                                                         abandonware?.ipfsCid
                                                     }
+                                                    download={abandonware?.name}
                                                     target='_blank'
                                                     className='max-w-sm rounded-lg bg-primary p-2 text-center text-foreground'
                                                 >
@@ -122,7 +129,7 @@ export default function GameInfo() {
                                                     <Link
                                                         href={
                                                             '/challenge?gameHash=' +
-                                                            gameHash 
+                                                            gameHash
                                                         }
                                                         className='hover:cursor-pointer hover:text-special-magenta-200'
                                                     >
@@ -131,17 +138,18 @@ export default function GameInfo() {
                                                 </div>
                                             </>
                                         ) : (
-                                            // TODO: WHEN CREATE THE UPLOAD MODAL ADD HERE THE COMPONENT
-                                            <Link
-                                                href={
-                                                    'https://gateway.lighthouse.storage/ipfs/' +
-                                                    abandonware?.ipfsCid
+                                            <button
+                                                onClick={() =>
+                                                    setUploadGame(true)
                                                 }
-                                                target='_blank'
+                                                // href={
+                                                //     'https://gateway.lighthouse.storage/ipfs/' +
+                                                //     abandonware?.ipfsCid
+                                                // }
                                                 className='max-w-sm rounded-lg bg-primary p-2 text-center text-foreground transition duration-500 hover:bg-special-magenta-300'
                                             >
                                                 Upload
-                                            </Link>
+                                            </button>
                                         )}
                                     </div>
                                 </div>
@@ -154,6 +162,17 @@ export default function GameInfo() {
                                     </p>
                                 </div>
                             </div>
+                            {uploadGame && (
+                                    <div className='w-full max-w-lg mt-12'>
+                                        <Uploader
+                                            game={abandonware}
+                                            setUploadGame={setUploadGame}
+                                            setUploadedSuccessfully={
+                                                setUploadedSuccessfully
+                                            }
+                                        />
+                                    </div>
+                                )}
                         </div>
                     )}
                 </>

@@ -25,7 +25,7 @@ export const gameCasterArray = [
     }
 ]
 
-const subgraphName = 'vaultium-sepolia'
+const subgraphName = 'vaultium-sepolia-2'
 const graphId = '62919'
 export const graphUrl = `https://api.studio.thegraph.com/query/${graphId}/${subgraphName}/version/latest`
 
