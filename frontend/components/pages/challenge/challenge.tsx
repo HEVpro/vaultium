@@ -2,17 +2,15 @@
 import { Badge } from '@/components/ui/badge'
 import { contractAddress } from '@/lib/constants'
 import { Abandonware } from '@/lib/types'
-import { transformGenres } from '@/lib/utils'
-import { wagmiConfig } from '@/lib/wagmi/config'
 import { vaultiumContract } from '@/lib/wagmi/vaultiumContract'
 import { readContract } from '@wagmi/core'
+import { DownloadIcon } from 'lucide-react'
 import Link from 'next/link'
 import { redirect, useSearchParams } from 'next/navigation'
 import { useState } from 'react'
 import { useReadContract } from 'wagmi'
 
 export default function GameChallenge() {
-
     const searchParams = useSearchParams()
     const gameHash = searchParams.get('gameHash')
 
@@ -20,15 +18,14 @@ export default function GameChallenge() {
         redirect('/')
     }
 
-
     const { data: game } = useReadContract({
         abi: vaultiumContract.abi,
         address: contractAddress,
         functionName: 'getAbandonware',
         args: [gameHash],
     })
-    
-    const { data: gameHistory } = useReadContract({
+
+    const { data: gameHistory, isPending } = useReadContract({
         abi: vaultiumContract.abi,
         address: contractAddress,
         functionName: 'getGameVersionHistory',
@@ -36,8 +33,6 @@ export default function GameChallenge() {
     })
 
     const abandonware = game as Abandonware
-
-    const parsedGenres = transformGenres(abandonware?.genres ?? [])
 
     const isGameChallenged = true // TODO: check if the current version is being challenged using hasActiveChallengeForGame
 
@@ -47,68 +42,68 @@ export default function GameChallenge() {
     // challengeAbandonwareVersion --> call contract to challenge a version of the abandonware, imageCid pass an empty string (or anything, it is not being used)
     // voting: _voteNewVersion true -> new version, false -> current version // token count put 1
 
-    console.info(abandonware)
-    console.info(gameHistory)
+    console.info('game', abandonware)
+    console.info('history', gameHistory)
+    console.info('isPewnding', isPending)
+
+    const tableHeaders = ['ifpsCID', 'download', 'Upload date']
+    const fakeBody = [
+        [
+            '0xa8dd9f3badb02a73b27b31b48b5d6f1ff300baf486794f5e5799f869ff40e10c',
+            'QmSCQCr8pwjSrmiNNw1HTtkTfjDTk2Les2qLDUax7gzEZ2',
+            'image not uploaded',
+        ],
+    ]
 
     return (
         <>
             <div className='min-h-screen w-full space-y-10 px-8 py-12 text-white'>
                 <div className='flex w-full '>
-                    <div className='w-1/2 space-y-6 px-10'>
-                        <h1 className='text-3xl'>{abandonware?.name}</h1>
-                        {/* <div className='space-y-2'>
-                        <div className='grid grid-cols-2'>
-                            <div className=''>
-                                <p className='font-nunito font-bold'>
-                                    platform
-                                </p>
-                                <p>{abandonware?.platform}</p>
-                            </div>
-                            <div className=''>
-                                <p className='font-nunito font-bold'>year</p>
-                                <p>{abandonware?.year}</p>
-                            </div>
-                        </div>
-                        <div className='grid grid-cols-2'>
-                            <div className=''>
-                                <p className='font-nunito font-bold'>genre</p>
-                                <p>{abandonware?.genre}</p>
-                            </div>
-                            <div className=''>
-                                <p className='font-nunito font-bold'>
-                                    publisher
-                                </p>
-                                <p>{abandonware?.publisher}</p>
-                            </div>
-                        </div>
-                        <div className=''>
-                            <p className='font-nunito font-bold'>released in</p>
-                            <p>{abandonware?.releasedIn}</p>
-                        </div>
-                    </div> */}
-                        <div className=''>
-                            <p className='font-nunito font-bold'>
-                                version history
+                    <div className='w-full space-y-6 px-10'>
+                        <h1 className='text-3xl text-primary flex items-center justify-start gap-4'>
+                            Challenge game version of:
+                            <p className='font-semibold text-white'>
+                                {abandonware?.name}
                             </p>
-                            <table className='table-auto'>
-                                <thead>
-                                    <th>IPFS CID</th>
-                                    <th>Link</th>
-                                    <th>Uploaded at</th>
+                        </h1>
+                        <div className='w-full'>
+                            <p className='mb-2 font-nunito font-thin text-primary'>
+                                Version history
+                            </p>
+                            <table className='ronded-md min-w-full divide-y divide-gray-300 overflow-hidden rounded-md'>
+                                <thead className='bg-gray-50'>
+                                    <tr className='bg-primary/40 text-foreground'>
+                                        {tableHeaders.map((header) => (
+                                            <th
+                                                key={header}
+                                                scope='col'
+                                                className='py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6 capitalize'
+                                            >
+                                                {header}
+                                            </th>
+                                        ))}
+                                    </tr>
                                 </thead>
-                                <tbody>
-                                    <tr>
-                                        {' '}
-                                        {/** TODO: Convert to a mapping of the objects retrieved by thegraph or contract read */}
-                                        <td>
-                                            QmXTAXgvisCDzh1cqeJN54kdYkohKMV9VaSzsN3fGQ3Y4Q
+                                <tbody className='divide-y divide-gray-200 '>
+                                    <tr className='round-t-md bg-slate-900 text-white'>
+                                        <td className='whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium sm:pl-6'>
+                                            {fakeBody[0][1]}
                                         </td>
-                                        <td>
-                                            <a href='https://gateway.pinata.cloud/ipfs/QmXTAXgvisCDzh1cqeJN54kdYkohKMV9VaSzsN3fGQ3Y4Q'>
+                                        <td className='whitespace-nowrap px-3 py-4 text-sm text-gray-500'>
+                                            <a
+                                                href={`https://gateway.lighthouse.storage/ipfs/${fakeBody[0][1]}`}
+                                                download={fakeBody[0][1]}
+                                                target='_blank'
+                                                className='max-w-sm text-primary hover:underline pl-6 flex items-center gap-1'
+                                            >
                                                 Link
+                                                <DownloadIcon className='h-4 w-4 stroke-primary mb-1' />
                                             </a>
                                         </td>
-                                        <td>2021-09-30</td>
+                                        <td className='whitespace-nowrap px-3 py-4 pl-6 text-sm text-white'>
+                                            {/* TODO: ADD TO CONTRACT */}
+                                            20/05/2024
+                                        </td>
                                     </tr>
                                 </tbody>
                             </table>
