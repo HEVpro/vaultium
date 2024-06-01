@@ -6,8 +6,10 @@ import { Abandonware, GameVersion } from '@/lib/types'
 import { vaultiumContract } from '@/lib/wagmi/vaultiumContract'
 import { DownloadIcon, HeartIcon, ShieldX } from 'lucide-react'
 import { redirect, useSearchParams } from 'next/navigation'
+import { useState } from 'react'
 import { useWriteContract, useReadContract } from 'wagmi'
 import { sepolia } from 'wagmi/chains'
+import UploadNewVersion from '../upload/uploadNewVersion'
 
 export default function GameChallenge() {
     const searchParams = useSearchParams()
@@ -16,6 +18,8 @@ export default function GameChallenge() {
     if (!gameHash || !gameHash?.startsWith('0x')) {
         redirect('/')
     }
+
+    const [challenging, setChallenging] = useState<boolean>(false)
 
     let gameHistoryArray: GameVersion[] = []
 
@@ -174,12 +178,13 @@ export default function GameChallenge() {
                             )}
                             {!isGameChallenged && (
                                 <div className='mx-auto mt-8 flex w-fit items-center justify-center gap-8'>
-                                    <Button className='hover:bg-gradient flex min-w-44 items-center justify-center gap-2 rounded-lg bg-primary p-2 text-foreground transition duration-500'>
+                                    <Button onClick={() => setChallenging(true)}className='hover:bg-gradient flex min-w-44 items-center justify-center gap-2 rounded-lg bg-primary p-2 text-foreground transition duration-500'>
                                         <ShieldX className='h-6 w-6 stroke-white' />
                                         Challenge current version
                                     </Button>
                                 </div>
                             )}
+                            {challenging && (<UploadNewVersion game={abandonware} setUploadGame={setChallenging}/>)}
                         </div>
                     </div>
                 </div>
