@@ -17,6 +17,7 @@ export interface Abandonware {
     description: string
     ipfsCid: string
     gameHash: string
+    country: string;
     // Add other properties as needed
 }
 

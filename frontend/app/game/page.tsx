@@ -1,7 +1,4 @@
 import GameInfo from '@/components/pages/gameHash/gameInfo'
-import { Badge } from '@/components/ui/badge'
-import { getGames } from '@/lib/graph'
-import { notFound } from 'next/navigation'
 import { Suspense } from 'react'
 
 export default async function Page() {
