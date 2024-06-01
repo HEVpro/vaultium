@@ -16,7 +16,7 @@ import { cn } from '@/lib/utils'
 import { Abandonware, Game, OptionType } from '@/lib/types'
 import { usePrivy } from '@privy-io/react-auth'
 import { useWaitForTransactionReceipt, useWriteContract } from 'wagmi'
-import { sepolia } from 'wagmi/chains'
+import { filecoinCalibration, sepolia } from 'wagmi/chains'
 import { useEffect } from 'react'
 import Web3 from 'web3'
 import { contractAddress, gameCasterArray, genres } from '@/lib/constants'
@@ -57,7 +57,7 @@ export default function CreateAbandomware({
                     data.country,
                     data. genres.map((a) => a.value),
                 ],
-                chainId: sepolia.id,
+                chainId: filecoinCalibration.id,
             })
         } else {
             toast({

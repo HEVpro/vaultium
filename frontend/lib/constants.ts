@@ -29,7 +29,7 @@ const subgraphName = 'vaultium-sepolia-2'
 const graphId = '62919'
 export const graphUrl = `https://api.studio.thegraph.com/query/${graphId}/${subgraphName}/version/latest`
 
-export const contractAddress = '0x68d95dbe806ce53e011cc7044bbf7385d9519bc3'
+export const contractAddress = '0x60e097484cd0222a62057ebce6099913f77f8ed2'
 
 export const genres = [
     'Action',

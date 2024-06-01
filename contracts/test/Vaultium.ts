@@ -20,12 +20,20 @@ describe("Vaultium", function () {
 
         const publicClient = await hre.viem.getPublicClient();
 
+        const abiCoder = new ethers.utils.AbiCoder();
+        const encodedArguments = abiCoder.encode(
+            ["uint256", "string"], // Constructor argument types
+            [12345, "Hello, world!"] // Constructor argument values
+        );
+        
+
         return {
             vaultium,
             owner,
             otherAccount,
             publicClient,
         };
+        
     }
 
     describe("Deployment", function () {
