@@ -37,8 +37,8 @@ export default function UploadNewVersion({
         pollingInterval: 100,
     })
 
-    console.log("updated ipfsCID on the game", data)
-    console.log("loading updating challenge", isUpdatingChallenge)
+    console.info("updated ipfsCID on the game", data)
+    console.info("loading updating challenge", isUpdatingChallenge)
 
     const uploadToIPFS = async (filename: string) => {
         setIsSubmitting(true)

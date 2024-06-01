@@ -47,8 +47,8 @@ export default function GameChallenge() {
     // challengeAbandonwareVersion --> call contract to challenge a version of the abandonware, imageCid pass an empty string (or anything, it is not being used)
     // voting: _voteNewVersion true -> new version, false -> current version // token count put 1
 
-    console.log(abandonware)
-    console.log(gameHistory)
+    console.info(abandonware)
+    console.info(gameHistory)
 
     return (
         <>
