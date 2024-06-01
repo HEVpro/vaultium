@@ -1,8 +1,8 @@
 {
   "sepolia": {
-    "MockVaultium": {
-      "address": "0xe8b07e948168108c8f0be3bfd448d4a9a9b56596",
-      "startBlock": 5975525
+    "Vaultium": {
+      "address": "0x68d95dbe806ce53e011cc7044bbf7385d9519bc3",
+      "startBlock": 6017398
     }
   }
 }

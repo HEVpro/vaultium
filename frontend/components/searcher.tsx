@@ -1,14 +1,65 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { abandonwares } from '@/lib/abandonwares'
 import { GameCard } from './gameCard'
 import { Label } from './ui/label'
+import { usePrivy } from '@privy-io/react-auth'
+import { Skeleton } from './ui/skeleton'
+import { ApolloClient, InMemoryCache, gql } from '@apollo/client'
+import { graphUrl } from '@/lib/constants'
+import { graphClient } from '@/lib/graph'
 
+const tokensQuery = gql`
+  query{
+    gameAddedToSystems{
+        genres
+    name
+    publisher
+    year
+    gameHash
+    country
+    }
+  }
+`
+// TODO: RENAME
 const Searcher = () => {
     const [searchTerm, setSearchTerm] = useState('')
-    const [games, setGames] = useState(abandonwares)
+    const [games, setGames] = useState([])
     const [debounceGame, setDebounceGame] = useState('')
+    const { ready } = usePrivy()
+
+
+    const gamesNotToInclude = ['banana', 'game', 'test', 'gaming']
+
+    useEffect(() => {
+        graphClient
+            .query({
+                query: tokensQuery,
+            })
+            .then((data) => {
+                const results = data.data.gameAddedToSystems.map((item: any) => {
+                    return {
+                        name: item.name,
+                        year: item.year,
+                        publisher: item.publisher,
+                        gameHash: item.gameHash,
+                        genres: item.genres
+                    }
+                }).filter((item: any) => {
+                    const lowerCaseName = item.name.toLowerCase();
+                    if (debounceGame) {
+                        return lowerCaseName.includes(debounceGame.toLowerCase())
+                    } else {
+                        return !gamesNotToInclude.some(word => lowerCaseName.includes(word));
+                    }
+                })
+                setGames(results)
+            })
+            .catch((err) => {
+                console.error('Error fetching data: ', err)
+            })
+
+    }, [debounceGame])
 
     useEffect(() => {
         const timerId = setTimeout(() => {
@@ -19,17 +70,6 @@ const Searcher = () => {
             clearTimeout(timerId)
         }
     }, [searchTerm])
-
-    useEffect(() => {
-        if (debounceGame) {
-            const filteredGames = abandonwares.filter(({ name }) => {
-                return name.toLowerCase().includes(debounceGame.toLowerCase())
-            })
-            setGames(filteredGames)
-        } else {
-            setGames(abandonwares)
-        }
-    }, [debounceGame, abandonwares])
 
     return (
         <div className='mt-10 flex min-h-screen w-full flex-col items-end gap-8 pb-12'>
@@ -47,23 +87,33 @@ const Searcher = () => {
                     />
                 </div>
             </div>
-
-            {games.length > 0 ? (
+            {!ready ? (
                 <div className='grid w-full grid-cols-3 gap-8'>
-                    {games.map((item, idx) => (
-                        <GameCard key={idx} item={item} />
-                    ))}
+                    {new Array(6).fill(0).map((_, index) => <Skeleton key={index} className="h-[400px] w-full rounded-xl bg-gradient" />
+                    )}
+
                 </div>
             ) : (
-                <div className='h-full w-full py-8'>
-                    <p className='text-center text-3xl text-gray-400'>
-                        {"Oh no! We couldn't find any matching games."}
-                    </p>
-                    <p className='mx-auto w-[38ch] text-center text-3xl text-gray-400'>
-                        Looks like this game hid better than a final boss. Why
-                        not try another search?
-                    </p>
-                </div>
+                <>
+                    {games && games.length > 0 && (
+                        <div className='grid w-full grid-cols-3 gap-8'>
+                            {games.length && games.map((item, idx) => (
+                                <GameCard key={idx} item={item} />
+                            ))}
+                        </div>
+                    )}
+                    {games && games.length === 0 && debounceGame.length > 0 && (
+                        <div className='h-full w-full py-8'>
+                            <p className='text-center text-3xl text-gray-400'>
+                                {"Oh no! We couldn't find any matching games."}
+                            </p>
+                            <p className='mx-auto w-[38ch] text-center text-3xl text-gray-400'>
+                                Looks like this game hid better than a final boss. Why
+                                not try another search?
+                            </p>
+                        </div>
+                    )}
+                </>
             )}
         </div>
     )

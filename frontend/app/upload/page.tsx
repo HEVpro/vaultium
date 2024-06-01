@@ -1,7 +1,8 @@
 'use client'
 import { AnimatedCheck } from '@/components/animatedCheck'
-import UploadGameCard from '@/components/pages/upload/uploadGameCard'
-import ValidateForm from '@/components/pages/upload/validateForm'
+import GameCardResult from '@/components/pages/upload/uploadGameCard'
+import UploadNewVersion from '@/components/pages/upload/uploadNewVersion'
+import CreateAbandomware from '@/components/pages/upload/validateForm'
 import { Button } from '@/components/ui/button'
 import {
     Form,
@@ -28,7 +29,8 @@ import {
 } from '@/components/ui/tooltip'
 import useCustomForm, { FormSchema } from '@/components/uploadForm'
 import { countries } from '@/lib/countries'
-import { Game } from '@/lib/types'
+import { fleekSdk } from '@/lib/fleek'
+import { Abandonware, Game } from '@/lib/types'
 import { cn } from '@/lib/utils'
 import { motion } from 'framer-motion'
 import {
@@ -43,28 +45,29 @@ import {
 import Link from 'next/link'
 import { useState } from 'react'
 import { z } from 'zod'
+import crypto from 'crypto';
+
+function generateRandomSHA256() {
+    const randomData = crypto.randomBytes(32);
+    const hash = crypto.createHash('sha256');
+    hash.update(randomData);
+    return hash.digest('hex');
+}
 
 export default function Page() {
-    // Type FILE only suported in node >20, and Fleek deploys on Node 18
-    const [file, setFile] = useState<any | null>(null)
-    // TODO: REPLACE BY GALADRIEL VALIDATION
-    // const [isValid, setIsValid] = useState<boolean>(false)
-    const [searchedGames, setSearchedGames] = useState<Game[] | null>(null)
-    const [selectedGame, setSelectedGame] = useState<Game | null>(null)
-    const { form } = useCustomForm()
-
-    function onSubmit(data: z.infer<typeof FormSchema>) {
-        console.info(data)
-        // TODO:  INTEGRATE WITH THE BLOCKCHAIN
-        // toast({
-        //   title: "You submitted the following values:",
-        //   description: (
-        //     <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-        //       <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-        //     </pre>
-        //   ),
-        // })
+    const gameData: Abandonware = {
+        gameHash: generateRandomSHA256(),
+        name: 'Super Mario Bros. 3',
+        genres: [1],
+        publisher: 'Nintendo',
+        year: 1990,
+        country: 'USA',
+        description: '',
+        ipfsCid: '',
     }
+    // TODO: SET TO NULL OR GAMEDATA, IT'S ONLY FOR TESTING AND STYLING
+    const [gameResult, setGameResult] = useState<Abandonware | null>(null)
+    const [uploadGame, setUploadGame] = useState<boolean>(false)
 
     return (
         <div className='flex flex-col items-center justify-start px-6 pb-24'>
@@ -82,113 +85,42 @@ export default function Page() {
                         appreciated by gamers everywhere!
                     </p>
                 </div>
-                {/* VALIDATE */}
+                {/* CREATE */}
                 <div className='flex w-full flex-col gap-2'>
-                    <ValidateForm setSearchedGames={setSearchedGames} />
+                    <CreateAbandomware setResultGame={setGameResult} />
                 </div>
             </div>
             <div className='w-full'>
-                {!selectedGame &&
-                    searchedGames &&
-                    searchedGames?.length > 0 && (
-                        <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            transition={{ duration: 0.5 }}
-                            className={cn('mt-6 w-full')}
-                        >
-                            <h2 className='text-2xl font-semibold text-primary'>
-                                Maybe your a looking for one of these games?
-                            </h2>
-                            <div className='mt-4 grid w-full grid-cols-3 gap-4'>
-                                {searchedGames?.map((game) => (
-                                    <UploadGameCard
-                                        key={game.gameHash}
-                                        game={game}
-                                        setSelectedGame={setSelectedGame}
-                                        canBeUploaded={true}
-                                    />
-                                ))}
-                            </div>
-                        </motion.div>
-                    )}
-                {selectedGame && (
+                {/* GAME RESULT */}
+                {gameResult && (
                     <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
-                        transition={{ duration: 0.6, delay: 0.3 }}
-                        className='mt-6 w-full'
+                        transition={{ duration: 0.5 }}
+                        className={cn('mt-6 w-full')}
                     >
                         <h2 className='text-2xl font-semibold text-primary'>
-                            Do you have a new version? This is the moment!
+                            Maybe your a looking this game?
                         </h2>
                         <div className='relative mt-4 flex w-full items-end  justify-between gap-4'>
-                            <UploadGameCard
-                                game={selectedGame}
-                                setSelectedGame={setSelectedGame}
-                                canBeUploaded={false}
+                            <GameCardResult
+                                game={gameResult}
+                                setUploadGame={setUploadGame}
                             />
-                            <div className='w-full max-w-lg space-y-2'>
-                                <button
-                                    onClick={() => setSelectedGame(null)}
-                                    className='absolute right-0 top-0 transition duration-300 hover:scale-110 active:scale-90'
-                                >
-                                    <XIcon className='h-6 w-6 stroke-white' />
-                                </button>
-                                <div className='flex items-center gap-2'>
-                                    <div
-                                        className={
-                                            'relative h-12  w-60 cursor-pointer'
-                                        }
-                                    >
-                                        <Input
-                                            type={'file'}
-                                            className={
-                                                'absolute left-0 top-0 z-10 h-12 w-full cursor-pointer opacity-0'
-                                            }
-                                            name={'file'}
-                                            onChange={(e) => {
-                                                if (e.target.files) {
-                                                    setFile(e.target.files[0])
-                                                }
-                                            }}
-                                        />
-                                        <div className='absolute left-0 top-0.5 flex h-12 w-full cursor-pointer items-center justify-start gap-2 rounded-lg bg-primary pl-2 pt-2 text-sm font-light text-white'>
-                                            <FileBoxIcon className=' mb-2.5 h-7 w-7 stroke-foreground  stroke-1' />
-                                            <p className='mb-1 w-full'>
-                                                Click to upload
-                                            </p>
-                                        </div>
-                                    </div>
-
-                                    <div className='mt-1 flex h-12 w-full items-center justify-start gap-2 text-wrap rounded-lg border-2 pl-2 text-sm'>
-                                        {file && (
-                                            <AnimatedCheck classname='h-5 w-5 stroke-primary' />
-                                        )}
-                                        <p
-                                            className={cn(
-                                                'font-light tracking-wide text-white',
-                                                file && 'italic text-primary',
-                                                !file && 'pl-6'
-                                            )}
-                                        >
-                                            {file
-                                                ? file.name
-                                                : 'Select a file to upload'}
-                                        </p>
-                                    </div>
+                            {uploadGame && (
+                                <div className='w-full max-w-lg'>
+                                    <UploadNewVersion
+                                        game={gameResult}
+                                        setUploadGame={setUploadGame}
+                                    />
                                 </div>
-                                <Button
-                                    disabled={!file}
-                                    className='w-full text-base text-foreground transition duration-300 hover:text-white active:scale-90'
-                                >
-                                    Upload new version
-                                </Button>
-                            </div>
+                            )}
                         </div>
                     </motion.div>
                 )}
-                {searchedGames && searchedGames.length === 0 && (
+                {/* NOT EXISTING GAME */}
+                {/* TODO: FIX LOGIC WHEN LANDING ON PAGE */}
+                {/* {!gameResult && (
                     <div className='w-full py-12 text-center'>
                         <h2 className='mx-auto w-[50ch] text-xl text-primary'>
                             {
@@ -196,9 +128,8 @@ export default function Page() {
                             }
                         </h2>
                     </div>
-                )}
+                )} */}
             </div>
         </div>
     )
 }
-

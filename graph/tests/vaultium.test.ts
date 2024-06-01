@@ -8,9 +8,9 @@ import {
 } from "matchstick-as/assembly/index"
 import { Bytes, BigInt } from "@graphprotocol/graph-ts"
 import { GameAddedToSystem } from "../generated/schema"
-import { GameAddedToSystem as GameAddedToSystemEvent } from "../generated/MockVaultium/MockVaultium"
-import { handleGameAddedToSystem } from "../src/mock-vaultium"
-import { createGameAddedToSystemEvent } from "./mock-vaultium-utils"
+import { GameAddedToSystem as GameAddedToSystemEvent } from "../generated/Vaultium/Vaultium"
+import { handleGameAddedToSystem } from "../src/vaultium"
+import { createGameAddedToSystemEvent } from "./vaultium-utils"
 
 // Tests structure (matchstick-as >=0.5.0)
 // https://thegraph.com/docs/en/developer/matchstick/#tests-structure-0-5-0
@@ -19,15 +19,17 @@ describe("Describe entity assertions", () => {
   beforeAll(() => {
     let gameHash = Bytes.fromI32(1234567890)
     let name = "Example string value"
-    let genre = 123
     let publisher = "Example string value"
     let year = BigInt.fromI32(234)
+    let country = "Example string value"
+    let genres = [123]
     let newGameAddedToSystemEvent = createGameAddedToSystemEvent(
       gameHash,
       name,
-      genre,
       publisher,
-      year
+      year,
+      country,
+      genres
     )
     handleGameAddedToSystem(newGameAddedToSystemEvent)
   })
@@ -58,12 +60,6 @@ describe("Describe entity assertions", () => {
     assert.fieldEquals(
       "GameAddedToSystem",
       "0xa16081f360e3847006db660bae1c6d1b2e17ec2a-1",
-      "genre",
-      "123"
-    )
-    assert.fieldEquals(
-      "GameAddedToSystem",
-      "0xa16081f360e3847006db660bae1c6d1b2e17ec2a-1",
       "publisher",
       "Example string value"
     )
@@ -72,6 +68,18 @@ describe("Describe entity assertions", () => {
       "0xa16081f360e3847006db660bae1c6d1b2e17ec2a-1",
       "year",
       "234"
+    )
+    assert.fieldEquals(
+      "GameAddedToSystem",
+      "0xa16081f360e3847006db660bae1c6d1b2e17ec2a-1",
+      "country",
+      "Example string value"
+    )
+    assert.fieldEquals(
+      "GameAddedToSystem",
+      "0xa16081f360e3847006db660bae1c6d1b2e17ec2a-1",
+      "genres",
+      "[123]"
     )
 
     // More assert options:

@@ -9,7 +9,15 @@ const etherscanApiKey = "MCDPH2KUQKINYE172UM2R6DTIUCA6ETHJM"
 
 
 const config: HardhatUserConfig = {
-  solidity: "0.8.25",
+  solidity: {
+    version: "0.8.25",
+    settings: {
+      optimizer: {
+        enabled: true,
+        runs: 200
+      }
+    }
+  },
   etherscan: {
     apiKey: etherscanApiKey
   },
@@ -18,7 +26,7 @@ const config: HardhatUserConfig = {
       url: "https://rpc.sepolia.org",
       accounts: [deployerPrivateKey]
     }
-  }
+  },
 };
 
 export default config;

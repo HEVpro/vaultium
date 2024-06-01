@@ -5,28 +5,22 @@ schema:
   file: ./schema.graphql
 dataSources:
   - kind: ethereum
-    name: MockVaultium
+    name: Vaultium
     network: sepolia
     source:
-      address: "0xe8b07e948168108c8f0be3bfd448d4a9a9b56596"
-      abi: MockVaultium
-      startBlock: 5975525
+      address: "0x68d95dbe806ce53e011cc7044bbf7385d9519bc3"
+      abi: Vaultium
+      startBlock: 6017398
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
         - GameAddedToSystem
-        - VersionChallengeAccepted
-        - VersionChallenged
       abis:
-        - name: MockVaultium
-          file: ./abis/MockVaultium.json
+        - name: Vaultium
+          file: ./abis/Vaultium.json
       eventHandlers:
-        - event: GameAddedToSystem(bytes32,string,uint8,string,uint256)
+        - event: GameAddedToSystem(bytes32,string,string,uint256,string,uint8[])
           handler: handleGameAddedToSystem
-        - event: VersionChallengeAccepted(bytes32,string)
-          handler: handleVersionChallengeAccepted
-        - event: VersionChallenged(bytes32,string)
-          handler: handleVersionChallenged
-      file: ./src/mock-vaultium.ts
+      file: ./src/vaultium.ts
