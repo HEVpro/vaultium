@@ -40,7 +40,7 @@ export default function UploadNewVersion({
     console.info("updated ipfsCID on the game", data)
     console.info("loading updating challenge", isUpdatingChallenge)
 
-    const uploadToIPFS = async (filename: string) => {
+    const uploadToIPFS = async (filename: string, file: any) => {
         setIsSubmitting(true)
         const formData = new FormData()
         // Extract the file extension
