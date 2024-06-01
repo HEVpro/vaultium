@@ -454,7 +454,6 @@ contract Vaultium {
 
     // closing a challenges may insert a new entry to version history
     function closeChallengesIfNeeded(bytes32 _gameHash) public {
-    function closeChallengesIfNeeded(bytes32 _gameHash) public {
         bool hasLastChallenge = gameChallengeHistory[_gameHash].challengesSize > 0;
         if(!hasLastChallenge)
             return;
