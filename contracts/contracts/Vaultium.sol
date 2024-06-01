@@ -41,6 +41,13 @@ contract Vaultium {
         string imageCid;
     }
 
+    struct HistoryGameVersion {
+        bytes32 gameHash;
+        string ipfsCid;
+        string imageCid;
+        uint date;
+    }
+
     // objects for contract
     struct ChallengeVersion {
         GameVersion gameVersion;
@@ -59,7 +66,7 @@ contract Vaultium {
     }
 
     struct GameVersionHistory {
-        mapping(uint => GameVersion) versions;
+        mapping(uint => HistoryGameVersion) versions;
         uint versionsSize;
     }
 
@@ -364,7 +371,7 @@ contract Vaultium {
         return response;
     }
 
-    function getGameVersionHistory(bytes32 _gameHash) public view returns (GameVersion[] memory) {
+    function getGameVersionHistory(bytes32 _gameHash) public view returns (HistoryGameVersion[] memory) {
         require(game[_gameHash].year > 0, "Game not found");
 
         uint listSize = gameVersionHistory[_gameHash].versionsSize;
@@ -403,7 +410,7 @@ contract Vaultium {
 
         if(versionHistoryMissesLastChallenge)
             listSize++;
-        GameVersion[] memory response = new GameVersion[](listSize);
+        HistoryGameVersion[] memory response = new HistoryGameVersion[](listSize);
 
         for(uint i = 0; i < gameVersionHistory[_gameHash].versionsSize; i++){
             response[i] = gameVersionHistory[_gameHash].versions[i];
@@ -414,14 +421,18 @@ contract Vaultium {
             if(gameChallengeHistory[_gameHash].challenges[gameChallengeHistory[_gameHash].challengesSize - 1].currentVersionPoints <
                 gameChallengeHistory[_gameHash].challenges[gameChallengeHistory[_gameHash].challengesSize - 1].newVersionPoints){
                 // new version is the right one
-                response[listSize-1] = GameVersion(_gameHash, 
+                response[listSize-1] = HistoryGameVersion(_gameHash, 
                     gameChallengeHistory[_gameHash].challenges[gameChallengeHistory[_gameHash].challengesSize - 1].newChallengeVersion.gameVersion.ipfsCid,
-                    gameChallengeHistory[_gameHash].challenges[gameChallengeHistory[_gameHash].challengesSize - 1].newChallengeVersion.gameVersion.imageCid);
+                    gameChallengeHistory[_gameHash].challenges[gameChallengeHistory[_gameHash].challengesSize - 1].newChallengeVersion.gameVersion.imageCid,
+                    gameChallengeHistory[_gameHash].challenges[gameChallengeHistory[_gameHash].challengesSize - 1].closingDate
+                    );
             } else {
                 // current version is the right one
-                response[listSize-1] = GameVersion(_gameHash, 
+                response[listSize-1] = HistoryGameVersion(_gameHash, 
                     gameChallengeHistory[_gameHash].challenges[gameChallengeHistory[_gameHash].challengesSize - 1].currentChallengeVersion.gameVersion.ipfsCid,
-                    gameChallengeHistory[_gameHash].challenges[gameChallengeHistory[_gameHash].challengesSize - 1].currentChallengeVersion.gameVersion.imageCid);
+                    gameChallengeHistory[_gameHash].challenges[gameChallengeHistory[_gameHash].challengesSize - 1].currentChallengeVersion.gameVersion.imageCid,
+                    gameChallengeHistory[_gameHash].challenges[gameChallengeHistory[_gameHash].challengesSize - 1].closingDate
+                );
             }
         }
 
@@ -475,7 +486,9 @@ contract Vaultium {
         
         // If we get here, we have a valid last challenge that doesn't have its last version saved
         gameVersionHistory[_gameHash].versionsSize++;
-        gameVersionHistory[_gameHash].versions[gameVersionHistory[_gameHash].versionsSize -1] = GameVersion(_gameHash, newVersionIpfsCid, newVersionImageCid);
+        gameVersionHistory[_gameHash].versions[gameVersionHistory[_gameHash].versionsSize -1] = HistoryGameVersion(
+            _gameHash, newVersionIpfsCid, newVersionImageCid, gameChallengeHistory[_gameHash].challenges[gameChallengeHistory[_gameHash].challengesSize - 1].closingDate
+        );
         game[_gameHash].ipfsCid = newVersionIpfsCid;
         game[_gameHash].imageCid = newVersionImageCid;
     }
