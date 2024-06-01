@@ -11,6 +11,7 @@ import { FileBoxIcon } from 'lucide-react'
 import { useState } from 'react'
 import { useWaitForTransactionReceipt, useWriteContract } from 'wagmi'
 import { sepolia } from 'wagmi/chains'
+import lighthouse from '@lighthouse-web3/sdk'
 
 export default function Uploader({
     game,
@@ -26,6 +27,7 @@ export default function Uploader({
 
     const { data: hash, isPending, writeContract } = useWriteContract()
 
+    // TODO: IMPROVE THE WORKFLOW AFTER THE TRANSACTION IS CONFIRMED AFTER INSERT THE IPFSCID
     const {
         data,
         isLoading: isUpdatingChallenge,
@@ -36,12 +38,12 @@ export default function Uploader({
         pollingInterval: 100,
     })
 
-    const uploadToIPFS = async (filename: string, file: any) => {
+    const uploadToLighhouse = async (fileName: string, file: any) => {
         setIsSubmitting(true)
         const formData = new FormData()
         // Extract the file extension
-        const fileExtension = filename.slice(
-            ((filename.lastIndexOf('.') - 1) >>> 0) + 2
+        const fileExtension = fileName.slice(
+            ((fileName.lastIndexOf('.') - 1) >>> 0) + 2
         )
 
         // Append the file extension to the game hash
@@ -49,18 +51,22 @@ export default function Uploader({
         const newGame = new File([file], newFileName)
 
         formData.append('file', newGame)
-        fetch('/api/upload-game', {
+
+        fetch('https://node.lighthouse.storage/api/v0/add', {
             method: 'POST',
+            headers: {
+                Authorization: `Bearer ${process.env.NEXT_PUBLIC_LIGHTHOUSE_API_KEY}`,
+            },
             body: formData,
         })
             .then((response) => response.json())
             .then((data) => {
-                if (data.status === 201) {
+                if (data.Hash) {
                     setIsSubmitting(false)
                     setUploadedSuccessfully(true)
                     setIsSubmitting(false)
                     setUploadGame(false)
-                    const ipfsCid = data.data.pin.cid
+                    const ipfsCid = data.Hash
                     writeContract({
                         abi: vaultiumContract.abi,
                         address: contractAddress,
@@ -70,7 +76,8 @@ export default function Uploader({
                     })
                 }
             })
-            .catch((error) => console.error(error))
+            .catch((error) => console.error('Error:', error))
+
     }
     return (
         <>
@@ -121,7 +128,8 @@ export default function Uploader({
             </p>
             <div className='flex items-center justify-between gap-2'>
                 <Button
-                    onClick={() => uploadToIPFS(file.name, file)}
+                    // onClick={() => uploadToIPFS(file.name, file)}
+                    onClick={() => uploadToLighhouse(file.name, file)}
                     disabled={!file || isSubmitting}
                     className='w-full text-base text-foreground transition duration-300 hover:text-white active:scale-90'
                 >

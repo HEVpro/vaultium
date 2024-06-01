@@ -107,12 +107,12 @@ export default function GameInfo() {
                                         </div>
                                     </div>
                                     <div className='flex flex-col space-y-2'>
-                                        {abandonware.ipfsCid ? (
+                                        {abandonware.ipfsCid.length > 2 ? (
                                             <>
                                                 {/* TODO: DOWNLOAD */}
                                                 <a
                                                     href={
-                                                        'https://ipfs.io/ipfs/' +
+                                                        'https://gateway.lighthouse.storage/ipfs/' +
                                                         abandonware?.ipfsCid
                                                     }
                                                     download={abandonware?.name}
