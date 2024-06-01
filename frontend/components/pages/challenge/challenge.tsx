@@ -6,7 +6,8 @@ import { Abandonware, GameVersion } from '@/lib/types'
 import { vaultiumContract } from '@/lib/wagmi/vaultiumContract'
 import { DownloadIcon, HeartIcon, ShieldX } from 'lucide-react'
 import { redirect, useSearchParams } from 'next/navigation'
-import { useReadContract } from 'wagmi'
+import { useWriteContract, useReadContract } from 'wagmi'
+import { sepolia } from 'wagmi/chains'
 
 export default function GameChallenge() {
     const searchParams = useSearchParams()
@@ -39,6 +40,37 @@ export default function GameChallenge() {
         args: [gameHash],
     })
 
+    const { data: hashNewVersion, isPending: isPendingVoteNewVersion, writeContract: voteNewVersion } = useWriteContract()
+    const { data: hashCurrentVersion, isPending: isPendingVoteCurrentVersion, writeContract: voteCurrentVersion } = useWriteContract()
+
+    async function onVoteNewVersion() {
+        voteNewVersion({
+            abi: vaultiumContract.abi,
+            address: contractAddress,
+            functionName: 'voteChallenge',
+            args: [
+                gameHash,
+                true,
+                1
+            ],
+            chainId: sepolia.id,
+        })
+    }
+
+    async function onVoteCurrentVersion() {
+        voteCurrentVersion({
+            abi: vaultiumContract.abi,
+            address: contractAddress,
+            functionName: 'voteChallenge',
+            args: [
+                gameHash,
+                false,
+                1
+            ],
+            chainId: sepolia.id,
+        })
+    }
+
     const abandonware = game as Abandonware
     const isGameChallenged = hasActiveChallengeForGame as boolean
     gameHistoryArray = gameHistory as GameVersion[]
@@ -46,7 +78,6 @@ export default function GameChallenge() {
     // TODO: enable users to challenge a version
 
     // challengeAbandonwareVersion --> call contract to challenge a version of the abandonware, imageCid pass an empty string (or anything, it is not being used)
-    // voting: _voteNewVersion true -> new version, false -> current version // token count put 1
 
     const tableHeaders = ['ifpsCID', 'download', 'Upload date']
 
@@ -131,11 +162,11 @@ export default function GameChallenge() {
                             </div>
                             {isGameChallenged && (
                                 <div className='mx-auto mt-8 flex w-fit items-center justify-center gap-8'>
-                                    <Button className='hover:bg-gradient flex min-w-44 items-center justify-center gap-2 rounded-lg bg-primary p-2 text-foreground transition duration-500'>
+                                    <Button onClick={onVoteCurrentVersion} className='hover:bg-gradient flex min-w-44 items-center justify-center gap-2 rounded-lg bg-primary p-2 text-foreground transition duration-500'>
                                         <HeartIcon className='h-6 w-6 stroke-white' />
                                         Current Version
                                     </Button>
-                                    <Button className='hover:bg-gradient flex min-w-44 items-center justify-center gap-2 rounded-lg bg-primary p-2 text-foreground transition duration-500'>
+                                    <Button onClick={onVoteNewVersion} className='hover:bg-gradient flex min-w-44 items-center justify-center gap-2 rounded-lg bg-primary p-2 text-foreground transition duration-500'>
                                         <HeartIcon className='h-6 w-6 stroke-white' />
                                         New version
                                     </Button>
