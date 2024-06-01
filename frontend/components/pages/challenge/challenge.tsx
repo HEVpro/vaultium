@@ -2,7 +2,7 @@
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { contractAddress } from '@/lib/constants'
-import { Abandonware } from '@/lib/types'
+import { Abandonware, GameVersion } from '@/lib/types'
 import { vaultiumContract } from '@/lib/wagmi/vaultiumContract'
 import { readContract } from '@wagmi/core'
 import { DownloadIcon, HeartIcon } from 'lucide-react'
@@ -18,6 +18,8 @@ export default function GameChallenge() {
     if (!gameHash || !gameHash?.startsWith('0x')) {
         redirect('/')
     }
+
+    let gameHistoryArray: GameVersion[] = []
 
     const { data: game } = useReadContract({
         abi: vaultiumContract.abi,
@@ -42,8 +44,8 @@ export default function GameChallenge() {
 
     const abandonware = game as Abandonware
     const isGameChallenged = hasActiveChallengeForGame as boolean
-
-    // TODO: print gameversion history --> getGameVersionHistory
+    gameHistoryArray = gameHistory as GameVersion[]
+    
     // TODO: enable users to challenge a version
 
     // challengeAbandonwareVersion --> call contract to challenge a version of the abandonware, imageCid pass an empty string (or anything, it is not being used)
@@ -91,14 +93,15 @@ export default function GameChallenge() {
                                     </tr>
                                 </thead>
                                 <tbody className='divide-y divide-gray-200 '>
-                                    <tr className='round-t-md bg-slate-900 text-white'>
+                                {gameHistoryArray && gameHistoryArray.map((version) => (
+                                    <tr key={version.ipfsCid}className='round-t-md bg-slate-900 text-white'>
                                         <td className='whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium sm:pl-6'>
-                                            {fakeBody[0][1]}
+                                            {version.ipfsCid}
                                         </td>
                                         <td className='whitespace-nowrap px-3 py-4 text-sm text-gray-500'>
                                             <a
-                                                href={`https://gateway.lighthouse.storage/ipfs/${fakeBody[0][1]}`}
-                                                download={fakeBody[0][1]}
+                                                href={`https://gateway.lighthouse.storage/ipfs/${version.ipfsCid}`}
+                                                download={version.ipfsCid}
                                                 target='_blank'
                                                 className='flex max-w-sm items-center gap-1 pl-6 text-primary hover:underline'
                                             >
@@ -110,7 +113,7 @@ export default function GameChallenge() {
                                             {/* TODO: ADD TO CONTRACT */}
                                             20/05/2024
                                         </td>
-                                    </tr>
+                                    </tr>))}
                                 </tbody>
                             </table>
                         </div>

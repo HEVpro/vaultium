@@ -25,3 +25,9 @@ export type OptionType = {
     label: string
     value: any
 }
+
+export type GameVersion = {
+    gameHash: string
+    ipfsCid: string
+    imageCid: string
+}
