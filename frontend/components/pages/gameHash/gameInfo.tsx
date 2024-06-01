@@ -121,9 +121,8 @@ export default function GameInfo() {
                                                     </p>
                                                     <Link
                                                         href={
-                                                            '/' +
-                                                            gameHash +
-                                                            '/challenge'
+                                                            '/challenge?gameHash=' +
+                                                            gameHash 
                                                         }
                                                         className='hover:cursor-pointer hover:text-special-magenta-200'
                                                     >

@@ -66,10 +66,8 @@ export default function Page() {
         ipfsCid: '',
     }
     // TODO: SET TO NULL OR GAMEDATA, IT'S ONLY FOR TESTING AND STYLING
-    const [gameResult, setGameResult] = useState<Abandonware | null>(gameData)
+    const [gameResult, setGameResult] = useState<Abandonware | null>(null)
     const [uploadGame, setUploadGame] = useState<boolean>(false)
-
-    console.log('gameResult', gameResult)
 
     return (
         <div className='flex flex-col items-center justify-start px-6 pb-24'>
@@ -120,30 +118,6 @@ export default function Page() {
                         </div>
                     </motion.div>
                 )}
-                {/* YOU HAVE SELECTED A GAME AND YOU WANT TO UPLOAD A NEW VERSION, WITHOUT CHALLENGE */}
-                {/* {selectedGame && (
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ duration: 0.6, delay: 0.3 }}
-                        className='mt-6 w-full'
-                    >
-                        <h2 className='text-2xl font-semibold text-primary'>
-                            Do you have a new version? This is the moment!
-                        </h2>
-                        <div className='relative mt-4 flex w-full items-end  justify-between gap-4'>
-                            <GameCardResult
-                                game={selectedGame}
-                                setSelectedGame={setSelectedGame}
-                            />
-                            <div className='w-full max-w-lg space-y-2'>
-                                <UploadNewVersion
-                                    setSelectedGame={setSelectedGame}
-                                />
-                            </div>
-                        </div>
-                    </motion.div>
-                )} */}
                 {/* NOT EXISTING GAME */}
                 {/* TODO: FIX LOGIC WHEN LANDING ON PAGE */}
                 {/* {!gameResult && (

@@ -40,6 +40,8 @@ export default function CreateAbandomware({
         isSuccess: isConfirmed,
     } = useWaitForTransactionReceipt({
         hash,
+        confirmations: 2,
+        pollingInterval: 100,
     })
     async function onSubmit(data: z.infer<typeof FormSchema>) {
         if (authenticated) {

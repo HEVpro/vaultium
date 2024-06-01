@@ -1,12 +1,16 @@
 import { AnimatedCheck } from '@/components/animatedCheck'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { contractAddress } from '@/lib/constants'
 import { Abandonware, Game } from '@/lib/types'
 import { cn } from '@/lib/utils'
+import { vaultiumContract } from '@/lib/wagmi/vaultiumContract'
 import { motion } from 'framer-motion'
 import { FileBoxIcon, XIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
+import { useWaitForTransactionReceipt, useWriteContract } from 'wagmi'
+import { sepolia } from 'wagmi/chains'
 
 export default function UploadNewVersion({
     game,
@@ -21,6 +25,21 @@ export default function UploadNewVersion({
     const [uploadedSuccessfully, setUploadedSuccessfully] =
         useState<boolean>(false)
 
+    const { data: hash, isPending, writeContract } = useWriteContract()
+
+    const {
+        data,
+        isLoading: isUpdatingChallenge,
+        isSuccess: isConfirmed,
+    } = useWaitForTransactionReceipt({
+        hash,
+        confirmations: 2,
+        pollingInterval: 100,
+    })
+
+    console.log("updated ipfsCID on the game", data)
+    console.log("loading updating challenge", isUpdatingChallenge)
+
     const uploadToIPFS = async (filename: string) => {
         setIsSubmitting(true)
         const formData = new FormData()
@@ -33,8 +52,6 @@ export default function UploadNewVersion({
         const newFileName = `${game.gameHash}.${fileExtension}`
         const newGame = new File([file], newFileName)
 
-        console.log('newGame', newGame)
-
         formData.append('file', newGame)
         fetch('/api/upload-game', {
             method: 'POST',
@@ -42,22 +59,31 @@ export default function UploadNewVersion({
         })
             .then((response) => response.json())
             .then((data) => {
-                if(data.status === 201){
+                if (data.status === 201) {
                     setIsSubmitting(false)
                     setUploadedSuccessfully(true)
                     setIsSubmitting(false)
                     setUploadedSuccessfully(true)
                     const ipfsCid = data.data.pin.cid
-                    // TODO: WRITE ON CONTRACT WITH THE IPFS HASH
-                    console.log('uploaded successfully', ipfsCid)
+                    writeContract({
+                        abi: vaultiumContract.abi,
+                        address: contractAddress,
+                        functionName: 'challengeAbandonwareVersion',
+                        args: [
+                            game.gameHash,
+                            ipfsCid,
+                            'image not uploaded'
+                        ],
+                        chainId: sepolia.id,
+                    })
                 }
-               
             })
             .catch((error) => console.error(error))
     }
 
     return (
         <>
+        {/* TODO: WE NEED ONE STEP MORE, WHEN SIGN THE CHALLENGE UPDATED, THEN SHOW THIS MESSAGE BELOW */}
             {uploadedSuccessfully ? (
                 <div className='flex w-full flex-col items-center justify-between gap-2 rounded-md text-white'>
                     <p className='text-2xl text-primary'>

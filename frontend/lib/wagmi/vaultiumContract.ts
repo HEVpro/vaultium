@@ -1,4 +1,4 @@
-export const VaultiumContract = {
+export const vaultiumContract = {
     contractName: "Vaultium",
     sourceName: "contracts/Vaultium.sol",
     abi: [
