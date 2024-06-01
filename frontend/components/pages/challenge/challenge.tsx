@@ -1,10 +1,11 @@
 'use client'
 import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import { contractAddress } from '@/lib/constants'
 import { Abandonware } from '@/lib/types'
 import { vaultiumContract } from '@/lib/wagmi/vaultiumContract'
 import { readContract } from '@wagmi/core'
-import { DownloadIcon } from 'lucide-react'
+import { DownloadIcon, HeartIcon } from 'lucide-react'
 import Link from 'next/link'
 import { redirect, useSearchParams } from 'next/navigation'
 import { useState } from 'react'
@@ -34,7 +35,7 @@ export default function GameChallenge() {
 
     const abandonware = game as Abandonware
 
-    const isGameChallenged = true // TODO: check if the current version is being challenged using hasActiveChallengeForGame
+    const isGameChallenged = false // TODO: check if the current version is being challenged using hasActiveChallengeForGame
 
     // TODO: print gameversion history --> getGameVersionHistory
     // TODO: enable users to challenge a version
@@ -60,7 +61,7 @@ export default function GameChallenge() {
             <div className='min-h-screen w-full space-y-10 px-8 py-12 text-white'>
                 <div className='flex w-full '>
                     <div className='w-full space-y-6 px-10'>
-                        <h1 className='text-3xl text-primary flex items-center justify-start gap-4'>
+                        <h1 className='flex items-center justify-start gap-4 text-3xl text-primary'>
                             Challenge game version of:
                             <p className='font-semibold text-white'>
                                 {abandonware?.name}
@@ -77,7 +78,7 @@ export default function GameChallenge() {
                                             <th
                                                 key={header}
                                                 scope='col'
-                                                className='py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6 capitalize'
+                                                className='py-3.5 pl-4 pr-3 text-left text-sm font-semibold capitalize text-gray-900 sm:pl-6'
                                             >
                                                 {header}
                                             </th>
@@ -94,10 +95,10 @@ export default function GameChallenge() {
                                                 href={`https://gateway.lighthouse.storage/ipfs/${fakeBody[0][1]}`}
                                                 download={fakeBody[0][1]}
                                                 target='_blank'
-                                                className='max-w-sm text-primary hover:underline pl-6 flex items-center gap-1'
+                                                className='flex max-w-sm items-center gap-1 pl-6 text-primary hover:underline'
                                             >
                                                 Link
-                                                <DownloadIcon className='h-4 w-4 stroke-primary mb-1' />
+                                                <DownloadIcon className='mb-1 h-4 w-4 stroke-primary' />
                                             </a>
                                         </td>
                                         <td className='whitespace-nowrap px-3 py-4 pl-6 text-sm text-white'>
@@ -110,10 +111,10 @@ export default function GameChallenge() {
                         </div>
                         {!isGameChallenged && (
                             <div className='flex flex-col space-y-2'>
-                                <p className='font-nunito font-bold'>
-                                    challenge
+                                <p className='mb-2 font-nunito font-thin text-primary'>
+                                    Challenge
                                 </p>
-                                <span className='bg-gradient rounded-lg p-2 text-black'>
+                                <span className='bg-gradient rounded-lg p-2 '>
                                     Challenge game version{' '}
                                     {/** TODO: show modal or redirect to page to contract interaction */}
                                 </span>
@@ -128,30 +129,37 @@ export default function GameChallenge() {
                                 </i>
                             </div>
                         )}
-                        {/* {isGameChallenged && (
-                        <div className='flex flex-col space-y-2'>
-                            <p className='font-nunito font-bold'>
-                                challenge status
-                            </p>
-                            <span className='bg-gradient rounded-lg p-2 text-black'>
-                                Challenged
-                            </span>
-                            <i>
-                                The current version of the game is being
-                                challenged. You can vote for the current version
-                                or the new one that is being proposed by the
-                                challenger.
-                            </i>
-                            <div className='flex justify-around'>
-                                <span className='bg-gradient rounded-lg p-2 text-black'>
-                                    Vote for current version
-                                </span>
-                                <span className='bg-gradient rounded-lg p-2 text-black'>
-                                    Vote for new version
-                                </span>
+                        {isGameChallenged && (
+                            <div className='flex flex-col space-y-6'>
+                                <div className='flex items-end justify-between gap-2'>
+                                    <div className='flex flex-col items-start justify-between gap-2'>
+                                        <p className=' font-nunito font-thin text-primary'>
+                                            Status:
+                                        </p>
+                                        <Badge className='rounded-md text-base text-foreground'>
+                                            Challenged
+                                        </Badge>
+                                    </div>
+                                    <i className='max-w-2xl mt-0.5'>
+                                        The current version of the game is being
+                                        challenged. You can vote for the current
+                                        version or the new one that is being
+                                        proposed by the challenger.
+                                    </i>
+                                </div>
+
+                                <div className='mx-auto mt-8 flex w-fit items-center justify-center gap-8'>
+                                    <Button className='hover:bg-gradient flex min-w-44 items-center justify-center gap-2 rounded-lg bg-primary p-2 text-foreground transition duration-500'>
+                                        <HeartIcon className='h-6 w-6 stroke-white' />
+                                        Current Version
+                                    </Button>
+                                    <Button className='hover:bg-gradient flex min-w-44 items-center justify-center gap-2 rounded-lg bg-primary p-2 text-foreground transition duration-500'>
+                                        <HeartIcon className='h-6 w-6 stroke-white' />
+                                        New version
+                                    </Button>
+                                </div>
                             </div>
-                        </div>
-                    )} */}
+                        )}
                     </div>
                 </div>
             </div>
