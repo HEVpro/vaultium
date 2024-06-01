@@ -30,7 +30,7 @@ import {
 import useCustomForm, { FormSchema } from '@/components/uploadForm'
 import { countries } from '@/lib/countries'
 import { fleekSdk } from '@/lib/fleek'
-import { Game } from '@/lib/types'
+import { Abandonware, Game } from '@/lib/types'
 import { cn } from '@/lib/utils'
 import { motion } from 'framer-motion'
 import {
@@ -45,45 +45,31 @@ import {
 import Link from 'next/link'
 import { useState } from 'react'
 import { z } from 'zod'
+import crypto from 'crypto';
+
+function generateRandomSHA256() {
+    const randomData = crypto.randomBytes(32);
+    const hash = crypto.createHash('sha256');
+    hash.update(randomData);
+    return hash.digest('hex');
+}
 
 export default function Page() {
-    const [gameResult, setGameResult] = useState<Game | null>(null)
-    const [selectedGame, setSelectedGame] = useState<Game | null>(null)
-    const [file, setFile] = useState<any | null>(null)
-    const { form } = useCustomForm()
-
-    function onSubmit(data: z.infer<typeof FormSchema>) {
-        console.info(data)
-        // TODO:  INTEGRATE WITH THE BLOCKCHAIN
-        // toast({
-        //   title: "You submitted the following values:",
-        //   description: (
-        //     <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-        //       <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-        //     </pre>
-        //   ),
-        // })
+    const gameData: Abandonware = {
+        gameHash: generateRandomSHA256(),
+        name: 'Super Mario Bros. 3',
+        genres: [1],
+        publisher: 'Nintendo',
+        year: 1990,
+        country: 'USA',
+        description: '',
+        ipfsCid: '',
     }
+    // TODO: SET TO NULL OR GAMEDATA, IT'S ONLY FOR TESTING AND STYLING
+    const [gameResult, setGameResult] = useState<Abandonware | null>(gameData)
+    const [uploadGame, setUploadGame] = useState<boolean>(false)
 
-    // REPLACE BY GAME,
-    const uploadToIPFS = async (filename: string, content: Buffer) => {
-        const formData = new FormData()
-        formData.append('file', file)
-
-        fetch('/api/upload-image', {
-            method: 'POST',
-            body: formData,
-        })
-            .then((response) => response.json())
-            .then((data) => console.info('uploaded successfully', data.pin.cid))
-            .catch((error) => console.error(error))
-    }
-    // TODO: NEXT STEPS
-    // 0. ADD LOADERS AND CREATE A COMPONENT FOR IT
-    // 1 IF THE GAME HAVE NO CID, UPLOAD THE GAME WITH ICON IN CARD
-    // 2.IF THE GAME DON'T HAVE A CID IMAGE, UPLOAD THE IMAGE WITH ICON IN CARD
-    // 3. IF THE GAME HAVE CID AND IMAGE, SHOW THE GAME CARD WITH ICON
-    // all the steps need to write on the contract
+    console.log('gameResult', gameResult)
 
     return (
         <div className='flex flex-col items-center justify-start px-6 pb-24'>
@@ -106,18 +92,8 @@ export default function Page() {
                     <CreateAbandomware setResultGame={setGameResult} />
                 </div>
             </div>
-            {/* TODO: upload image */}
-            {/* <Input
-                type='file'
-                onChange={(e) => e.target.files && setFile(e.target.files[0])}
-            />
-            <Button onClick={() => uploadToIPFS(file.name, file)}>
-                <CloudUploadIcon size={24} />
-                Upload
-            </Button> */}
-
             <div className='w-full'>
-                {/* THE LIST OF GAME RESULTS */}
+                {/* GAME RESULT */}
                 {gameResult && (
                     <motion.div
                         initial={{ opacity: 0 }}
@@ -128,17 +104,24 @@ export default function Page() {
                         <h2 className='text-2xl font-semibold text-primary'>
                             Maybe your a looking this game?
                         </h2>
-                        <div className='mt-4 grid w-full grid-cols-3 gap-4'>
+                        <div className='relative mt-4 flex w-full items-end  justify-between gap-4'>
                             <GameCardResult
-                                key={gameResult.gameHash}
                                 game={gameResult}
-                                setSelectedGame={setSelectedGame}
+                                setUploadGame={setUploadGame}
                             />
+                            {uploadGame && (
+                                <div className='w-full max-w-lg'>
+                                    <UploadNewVersion
+                                        game={gameResult}
+                                        setUploadGame={setUploadGame}
+                                    />
+                                </div>
+                            )}
                         </div>
                     </motion.div>
                 )}
                 {/* YOU HAVE SELECTED A GAME AND YOU WANT TO UPLOAD A NEW VERSION, WITHOUT CHALLENGE */}
-                {selectedGame && (
+                {/* {selectedGame && (
                     <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
@@ -160,7 +143,7 @@ export default function Page() {
                             </div>
                         </div>
                     </motion.div>
-                )}
+                )} */}
                 {/* NOT EXISTING GAME */}
                 {/* TODO: FIX LOGIC WHEN LANDING ON PAGE */}
                 {/* {!gameResult && (

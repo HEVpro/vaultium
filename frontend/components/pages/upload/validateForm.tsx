@@ -13,7 +13,7 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { cn } from '@/lib/utils'
-import { Game, OptionType } from '@/lib/types'
+import { Abandonware, Game, OptionType } from '@/lib/types'
 import { usePrivy } from '@privy-io/react-auth'
 import { useWaitForTransactionReceipt, useWriteContract } from 'wagmi'
 import { sepolia } from 'wagmi/chains'
@@ -26,7 +26,7 @@ import { MultiSelect } from '@/components/multiselect'
 export default function CreateAbandomware({
     setResultGame,
 }: {
-    setResultGame: (value: Game) => void
+    setResultGame: (value: Abandonware) => void
 }) {
     const { form } = useValidateForm()
     const { authenticated } = usePrivy()
@@ -75,14 +75,16 @@ export default function CreateAbandomware({
                 gameCasterArray,
                 hashData
             )
-            const gameData: Game = {
+            const gameData: Abandonware = {
                 gameHash: String(decodedParameters.gameHash),
                 name: decodedParameters.name as unknown as string,
                 genres: decodedParameters.genres as number[],
                 publisher: decodedParameters.publisher as unknown as string,
                 year: Number(decodedParameters.year),
                 country: decodedParameters.country as unknown as string,
-                description: ''
+                // TODO: IF EXISTS IT WILL RETURN THAT THE IPFSCID??
+                description: '',
+                ipfsCid: '',
             }
 
             setResultGame(gameData)
@@ -236,6 +238,7 @@ export default function CreateAbandomware({
                         )}
                     />
                 ))}
+                {/* TODO: CREATE THE BUTTON MESSAGE DEPENDING STATE: CREATE + PENDING SIGNATURE + VALIDATING */}
                 <Button
                     disabled={isConfirming}
                     className='col-span-full mt-8 text-base text-foreground transition duration-300 hover:text-white active:scale-90'
