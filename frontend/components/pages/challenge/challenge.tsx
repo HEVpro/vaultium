@@ -26,16 +26,22 @@ export default function GameChallenge() {
         args: [gameHash],
     })
 
-    const { data: gameHistory, isPending } = useReadContract({
+    const { data: gameHistory } = useReadContract({
         abi: vaultiumContract.abi,
         address: contractAddress,
         functionName: 'getGameVersionHistory',
         args: [gameHash],
     })
 
-    const abandonware = game as Abandonware
+    const { data: hasActiveChallengeForGame } = useReadContract({
+        abi: vaultiumContract.abi,
+        address: contractAddress,
+        functionName: 'hasActiveChallengeForGame',
+        args: [gameHash],
+    })
 
-    const isGameChallenged = false // TODO: check if the current version is being challenged using hasActiveChallengeForGame
+    const abandonware = game as Abandonware
+    const isGameChallenged = hasActiveChallengeForGame as boolean
 
     // TODO: print gameversion history --> getGameVersionHistory
     // TODO: enable users to challenge a version
@@ -45,7 +51,6 @@ export default function GameChallenge() {
 
     console.info('game', abandonware)
     console.info('history', gameHistory)
-    console.info('isPewnding', isPending)
 
     const tableHeaders = ['ifpsCID', 'download', 'Upload date']
     const fakeBody = [
