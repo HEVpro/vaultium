@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.25;
+pragma solidity 0.8.24;
 
 contract Vaultium {
     enum Genre {
@@ -356,6 +356,7 @@ contract Vaultium {
                 .currentVersionPoints += newPoints;
         }
         return getChallengeResponse(_gameHash, gameChallengeHistory[_gameHash].challengesSize - 1);
+        return getChallengeResponse(_gameHash, gameChallengeHistory[_gameHash].challengesSize - 1);
     }
 
     function getGameChallengeHistory(bytes32 _gameHash) public view returns (ChallengeResponse[] memory) {
@@ -452,6 +453,7 @@ contract Vaultium {
     }
 
     // closing a challenges may insert a new entry to version history
+    function closeChallengesIfNeeded(bytes32 _gameHash) public {
     function closeChallengesIfNeeded(bytes32 _gameHash) public {
         bool hasLastChallenge = gameChallengeHistory[_gameHash].challengesSize > 0;
         if(!hasLastChallenge)
