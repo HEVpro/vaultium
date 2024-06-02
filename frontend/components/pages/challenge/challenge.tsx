@@ -134,7 +134,8 @@ export default function GameChallenge() {
                                                     </a>
                                                 </td>
                                                 <td className='whitespace-nowrap px-3 py-4 pl-6 text-sm text-white'>
-                                                    {/* TODO: ADD TO CONTRACT */}
+                                                    {/* TODO: WHEN THE CONTRACT WILL BE DEPLOYED, DELETE THE HARDCODED STRING */}
+                                                    {/* {version.date} */}
                                                     20/05/2024
                                                 </td>
                                             </tr>
