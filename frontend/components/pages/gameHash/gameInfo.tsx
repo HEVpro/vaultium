@@ -31,7 +31,16 @@ export default function GameInfo() {
         functionName: 'getAbandonware',
         args: [gameHash],
     })
+
+    const { data: hasActiveChallengeForGame } = useReadContract({
+        abi: vaultiumContract.abi,
+        address: contractAddress,
+        functionName: 'hasActiveChallengeForGame',
+        args: [gameHash],
+    })
+
     const abandonware = data as Abandonware
+    const isGameChallenged = hasActiveChallengeForGame as boolean
 
     const parsedGenres = transformGenres(abandonware?.genres ?? [])
 
@@ -95,21 +104,47 @@ export default function GameInfo() {
                                                 >
                                                     Download
                                                 </a>
-                                                <div className='flex items-center gap-2'>
-                                                    <p className='text-primary'>
-                                                        Is this version of the
-                                                        file wrong?
-                                                    </p>
-                                                    <Link
-                                                        href={
-                                                            '/challenge?gameHash=' +
-                                                            gameHash
-                                                        }
-                                                        className='hover:cursor-pointer hover:text-special-magenta-200'
-                                                    >
-                                                        Challenge it now!
-                                                    </Link>
-                                                </div>
+                                                {!isGameChallenged && (
+                                                    <div className='flex items-center gap-2'>
+                                                        <p className='text-primary'>
+                                                            Is this version of
+                                                            the file wrong?
+                                                        </p>
+                                                        <Link
+                                                            href={
+                                                                '/challenge?gameHash=' +
+                                                                gameHash
+                                                            }
+                                                            className='hover:cursor-pointer hover:text-special-magenta-200'
+                                                        >
+                                                            Challenge it now!
+                                                        </Link>
+                                                    </div>
+                                                )}
+                                                {/** TODO: make it beautiful */}
+                                                {isGameChallenged && (
+                                                    <div className='flex items-center gap-2'>
+                                                        <p className='text-primary'>
+                                                            The current version
+                                                            of the game is being
+                                                            challenged, please,
+                                                            check game history
+                                                            and contribute to
+                                                            Vaultium by voting
+                                                            the best version of
+                                                            the game!
+                                                        </p>
+                                                        <Link
+                                                            href={
+                                                                '/challenge?gameHash=' +
+                                                                gameHash
+                                                            }
+                                                            className='hover:cursor-pointer hover:text-special-magenta-200'
+                                                        >
+                                                            Vote now!
+                                                        </Link>
+                                                    </div>
+                                                )}
                                             </>
                                         ) : (
                                             <button
