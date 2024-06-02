@@ -54,27 +54,29 @@ export default function UploadNewVersion({
                 />
             )}
 
-            {signingContract && !uploadedSuccessfully && (
-                <motion.p
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ duration: 0.5 }}
-                    className='mt-2 max-w-[55ch] text-center text-base font-thin text-white'
-                >
-                    Waiting for Signature...
-                </motion.p>
-            )}
-            {uploadingGame && !uploadedSuccessfully && (
-                <motion.p
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ duration: 0.5 }}
-                    className='mt-2 max-w-[55ch] text-center text-base font-thin text-white'
-                >
-                    Your transaction is being processed on the blockchain. This
-                    might take a few moments. 🌐🔄
-                </motion.p>
-            )}
+            <div className='w-full flex-col items-center'>
+                {signingContract && !uploadedSuccessfully && (
+                    <motion.p
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 0.5 }}
+                        className='mt-2 max-w-[55ch] text-center text-base font-thin text-white'
+                    >
+                        Waiting for Signature...
+                    </motion.p>
+                )}
+                {uploadingGame && !uploadedSuccessfully && (
+                    <motion.p
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 0.5 }}
+                        className='mt-2 max-w-[55ch] text-center text-base font-thin text-white'
+                    >
+                        Your transaction is being processed on the blockchain.
+                        This might take a few moments. 🌐🔄
+                    </motion.p>
+                )}
+            </div>
         </>
     )
 }
