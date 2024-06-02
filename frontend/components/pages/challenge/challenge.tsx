@@ -78,8 +78,20 @@ export default function GameChallenge() {
     const abandonware = game as Abandonware
     const isGameChallenged = hasActiveChallengeForGame as boolean
     gameHistoryArray = gameHistory as GameVersion[]
-
     const tableHeaders = ['ifpsCID', 'download', 'Upload date']
+
+    function timestampToDate(timestamp: bigint): string {
+
+        const date = new Date(Number(timestamp) * 1000);
+        const day = date.getDate().toString().padStart(2, '0');
+        const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Months are zero-based
+        const year = date.getFullYear().toString();
+
+        const formattedDate = `${day}-${month}-${year}`;
+
+        return formattedDate;
+    }
+
 
     return (
         <>
@@ -134,9 +146,7 @@ export default function GameChallenge() {
                                                     </a>
                                                 </td>
                                                 <td className='whitespace-nowrap px-3 py-4 pl-6 text-sm text-white'>
-                                                    {/* TODO: WHEN THE CONTRACT WILL BE DEPLOYED, DELETE THE HARDCODED STRING */}
-                                                    {/* {version.date} */}
-                                                    20/05/2024
+                                                    {timestampToDate(version.date)}
                                                 </td>
                                             </tr>
                                         ))}

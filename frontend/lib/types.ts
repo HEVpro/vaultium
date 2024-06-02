@@ -30,4 +30,5 @@ export type GameVersion = {
     gameHash: string
     ipfsCid: string
     imageCid: string
+    date: bigint
 }
