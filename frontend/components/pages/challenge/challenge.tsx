@@ -152,7 +152,7 @@ export default function GameChallenge() {
                                     <p className=' font-nunito font-thin text-primary'>
                                         Status:
                                     </p>
-                                    <Badge className='rounded-md text-base text-foreground'>
+                                    <Badge className='rounded-md text-base text-foreground truncate'>
                                         {isGameChallenged
                                             ? 'Challenged'
                                             : 'Not Challenged'}
@@ -178,7 +178,7 @@ export default function GameChallenge() {
                             )}
                             {!isGameChallenged && (
                                 <div className='mx-auto mt-8 flex w-fit items-center justify-center gap-8'>
-                                    <Button onClick={() => setChallenging(true)}className='hover:bg-gradient flex min-w-44 items-center justify-center gap-2 rounded-lg bg-primary p-2 text-foreground transition duration-500'>
+                                    <Button onClick={() => setChallenging(true)}className='hover:bg-gradient  hover:animate-background flex min-w-44 items-center justify-center gap-2 rounded-lg bg-primary p-2 text-foreground transition duration-500'>
                                         <ShieldX className='h-6 w-6 stroke-white' />
                                         Challenge current version
                                     </Button>
