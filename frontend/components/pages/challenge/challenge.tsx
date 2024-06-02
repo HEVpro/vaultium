@@ -79,10 +79,6 @@ export default function GameChallenge() {
     const isGameChallenged = hasActiveChallengeForGame as boolean
     gameHistoryArray = gameHistory as GameVersion[]
 
-    // TODO: enable users to challenge a version
-
-    // challengeAbandonwareVersion --> call contract to challenge a version of the abandonware, imageCid pass an empty string (or anything, it is not being used)
-
     const tableHeaders = ['ifpsCID', 'download', 'Upload date']
 
     return (
