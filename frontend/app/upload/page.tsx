@@ -6,11 +6,12 @@ import { Abandonware } from '@/lib/types'
 import { cn } from '@/lib/utils'
 import { motion } from 'framer-motion'
 import { useState } from 'react'
+import { gameExample } from '@/lib/constants'
 
 export default function Page() {
 
     // IF YOU WANT TO GO TO NEXT STEP OF CREATE ABANDOMWARE IMPORT gameExample FROM CONSTANTS AND SET GAME RESULT TO gameExample
-    const [gameResult, setGameResult] = useState<Abandonware | null>(null)
+    const [gameResult, setGameResult] = useState<Abandonware | null>(gameExample)
     const [uploadGame, setUploadGame] = useState<boolean>(false)
 
     return (

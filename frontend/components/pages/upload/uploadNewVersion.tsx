@@ -27,7 +27,9 @@ export default function UploadNewVersion({
     const [signingContract, setSigningContract] = useState<boolean>(false)
 
 
-
+    console.log("uploadedSuccessfully", uploadedSuccessfully)
+    console.log("uploadingGame", uploadingGame)
+    console.log("signingContract", signingContract)
 
     return (
         <>

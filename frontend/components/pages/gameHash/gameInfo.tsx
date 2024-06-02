@@ -18,6 +18,9 @@ export default function GameInfo() {
     const gameHash = searchParams.get('gameHash')
     const [uploadedSuccessfully, setUploadedSuccessfully] =
         useState<boolean>(false)
+    const [uploadingGame, setUploadingGame] = useState<boolean>(false)
+    const [signingContract, setSigningContract] = useState<boolean>(false)
+
 
     const [uploadGame, setUploadGame] = useState<boolean>(false)
 
@@ -179,6 +182,8 @@ export default function GameInfo() {
                                         setUploadedSuccessfully={
                                             setUploadedSuccessfully
                                         }
+                                        setUploadingGame={setUploadingGame}
+                                        setSigningContract={setSigningContract}
                                     />
                                 </div>
                             )}
