@@ -356,7 +356,6 @@ contract Vaultium {
                 .currentVersionPoints += newPoints;
         }
         return getChallengeResponse(_gameHash, gameChallengeHistory[_gameHash].challengesSize - 1);
-        return getChallengeResponse(_gameHash, gameChallengeHistory[_gameHash].challengesSize - 1);
     }
 
     function getGameChallengeHistory(bytes32 _gameHash) public view returns (ChallengeResponse[] memory) {
