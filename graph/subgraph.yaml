@@ -8,9 +8,9 @@ dataSources:
     name: Vaultium
     network: sepolia
     source:
-      address: "0x68d95dbe806ce53e011cc7044bbf7385d9519bc3"
+      address: "0x7917493b0ed30085a7aE83ef0bD42bBB5F0Ca49E"
       abi: Vaultium
-      startBlock: 6017398
+      startBlock: 6024511
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7

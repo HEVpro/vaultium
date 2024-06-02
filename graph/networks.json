@@ -1,8 +1,8 @@
 {
   "sepolia": {
     "Vaultium": {
-      "address": "0x68d95dbe806ce53e011cc7044bbf7385d9519bc3",
-      "startBlock": 6017398
+      "address": "0x7917493b0ed30085a7aE83ef0bD42bBB5F0Ca49E",
+      "startBlock": 6024511
     }
   }
 }

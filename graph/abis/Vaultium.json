@@ -401,9 +401,10 @@
         "components": [
           { "internalType": "bytes32", "name": "gameHash", "type": "bytes32" },
           { "internalType": "string", "name": "ipfsCid", "type": "string" },
-          { "internalType": "string", "name": "imageCid", "type": "string" }
+          { "internalType": "string", "name": "imageCid", "type": "string" },
+          { "internalType": "uint256", "name": "date", "type": "uint256" }
         ],
-        "internalType": "struct Vaultium.GameVersion[]",
+        "internalType": "struct Vaultium.HistoryGameVersion[]",
         "name": "",
         "type": "tuple[]"
       }
