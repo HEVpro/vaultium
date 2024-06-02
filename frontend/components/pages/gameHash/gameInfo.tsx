@@ -84,7 +84,6 @@ export default function GameInfo() {
                                     <div className='flex flex-col space-y-2'>
                                         {abandonware.ipfsCid.length > 2 ? (
                                             <>
-                                                {/* TODO: DOWNLOAD */}
                                                 <a
                                                     href={
                                                         'https://gateway.lighthouse.storage/ipfs/' +

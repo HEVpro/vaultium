@@ -55,7 +55,7 @@ export default function CreateAbandomware({
                     data.publisher,
                     data.year,
                     data.country,
-                    data. genres.map((a) => a.value),
+                    data.genres.map((a) => a.value),
                 ],
                 chainId: sepolia.id,
             })
@@ -84,8 +84,7 @@ export default function CreateAbandomware({
                 publisher: decodedParameters.publisher as unknown as string,
                 year: Number(decodedParameters.year),
                 country: decodedParameters.country as unknown as string,
-                // TODO: IF EXISTS IT WILL RETURN THAT THE IPFSCID??
-                description: '',
+                description: decodedParameters.description as unknown as string ?? '',
                 ipfsCid: '',
             }
 
@@ -240,12 +239,13 @@ export default function CreateAbandomware({
                         )}
                     />
                 ))}
-                {/* TODO: CREATE THE BUTTON MESSAGE DEPENDING STATE: CREATE + PENDING SIGNATURE + VALIDATING */}
                 <Button
                     disabled={isConfirming}
                     className='col-span-full mt-8 text-base text-foreground transition duration-300 hover:text-white active:scale-90'
                 >
-                    {isPending || isConfirming ? 'Validating...' : 'Create'}
+                    {isPending && 'Submitting...'}
+                    {isConfirming && 'Waiting for block validation, please wait...'}
+                    {!isPending && !isConfirming && 'Create'}
                 </Button>
             </form>
         </Form>

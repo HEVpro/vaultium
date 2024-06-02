@@ -1,71 +1,15 @@
 'use client'
-import { AnimatedCheck } from '@/components/animatedCheck'
 import GameCardResult from '@/components/pages/upload/uploadGameCard'
 import UploadNewVersion from '@/components/pages/upload/uploadNewVersion'
-import CreateAbandomware from '@/components/pages/upload/validateForm'
-import { Button } from '@/components/ui/button'
-import {
-    Form,
-    FormControl,
-    FormDescription,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
-} from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select'
-import {
-    Tooltip,
-    TooltipContent,
-    TooltipProvider,
-    TooltipTrigger,
-} from '@/components/ui/tooltip'
-import useCustomForm, { FormSchema } from '@/components/uploadForm'
-import { countries } from '@/lib/countries'
-import { fleekSdk } from '@/lib/fleek'
-import { Abandonware, Game } from '@/lib/types'
+import CreateAbandomware from '@/components/pages/upload/createAbandomwareForm'
+import { Abandonware } from '@/lib/types'
 import { cn } from '@/lib/utils'
 import { motion } from 'framer-motion'
-import {
-    CircleCheck,
-    CloudUploadIcon,
-    FileBoxIcon,
-    LinkIcon,
-    PickaxeIcon,
-    Upload,
-    XIcon,
-} from 'lucide-react'
-import Link from 'next/link'
 import { useState } from 'react'
-import { z } from 'zod'
-import crypto from 'crypto';
-
-function generateRandomSHA256() {
-    const randomData = crypto.randomBytes(32);
-    const hash = crypto.createHash('sha256');
-    hash.update(randomData);
-    return hash.digest('hex');
-}
 
 export default function Page() {
-    const gameData: Abandonware = {
-        gameHash: generateRandomSHA256(),
-        name: 'Super Mario Bros. 3',
-        genres: [1],
-        publisher: 'Nintendo',
-        year: 1990,
-        country: 'USA',
-        description: '',
-        ipfsCid: '',
-    }
-    // TODO: SET TO NULL OR GAMEDATA, IT'S ONLY FOR TESTING AND STYLING
+
+    // IF YOU WANT TO GO TO NEXT STEP OF CREATE ABANDOMWARE IMPORT gameExample FROM CONSTANTS AND SET GAME RESULT TO gameExample
     const [gameResult, setGameResult] = useState<Abandonware | null>(null)
     const [uploadGame, setUploadGame] = useState<boolean>(false)
 
@@ -118,17 +62,6 @@ export default function Page() {
                         </div>
                     </motion.div>
                 )}
-                {/* NOT EXISTING GAME */}
-                {/* TODO: FIX LOGIC WHEN LANDING ON PAGE */}
-                {/* {!gameResult && (
-                    <div className='w-full py-12 text-center'>
-                        <h2 className='mx-auto w-[50ch] text-xl text-primary'>
-                            {
-                                "Oops! Those titles are missing from our library, like they've vanished into the digital void. Try looking for them on Steam while we keep searching for new games for you. "
-                            }
-                        </h2>
-                    </div>
-                )} */}
             </div>
         </div>
     )
