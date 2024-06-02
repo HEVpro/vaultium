@@ -18,9 +18,9 @@ export const GameCard = ({ item }: GameCardProps) => {
     const parsedGenres = transformGenres(item?.genres ?? [])
 
     return (
-        <div className='bg-gradient group relative h-[400px] w-full overflow-hidden rounded-xl'>
-            <div className='absolute inset-0.5 place-content-center'>
-                <div className='relative z-20  h-full w-full min-w-44 rounded-xl text-white shadow-[inset_0px_110px_60px_-44px_rgba(0,0,0,0.75)] shadow-black transition duration-300 *:transition *:duration-300'>
+        <div className='group bg-gradient relative h-[400px] w-full overflow-hidden rounded-xl upload hover:scale-105 hover:animate-background transition-all duration-300'>
+            <div className='absolute inset-0.5 place-content-center '>
+                <div className='relative z-20  h-full w-full min-w-44 rounded-xl text-white shadow-[inset_0px_110px_60px_-44px_rgba(0,0,0,0.75)] shadow-black transition duration-300 *:transition *:duration-300 '>
                     <div className='absolute inset-0 -z-10 rounded-xl bg-black bg-opacity-60 transition  duration-300' />
                     <Image
                         width={350}

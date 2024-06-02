@@ -1,4 +1,4 @@
-import Searcher from '@/components/searcher'
+import GameList from '@/components/searcher'
 
 export default function Home() {
     return (
@@ -9,7 +9,7 @@ export default function Home() {
                     The video game basement is waiting for you. Dare to explore?
                 </p>
             </section>
-            <Searcher />
+            <GameList />
         </>
     )
 }

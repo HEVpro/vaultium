@@ -1,3 +1,6 @@
+import { Abandonware } from "./types"
+import { generateRandomSHA256 } from "./utils"
+
 export const gameCasterArray = [
     {
         name: 'gameHash',
@@ -22,14 +25,14 @@ export const gameCasterArray = [
     {
         name: 'genres',
         type: 'uint8[]',
-    }
+    },
 ]
 
-const subgraphName = 'vaultium-sepolia'
+const subgraphName = 'vaultium-final-hackfs'
 const graphId = '62919'
 export const graphUrl = `https://api.studio.thegraph.com/query/${graphId}/${subgraphName}/version/latest`
 
-export const contractAddress = '0x68d95dbe806ce53e011cc7044bbf7385d9519bc3'
+export const contractAddress = '0x7917493b0ed30085a7aE83ef0bD42bBB5F0Ca49E'
 
 export const genres = [
     'Action',
@@ -44,3 +47,14 @@ export const genres = [
     'Sports',
     'Strategy',
 ]
+
+export const gameExample = {
+    gameHash: '0x46253b76e773f30ef16fbbc8be78706298d0e768cfaee7d43fe8f60ea56aeabf',
+    name: 'Super Mario Bros. 3',
+    genres: [1],
+    publisher: 'Nintendo',
+    year: 1990,
+    country: 'USA',
+    description: '',
+    ipfsCid: '',
+}

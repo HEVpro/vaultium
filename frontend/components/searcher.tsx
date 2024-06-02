@@ -8,21 +8,22 @@ import { Skeleton } from './ui/skeleton'
 import { ApolloClient, InMemoryCache, gql } from '@apollo/client'
 import { graphUrl } from '@/lib/constants'
 import { graphClient } from '@/lib/graph'
+import { SearchIcon } from 'lucide-react'
 
 const tokensQuery = gql`
   query{
     gameAddedToSystems{
         genres
-    name
-    publisher
-    year
-    gameHash
-    country
+        name
+        publisher
+        year
+        gameHash
+        country
     }
   }
 `
-// TODO: RENAME
-const Searcher = () => {
+
+const GameList = () => {
     const [searchTerm, setSearchTerm] = useState('')
     const [games, setGames] = useState([])
     const [debounceGame, setDebounceGame] = useState('')
@@ -46,11 +47,13 @@ const Searcher = () => {
                         genres: item.genres
                     }
                 }).filter((item: any) => {
-                    const lowerCaseName = item.name.toLowerCase();
+                    return !gamesNotToInclude.some(word => item.name.toLowerCase().includes(word));
+                }).filter((item: any) => {
                     if (debounceGame) {
-                        return lowerCaseName.includes(debounceGame.toLowerCase())
+                        return item.name.toLowerCase().includes(debounceGame.toLowerCase())
                     } else {
-                        return !gamesNotToInclude.some(word => lowerCaseName.includes(word));
+                        return item.name.toLowerCase()
+
                     }
                 })
                 setGames(results)
@@ -78,13 +81,17 @@ const Searcher = () => {
                     <p className='w-full pr-3 text-right uppercase text-white'>
                         <Label htmlFor='gameName'>Search by name</Label>
                     </p>
-                    <input
-                        className='w-full rounded-full border bg-blue-950 bg-opacity-20 px-6 py-2 text-primary placeholder:italic placeholder:text-primary/60 focus:ring focus:ring-primary'
-                        name='gameName'
-                        value={searchTerm}
-                        placeholder='e.g. Dune 2000'
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                    />
+                    <div className='relative'>
+                        <input
+                            className='w-full rounded-full border bg-blue-950 bg-opacity-20 pl-6 pr-14 py-2 text-primary placeholder:italic placeholder:text-primary/60 focus:ring focus:ring-primary'
+                            name='gameName'
+                            value={searchTerm}
+                            placeholder='e.g. Dune 2000'
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                        <SearchIcon className='absolute top-1/2 right-4 -translate-y-1/2 text-primary' />
+
+                    </div>
                 </div>
             </div>
             {!ready ? (
@@ -119,4 +126,4 @@ const Searcher = () => {
     )
 }
 
-export default Searcher
+export default GameList
