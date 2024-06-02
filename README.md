@@ -8,7 +8,7 @@ The website itself is deployed in Fleek, and accessible via .eth.limo [here](htt
 
 ## Contracts
 
-Our contracts are currently deployed only in testnet, both [Filecoin Calibration](https://calibration.filscan.io/en/address/0x60e097484cd0222a62057ebce6099913f77f8ed2/) & [Ethereum Sepolia](https://sepolia.etherscan.io/address/0x68d95dbe806ce53e011cc7044bbf7385d9519bc3)
+Our contracts are currently deployed only in testnet, both [Filecoin Calibration](https://calibration.filscan.io/en/address/0x60e097484cd0222a62057ebce6099913f77f8ed2/) & [Ethereum Sepolia](https://sepolia.etherscan.io/address/0x7917493b0ed30085a7aE83ef0bD42bBB5F0Ca49E)
 
 ## Technologies & tools
 
