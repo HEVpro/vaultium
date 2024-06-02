@@ -126,7 +126,7 @@ const Navbar = () => {
                             className='hover:text-white'>
                             <Button
                                 className={cn('z-10 relative flex flex-col font-nunito text-lg tracking-wider font-semibold  transition-all duration-300  hover:text-white hover:no-underline',
-                                    link.href !== "/" && link.href === pathname.slice(0, -1) ? "bg-gradient bg-clip-text text-transparent" : "text-white")}
+                                    (link.href !== "/" ? link.href === pathname.slice(0, -1) : link.href === pathname) ? "bg-gradient bg-clip-text text-transparent" : "text-white")}
                                 variant={'link'}
                             >
                                 {link.name}
