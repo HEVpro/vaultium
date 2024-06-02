@@ -4,38 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="01fed59b-d374-45d6-810a-43cd360f87d2" name="Changes" comment="Redirect pipeline to frontend">
-      <change afterPath="$PROJECT_DIR$/.gitingore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/contracts/contracts/Vaultium.sol" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/app/api/upload-game/route.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/components/animatedCheck.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/components/gameCard.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/components/pages/upload/uploadGameCard.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/components/pages/upload/useValidateForm.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/components/pages/upload/validateForm.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/components/ui/badge.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/components/ui/textarea.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/components/uploadGame.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/lib/api.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/lib/types.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/public/game_bg.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.vscode/settings.json" beforeDir="false" afterPath="$PROJECT_DIR$/.vscode/settings.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/contracts/hardhat.config.ts" beforeDir="false" afterPath="$PROJECT_DIR$/contracts/hardhat.config.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/contracts/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/contracts/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/contracts/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/contracts/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/.env.example" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/.env.example" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/.eslintrc.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/.eslintrc.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/app/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/app/upload/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/upload/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/components/navbar.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/components/navbar.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/components/searcher.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/components/searcher.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/lib/abandonwares.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/lib/abandonwares.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/lib/countries.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/lib/countries.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/next.config.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/next.config.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package.json" afterDir="false" />
-    </list>
+    <list default="true" id="01fed59b-d374-45d6-810a-43cd360f87d2" name="Changes" comment="Redirect pipeline to frontend" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -67,7 +36,7 @@
   "keyToString": {
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "Merging mock-contract",
+    "git-widget-placeholder": "UI-animantions",
     "last_opened_file_path": "/Users/hectoresquerdovalverde/Desktop/Projects/freelance/vaultium",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
@@ -87,6 +56,7 @@
       <option name="presentableId" value="Default" />
       <updated>1716132835130</updated>
       <workItem from="1716132836408" duration="713000" />
+      <workItem from="1717343154045" duration="558000" />
     </task>
     <task id="LOCAL-00001" summary="Redirect pipeline to frontend">
       <option name="closed" value="true" />
