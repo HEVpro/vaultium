@@ -1,8 +1,26 @@
+# Sample Hardhat Project
+
+This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, and a Hardhat Ignition module that deploys that contract.
+
+Try running some of the following tasks:
+
+```shell
+npx hardhat help
+npx hardhat test
+REPORT_GAS=true npx hardhat test
+npx hardhat node
+npx hardhat ignition deploy ./ignition/modules/Lock.ts
+```
+
 # Contract deployment
 
 A mock contract has been deployed on this address: [0xE8B07e948168108C8f0BE3bfD448D4a9A9B56596](https://sepolia.etherscan.io/address/0xe8b07e948168108c8f0be3bfd448d4a9a9b56596) - Only for front-end development purposes
 
-The current last version of the contract is deployed on this address: [0x60E097484CD0222A62057EBCe6099913F77f8ED2](https://sepolia.etherscan.io/address/0x60E097484CD0222A62057EBCe6099913F77f8ED2)
+The current last version of the contract is deployed on this address: [0x68d95dbe806ce53e011cc7044bbf7385d9519bc3](https://sepolia.etherscan.io/address/0x68d95dbe806ce53e011cc7044bbf7385d9519bc3)
+
+
+
+
 
 # Contract specs for Vaultium
 
@@ -56,6 +74,8 @@ The current last version of the contract is deployed on this address: [0x60E0974
 
 - game                          : mapping(bytes32 => GameInfo)
 - challenge                     : mapping(bytes32 => Challenge)
+
+// decide if we are storing this or if we store history somewhere else
 - gameVersionHistory            : mapping(bytes32 => GameVersionHistory)
 - gameChallengeHistory          : mapping(bytes32 => GameChallengeHistory)
 

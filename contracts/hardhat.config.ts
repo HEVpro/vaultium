@@ -10,7 +10,7 @@ const etherscanApiKey = "MCDPH2KUQKINYE172UM2R6DTIUCA6ETHJM"
 
 const config: HardhatUserConfig = {
   solidity: {
-    version: "0.8.24",
+    version: "0.8.25",
     settings: {
       optimizer: {
         enabled: true,
@@ -25,11 +25,7 @@ const config: HardhatUserConfig = {
     sepolia: {
       url: "https://rpc.sepolia.org",
       accounts: [deployerPrivateKey]
-    },
-    filecoinCalibration: {
-      url: "https://rpc.ankr.com/filecoin_testnet",
-      accounts: [deployerPrivateKey]
-    },
+    }
   },
 };
 
