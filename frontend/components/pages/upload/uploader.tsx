@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils'
 import { vaultiumContract } from '@/lib/wagmi/vaultiumContract'
 import { motion } from 'framer-motion'
 import { FileBoxIcon } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useWaitForTransactionReceipt, useWriteContract } from 'wagmi'
 import { sepolia } from 'wagmi/chains'
 import lighthouse from '@lighthouse-web3/sdk'
@@ -16,11 +16,15 @@ import lighthouse from '@lighthouse-web3/sdk'
 export default function Uploader({
     game,
     setUploadGame,
+    setUploadingGame,
     setUploadedSuccessfully,
+    setSigningContract
 }: {
     game: Abandonware
     setUploadGame: (value: boolean) => void
+    setUploadingGame: (value: boolean) => void
     setUploadedSuccessfully: (value: boolean) => void
+    setSigningContract: (value: boolean) => void
 }) {
     const [file, setFile] = useState<any | null>(null)
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
@@ -40,6 +44,7 @@ export default function Uploader({
 
     const uploadToLighhouse = async (fileName: string, file: any) => {
         setIsSubmitting(true)
+        setSigningContract(true)
         const formData = new FormData()
         // Extract the file extension
         const fileExtension = fileName.slice(
@@ -62,10 +67,11 @@ export default function Uploader({
             .then((response) => response.json())
             .then((data) => {
                 if (data.Hash) {
-                    setIsSubmitting(false)
-                    setUploadedSuccessfully(true)
-                    setIsSubmitting(false)
-                    setUploadGame(false)
+                    console.log("entra")
+
+                    // setUploadedSuccessfully(true)
+                    // setIsSubmitting(false)
+                    // setUploadGame(false)
                     const ipfsCid = data.Hash
                     writeContract({
                         abi: vaultiumContract.abi,
@@ -79,6 +85,24 @@ export default function Uploader({
             .catch((error) => console.error('Error:', error))
 
     }
+
+
+    useEffect(() => {
+
+        setUploadingGame(isUpdatingChallenge)
+        setUploadedSuccessfully(isConfirmed)
+        if (isUpdatingChallenge) {
+            console.log("SUBIENDO")
+            setSigningContract(false)
+        }
+        if (isConfirmed) {
+            console.log("confirmado")
+            setIsSubmitting(false)
+
+        }
+    }, [isConfirmed, isUpdatingChallenge])
+
+
     return (
         <>
             <motion.div
@@ -143,6 +167,7 @@ export default function Uploader({
                     Cancel
                 </Button>
             </div>
+
         </>
     )
 }
