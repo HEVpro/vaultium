@@ -22,9 +22,9 @@ export default function Uploader({
 }: {
     game: Abandonware
     setUploadGame: (value: boolean) => void
-    setUploadingGame?: (value: boolean) => void
-    setUploadedSuccessfully?: (value: boolean) => void
-    setSigningContract?: (value: boolean) => void
+    setUploadingGame: (value: boolean) => void
+    setUploadedSuccessfully: (value: boolean) => void
+    setSigningContract: (value: boolean) => void
 }) {
     const [file, setFile] = useState<any | null>(null)
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
