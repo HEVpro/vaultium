@@ -11,6 +11,7 @@ import { useState } from 'react'
 import { useReadContract } from 'wagmi'
 import Uploader from '../upload/uploader'
 import { AnimatePresence, motion } from 'framer-motion'
+import GameSkeleton from '@/components/skeletons/gameSkeleton'
 
 export default function GameInfo() {
     const searchParams = useSearchParams()
@@ -19,8 +20,6 @@ export default function GameInfo() {
         useState<boolean>(false)
 
     const [uploadGame, setUploadGame] = useState<boolean>(false)
-
-
 
     if (!gameHash || !gameHash?.startsWith('0x')) {
         redirect('/')
@@ -39,45 +38,7 @@ export default function GameInfo() {
     return (
         <>
             {isPending ? (
-                <AnimatePresence>
-                    <motion.div
-                        initial={{ opacity: 1 }}
-                        animate={{ opacity: 0 }}
-                        transition={{ duration: 0.4, delay: 0.2 }}
-                        className='flex w-full flex-col justify-between gap-8'>
-                        <Skeleton className='bg-gradient h-10 w-1/2 rounded-xl' />
-                        <div className='flex w-full justify-between gap-10'>
-                            <div className='w-1/2 space-y-4'>
-                                <div className='grid w-full grid-cols-3 gap-4'>
-                                    <div className='flex w-full flex-col gap-1'>
-                                        <Skeleton className='bg-gradient h-6 w-1/2 rounded-xl' />
-                                        <Skeleton className='bg-gradient h-6 w-1/2 rounded-xl' />
-                                    </div>
-                                    <div className='flex w-full flex-col gap-1'>
-                                        <Skeleton className='bg-gradient h-6 w-1/2 rounded-xl' />
-                                        <Skeleton className='bg-gradient h-6 w-1/2 rounded-xl' />
-                                    </div>
-                                    <div className='col-span-3 row-start-2 flex w-full flex-col gap-1'>
-                                        <Skeleton className='bg-gradient h-6 w-1/6 rounded-xl' />
-                                        <div className='flex w-full gap-2'>
-                                            <Skeleton className='bg-gradient h-6 w-1/6 rounded-xl' />
-                                            <Skeleton className='bg-gradient h-6 w-1/6 rounded-xl' />
-                                            <Skeleton className='bg-gradient h-6 w-1/6 rounded-xl' />
-                                            <Skeleton className='bg-gradient h-6 w-1/6 rounded-xl' />
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className='w-full space-y-1'>
-                                    <Skeleton className='bg-gradient h-8 w-full rounded-xl' />
-                                    <Skeleton className='bg-gradient h-6 w-full rounded-xl' />
-                                </div>
-                            </div>
-                            <div className='w-1/2'>
-                                <Skeleton className='bg-gradient h-64 w-full rounded-xl' />
-                            </div>
-                        </div>
-                    </motion.div>
-                </AnimatePresence>
+                <GameSkeleton />
             ) : (
                 <AnimatePresence>
                     {abandonware && (
@@ -106,9 +67,7 @@ export default function GameInfo() {
                                             </p>
                                             <p>{abandonware?.publisher}</p>
                                         </div>
-                                        <div
-
-                                            className='col-span-full'>
+                                        <div className='col-span-full'>
                                             <p className='font-nunito text-primary'>
                                                 Genres
                                             </p>
@@ -179,7 +138,7 @@ export default function GameInfo() {
                                 </div>
                             </div>
                             {uploadGame && (
-                                <div className='w-full max-w-lg mt-12'>
+                                <div className='mt-12 w-full max-w-lg'>
                                     <Uploader
                                         game={abandonware}
                                         setUploadGame={setUploadGame}
@@ -192,8 +151,7 @@ export default function GameInfo() {
                         </motion.div>
                     )}
                 </AnimatePresence>
-            )
-            }
+            )}
         </>
     )
 }
