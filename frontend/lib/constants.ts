@@ -28,11 +28,11 @@ export const gameCasterArray = [
     },
 ]
 
-const subgraphName = 'vaultium-sepolia-2'
+const subgraphName = 'vaultium-final-hackfs'
 const graphId = '62919'
 export const graphUrl = `https://api.studio.thegraph.com/query/${graphId}/${subgraphName}/version/latest`
 
-export const contractAddress = '0x68d95dbe806ce53e011cc7044bbf7385d9519bc3'
+export const contractAddress = '0x7917493b0ed30085a7aE83ef0bD42bBB5F0Ca49E'
 
 export const genres = [
     'Action',
