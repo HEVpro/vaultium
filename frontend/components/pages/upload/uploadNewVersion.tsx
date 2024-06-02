@@ -54,13 +54,13 @@ export default function UploadNewVersion({
                 />
             )}
 
-            <div className='w-full flex-col items-center'>
+            <div className='w-full flex-col items-center mt-2'>
                 {signingContract && !uploadedSuccessfully && (
                     <motion.p
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ duration: 0.5 }}
-                        className='mt-2 max-w-[55ch] text-center text-base font-thin text-white'
+                        className='max-w-[55ch] text-center text-base font-thin text-white'
                     >
                         Waiting for Signature...
                     </motion.p>
@@ -70,7 +70,7 @@ export default function UploadNewVersion({
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ duration: 0.5 }}
-                        className='mt-2 max-w-[55ch] text-center text-base font-thin text-white'
+                        className='max-w-[55ch] text-center text-base font-thin text-white'
                     >
                         Your transaction is being processed on the blockchain.
                         This might take a few moments. 🌐🔄
