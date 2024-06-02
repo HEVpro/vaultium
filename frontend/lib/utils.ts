@@ -1,6 +1,7 @@
 import { type ClassValue, clsx } from 'clsx'
 import { twMerge } from 'tailwind-merge'
 import { z } from 'zod';
+import crypto from 'crypto';
 
 export function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs))
@@ -29,3 +30,10 @@ export const optionSchemaNumber = z.object({
     label: z.string(),
     value: z.number(),
 })
+
+export function generateRandomSHA256() {
+    const randomData = crypto.randomBytes(32);
+    const hash = crypto.createHash('sha256');
+    hash.update(randomData);
+    return hash.digest('hex');
+}

@@ -1,3 +1,6 @@
+import { Abandonware } from "./types"
+import { generateRandomSHA256 } from "./utils"
+
 export const gameCasterArray = [
     {
         name: 'gameHash',
@@ -22,7 +25,7 @@ export const gameCasterArray = [
     {
         name: 'genres',
         type: 'uint8[]',
-    }
+    },
 ]
 
 const subgraphName = 'vaultium-sepolia-2'
@@ -44,3 +47,14 @@ export const genres = [
     'Sports',
     'Strategy',
 ]
+
+export const gameExample = {
+    gameHash: generateRandomSHA256(),
+    name: 'Super Mario Bros. 3',
+    genres: [1],
+    publisher: 'Nintendo',
+    year: 1990,
+    country: 'USA',
+    description: '',
+    ipfsCid: '',
+}

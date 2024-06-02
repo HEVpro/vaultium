@@ -68,14 +68,3 @@ const fakeResponses = [
 
 
 
-export async function validateGame(
-    data: any
-): Promise<{ data: any; error: any }> {
-    // TODO: sync with solidity contract -> Galadriel or lilypad
-
-    // TODO: REPLACE BY THE CORRECT ANSWER FROM THE BLOCKCHAIN
-    const randomIndex = Math.floor(Math.random() * fakeResponses.length)
-    const randomResponse = fakeResponses[randomIndex]
-
-    return { data: randomResponse, error: null }
-}

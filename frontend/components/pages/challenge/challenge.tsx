@@ -147,7 +147,7 @@ export default function GameChallenge() {
                             </table>
                         </div>
                         <div className='flex flex-col space-y-6'>
-                            <div className='flex items-end justify-between gap-2'>
+                            <div className='flex items-end justify-between gap-8 leading-5 font-thin'>
                                 <div className='flex flex-col items-start justify-between gap-2'>
                                     <p className=' font-nunito font-thin text-primary'>
                                         Status:

@@ -62,27 +62,6 @@ export default function GameCardResult({
                             </TooltipContent>
                         </Tooltip>
                     </TooltipProvider>
-
-                    {/* TODO: TO BE DELETED */}
-                    {/* <TooltipProvider>
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <button
-                                    // TODO: ADD FUNCTIONALITY TO UPLOAD IMAGE
-                                        onClick={() => setSelectedGame(game)}
-                                        className='cursor-pointer transition duration-500 hover:scale-110 active:scale-90 '
-                                    >
-                                        <ImageUp className='h-5 w-5 stroke-1 text-primary transition duration-500 hover:stroke-2' />
-                                    </button>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                    <p className='text-foreground'>
-                                        Upload a image
-                                    </p>
-                                </TooltipContent>
-                            </Tooltip>
-                        </TooltipProvider> */}
-
                     <Link
                         href={`/game?gameHash=${game.gameHash}`}
                         className=' cursor-pointer transition duration-500 hover:scale-110 active:scale-90 '
