@@ -49,7 +49,7 @@ export const genres = [
 ]
 
 export const gameExample = {
-    gameHash: generateRandomSHA256(),
+    gameHash: '0x46253b76e773f30ef16fbbc8be78706298d0e768cfaee7d43fe8f60ea56aeabf',
     name: 'Super Mario Bros. 3',
     genres: [1],
     publisher: 'Nintendo',

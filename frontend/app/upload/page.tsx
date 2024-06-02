@@ -47,7 +47,7 @@ export default function Page() {
                         <h2 className='text-2xl font-semibold text-primary'>
                             Maybe your a looking this game?
                         </h2>
-                        <div className='relative mt-4 flex w-full items-end  justify-between gap-4'>
+                        <div className='relative mt-4 flex w-full items-start  justify-between gap-4'>
                             <GameCardResult
                                 game={gameResult}
                                 setUploadGame={setUploadGame}

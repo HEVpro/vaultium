@@ -22,9 +22,9 @@ export default function Uploader({
 }: {
     game: Abandonware
     setUploadGame: (value: boolean) => void
-    setUploadingGame: (value: boolean) => void
-    setUploadedSuccessfully: (value: boolean) => void
-    setSigningContract: (value: boolean) => void
+    setUploadingGame?: (value: boolean) => void
+    setUploadedSuccessfully?: (value: boolean) => void
+    setSigningContract?: (value: boolean) => void
 }) {
     const [file, setFile] = useState<any | null>(null)
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
@@ -35,7 +35,7 @@ export default function Uploader({
     const {
         data,
         isLoading: isUpdatingChallenge,
-        isSuccess: isConfirmed,
+        isSuccess: gameIsConfirmed,
     } = useWaitForTransactionReceipt({
         hash,
         confirmations: 2,
@@ -44,7 +44,6 @@ export default function Uploader({
 
     const uploadToLighhouse = async (fileName: string, file: any) => {
         setIsSubmitting(true)
-        setSigningContract(true)
         const formData = new FormData()
         // Extract the file extension
         const fileExtension = fileName.slice(
@@ -67,11 +66,6 @@ export default function Uploader({
             .then((response) => response.json())
             .then((data) => {
                 if (data.Hash) {
-                    console.log("entra")
-
-                    // setUploadedSuccessfully(true)
-                    // setIsSubmitting(false)
-                    // setUploadGame(false)
                     const ipfsCid = data.Hash
                     writeContract({
                         abi: vaultiumContract.abi,
@@ -80,27 +74,27 @@ export default function Uploader({
                         args: [game.gameHash, ipfsCid, 'image not uploaded'],
                         chainId: sepolia.id,
                     })
+                                        setSigningContract(true)
                 }
             })
             .catch((error) => console.error('Error:', error))
 
     }
 
+    useEffect(() => {
+        if(hash){
+            setSigningContract(false)
+            setUploadingGame(true)
+
+        }
+    }, [hash])
 
     useEffect(() => {
-
-        setUploadingGame(isUpdatingChallenge)
-        setUploadedSuccessfully(isConfirmed)
-        if (isUpdatingChallenge) {
-            console.log("SUBIENDO")
-            setSigningContract(false)
+        if(gameIsConfirmed){
+            setUploadingGame(false)
+            setUploadedSuccessfully(true)
         }
-        if (isConfirmed) {
-            console.log("confirmado")
-            setIsSubmitting(false)
-
-        }
-    }, [isConfirmed, isUpdatingChallenge])
+    }, [gameIsConfirmed])
 
 
     return (
@@ -109,7 +103,7 @@ export default function Uploader({
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.5 }}
-                className='mb-0.5 flex items-center gap-2'
+                className='mb-0.5 flex items-center gap-2 mb-4'
             >
                 <div className={'relative h-12  w-60 cursor-pointer'}>
                     <input
@@ -152,7 +146,6 @@ export default function Uploader({
             </p>
             <div className='flex items-center justify-between gap-2'>
                 <Button
-                    // onClick={() => uploadToIPFS(file.name, file)}
                     onClick={() => uploadToLighhouse(file.name, file)}
                     disabled={!file || isSubmitting}
                     className='w-full text-base text-foreground transition duration-300 hover:text-white active:scale-90'
