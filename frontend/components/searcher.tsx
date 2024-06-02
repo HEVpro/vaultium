@@ -30,7 +30,7 @@ const GameList = () => {
     const { ready } = usePrivy()
 
 
-    const gamesNotToInclude = ['banana', 'game', 'test', 'gaming']
+    const gamesNotToInclude = ['banana', 'game', 'test', 'gaming', 'tes', 'text']
 
     useEffect(() => {
         graphClient

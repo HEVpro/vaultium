@@ -31,7 +31,6 @@ export default function Uploader({
 
     const { data: hash, isPending, writeContract } = useWriteContract()
 
-    // TODO: IMPROVE THE WORKFLOW AFTER THE TRANSACTION IS CONFIRMED AFTER INSERT THE IPFSCID
     const {
         data,
         isLoading: isUpdatingChallenge,
