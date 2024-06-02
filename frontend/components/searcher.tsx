@@ -14,11 +14,11 @@ const tokensQuery = gql`
   query{
     gameAddedToSystems{
         genres
-    name
-    publisher
-    year
-    gameHash
-    country
+        name
+        publisher
+        year
+        gameHash
+        country
     }
   }
 `
@@ -51,6 +51,9 @@ const GameList = () => {
                 }).filter((item: any) => {
                     if (debounceGame) {
                         return item.name.toLowerCase().includes(debounceGame.toLowerCase())
+                    } else {
+                        return item.name.toLowerCase()
+
                     }
                 })
                 setGames(results)
